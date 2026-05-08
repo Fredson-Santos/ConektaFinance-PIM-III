@@ -1,0 +1,88 @@
+@startuml Arquitetura_Sistema
+title Arquitetura em Camadas - Conekta
+
+package "Frontend (58D1 - Web Responsivo)" #87CEEB {
+  component [tela-login.html] as login
+  component [tela-dashboard.html] as dashboard
+  component [tela-gastos.html] as gastos
+  component [tela-relatorios.html] as relatorios
+  component [JavaScript/DOM] as js
+}
+
+package "Backend (57D9 - OOP C#)" #98FB98 {
+  component [AuthController] as auth
+  component [TransacaoController] as transacao
+  component [OrcamentoController] as orcamento
+  component [RelatorioController] as relatorio
+  component [AlertaService] as alertas
+  component [AuthService] as authsvc
+}
+
+package "Banco de Dados (57D8 - Modelagem)" #FFB6C6 {
+  database "MySQL/PostgreSQL" {
+    entity usuarios
+    entity categorias
+    entity transacoes
+    entity orcamentos
+    entity alertas
+  }
+}
+
+package "Camada de Dados" #DDA0DD {
+  component [UserRepository] as userrepo
+  component [TransacaoRepository] as tranrepo
+  component [OrcamentoRepository] as orcrepo
+  component [AlertaRepository] as alertrepo
+}
+
+login --> js
+dashboard --> js
+gastos --> js
+relatorios --> js
+
+js --> auth: POST /auth/login
+js --> transacao: CRUD /transacoes
+js --> orcamento: GET /orcamentos
+js --> relatorio: GET /relatorios
+
+auth --> authsvc: Valida credenciais
+authsvc --> userrepo: Busca usuário
+
+transacao --> tranrepo: CRUD transações
+tranrepo --> transacoes
+
+orcamento --> orcrepo: Lê orçamentos
+orcrepo --> orcamentos
+
+relatorio --> tranrepo: Agregações
+relatorio --> orcrepo: Comparações
+relatorio --> alertrepo: Alertas
+
+alertas --> alertrepo: Cria alertas
+alertrepo --> alertas
+
+userrepo --> usuarios
+orcrepo --> orcamentos
+tranrepo --> transacoes
+alertrepo --> alertas
+
+note right of login
+  Autenticação com JWT
+end note
+
+note right of dashboard
+  KPIs: Saldo, Total Gasto,
+  Gastos Registrados, Maior Gasto
+end note
+
+note right of transacao
+  CRUD completo:
+  Create, Read, Update, Delete
+end note
+
+note right of alertas
+  Detecta orçamento excedido
+  e gastos altos
+end note
+
+@enduml

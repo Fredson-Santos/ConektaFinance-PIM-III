@@ -9,6 +9,21 @@ Desenvolvimento de um sistema web completo para um negócio fictício, simulando
 
 ---
 
+# 📚 Disciplinas Abordadas
+
+Este PIM integra as seguintes disciplinas do curso:
+
+1. **Desenvolvimento Web Responsivo** (Frontend HTML/CSS/JavaScript)
+2. **Engenharia de Software Ágil Aplicada** (Metodologia, Planejamento, Sprints)
+3. **Modelagem de Banco de Dados e NoSQL** (DER, SQL, Relacionamentos)
+4. **Programação Orientada a Objetos com C#** (Backend, API, Lógica de Negócio)
+5. **UX e UI Design** (Design System, Protótipos, Experiência do Usuário)
+6. **Machine Learning e Análise de Dados** (Relatórios, Insights, Previsões)
+7. **Comunicação, Liderança e Negociação** (Gestão de Stakeholders, Decisões)
+8. **Língua Brasileira de Sinais - LIBRAS** (Acessibilidade, Inclusão)
+
+---
+
 # 👥 Estrutura da Equipe
 
 ## 🔹 1. Tech Lead / Líder do Projeto
@@ -50,11 +65,11 @@ Desenvolvimento de um sistema web completo para um negócio fictício, simulando
 Definir a empresa fictícia
 
 ### 📦 Entregas:
-- Nome da empresa
-- Segmento
-- Público-alvo
-- Problema a ser resolvido
-- Descrição dos serviços
+- Nome da empresa = **Conekta**
+- Segmento = **Software House**
+- Público-alvo = **Jovens Adultos / Pessoas que querem se organizar financeiramente**
+- Problema a ser resolvido = **Desorganização financeira**
+- Descrição dos serviços = **Sistema de controle financeiro moderno**
 
 ---
 
@@ -63,14 +78,75 @@ Definir a empresa fictícia
 Organizar o projeto
 
 ### 📦 Entregas:
-- Stakeholders
-- Requisitos funcionais
-- Requisitos não funcionais
-- Backlog
-- Priorização (MVP)
+
+#### 👥 Stakeholders:
+- **Usuários Finais:** Jovens adultos (18-35 anos) que buscam organização financeira
+- **Product Owner:** Responsável pela priorização de features
+- **Backend Team:** Desenvolvimento da API em C#
+- **Frontend Team:** Interface web responsiva
+- **Database Engineer:** Modelagem e otimização do banco
+
+#### ✅ Requisitos Funcionais (RF):
+
+**Autenticação:**
+- RF1: Login com email/senha
+- RF2: Sessão de usuário
+
+**Dashboard:**
+- RF3: Visualizar resumo financeiro (4 KPIs)
+- RF4: Gráficos de despesas por categoria (Chart.js)
+- RF5: Tabela de últimas transações
+- RF6: Navegação por sidebar responsiva
+- RF7: Filtro por período (mês/ano)
+
+**Gestão de Gastos:**
+- RF8: Listar todas as despesas com paginação
+- RF9: Criar nova despesa (form modal)
+- RF10: Editar despesa
+- RF11: Deletar despesa
+- RF12: Categorizar gastos (Alimentação, Transporte, Lazer, Saúde, Moradia)
+
+**Relatórios:**
+- RF13: Visualizar KPIs em relatórios (Total, Orçamento, Comparação)
+- RF14: Gráficos básicos de despesas (linha, barra)
+- RF15: Relatório por categoria com progress bar e análise de padrões
+
+#### ⚙️ Requisitos Não Funcionais (RNF):
+
+- RNF1: Design responsivo (mobile-first)
+- RNF2: Design System (cores Verde/Teal, tipografia DM)
+- RNF3: Performance: Carregamento < 2s
+- RNF4: Compatibilidade: Chrome, Firefox, Safari
+- RNF5: Acessibilidade WCAG AA + Suporte a LIBRAS
+- RNF6: Segurança: Autenticação JWT, HTTPS, validação
+- RNF7: Escalabilidade: Suportar até 10k transações
+- RNF8: Documentação Ágil com sprints
+
+#### 📊 Backlog Priorizado:
+
+**P0 - MVP (Sprint 1-2):**
+- Tela de Login (existente, precisa integração backend)
+- Tela de Dashboard (existente, precisa dados reais)
+- CRUD Gastos básico (existente, precisa backend)
+
+**P1 (Sprint 2-3):**
+- Relatórios com gráficos (existente, precisa dados dinâmicos)
+- Sistema de categorias
+- Alertas automáticos
+
+**P2 (Sprint 3+):**
+- IA para insights e previsões
+- Exportação de PDF
+
+#### 📈 Priorização MVP:
+1. **Sprint 1:** Login + Autenticação + Dashboard básico
+2. **Sprint 2:** Gestão de Gastos (CRUD) + Categorias + Persistência
+3. **Sprint 3:** Relatórios dinâmicos + Alertas + Testes
 
 ### 🛠️ Ferramentas:
-- Trello / Notion / Jira
+- 📋 Gestão: Trello / Notion / Jira
+- 💻 Código: GitHub
+- 📝 Documentação: Confluence / Wiki
 
 ---
 
@@ -79,10 +155,101 @@ Organizar o projeto
 Estruturar o banco de dados
 
 ### 📦 Entregas:
-- Modelo conceitual (DER)
-- Modelo lógico
-- Tabelas e relacionamentos
-- Justificativa (SQL ou NoSQL)
+
+#### 📊 Modelo Conceitual (DER):
+**Entidades Principais:**
+- **USUARIO** — Usuários da plataforma
+- **CATEGORIA** — Categorias de gastos
+- **TRANSACAO** — Gastos/Transações
+- **ORCAMENTO** — Orçamentos por categoria
+- **ALERTA** — Sistema de alertas
+
+**Relacionamentos:**
+- USUARIO (1) ↔ (N) TRANSACAO
+- USUARIO (1) ↔ (N) ORCAMENTO
+- USUARIO (1) ↔ (N) ALERTA
+- CATEGORIA (1) ↔ (N) TRANSACAO
+- CATEGORIA (1) ↔ (N) ORCAMENTO
+
+#### 💾 Tabelas SQL (Modelo Lógico):
+
+**usuarios**
+- usuario_id (INT, PK, AUTO_INCREMENT)
+- email (VARCHAR 255, UNIQUE, NOT NULL)
+- senha_hash (VARCHAR 255, NOT NULL)
+- nome_completo (VARCHAR 255, NOT NULL)
+- tipo_conta (VARCHAR 50) — "Conta pessoal"
+- data_criacao (TIMESTAMP DEFAULT NOW())
+- data_atualizacao (TIMESTAMP DEFAULT NOW())
+
+**categorias**
+- categoria_id (INT, PK, AUTO_INCREMENT)
+- nome (VARCHAR 100, NOT NULL) — Alimentação, Transporte, etc
+- descricao (TEXT)
+- codigo_cor (VARCHAR 7) — Código hexadecimal (#27500A)
+- icone (VARCHAR 50) — Nome do ícone SVG
+- data_criacao (TIMESTAMP DEFAULT NOW())
+
+**transacoes**
+- transacao_id (INT, PK, AUTO_INCREMENT)
+- usuario_id (INT, FK → usuarios)
+- categoria_id (INT, FK → categorias)
+- descricao (VARCHAR 255, NOT NULL)
+- valor (DECIMAL 10,2, NOT NULL)
+- data_transacao (DATE, NOT NULL)
+- observacao (TEXT)
+- eh_recorrente (BOOLEAN DEFAULT FALSE)
+- status (VARCHAR 20) — "ativa", "deletada"
+- data_criacao (TIMESTAMP DEFAULT NOW())
+- data_atualizacao (TIMESTAMP DEFAULT NOW())
+
+**orcamentos**
+- orcamento_id (INT, PK, AUTO_INCREMENT)
+- usuario_id (INT, FK → usuarios)
+- categoria_id (INT, FK → categorias)
+- valor_limite (DECIMAL 10,2, NOT NULL)
+- mes_periodo (INT) — Mês (1-12)
+- ano_periodo (INT) — Ano
+- data_criacao (TIMESTAMP DEFAULT NOW())
+- data_atualizacao (TIMESTAMP DEFAULT NOW())
+
+**alertas**
+- alerta_id (INT, PK, AUTO_INCREMENT)
+- usuario_id (INT, FK → usuarios)
+- tipo (VARCHAR 50) — "orcamento_excedido", "gasto_alto"
+- mensagem (TEXT, NOT NULL)
+- categoria_id (INT, FK → categorias) — Opcional
+- foi_lido (BOOLEAN DEFAULT FALSE)
+- data_criacao (TIMESTAMP DEFAULT NOW())
+
+#### 🔑 Índices e Constraints:
+- **UNIQUE:** usuarios(email)
+- **INDEX:** transacoes(usuario_id, data_transacao)
+- **INDEX:** orcamentos(usuario_id, mes_periodo, ano_periodo)
+- **INDEX:** alertas(usuario_id, foi_lido)
+- **FOREIGN KEYS:** Integridade referencial entre tabelas
+
+#### 📋 Justificativa (SQL vs NoSQL):
+**Escolher: SQL (MySQL/PostgreSQL)**
+- ✅ Estrutura relacional clara (Usuario → Transações, Orçamentos)
+- ✅ Integridade de dados com constraints
+- ✅ Queries agregadas para relatórios (SUM, GROUP BY)
+- ✅ ACID compliance para transações financeiras
+- ❌ NoSQL seria inadequado (dados estruturados, relações fortes)
+
+#### 🔗 Relacionamentos e Cardinalidade:
+- 1 USUARIO → N TRANSACOES (um usuário, múltiplos gastos)
+- 1 USUARIO → N ORCAMENTOS (um usuário, múltiplos orçamentos)
+- 1 CATEGORIA → N TRANSACOES (uma categoria, múltiplos gastos)
+- 1 CATEGORIA → N ORCAMENTOS (uma categoria, múltiplo orçamento)
+- Sem relacionamento direto TRANSACAO → ORCAMENTO (validação em aplicação)
+
+#### 📈 Consultas Esperadas:
+- Listar gastos de um usuário (filtro: data, categoria)
+- Calcular total gasto por categoria (GROUP BY)
+- Comparar gastos vs orçamento (JOIN TRANSACAO + ORCAMENTO)
+- Gerar alertas (WHERE valor > valor_limite)
+- Dashboard KPIs (SUM, COUNT, agregações)
 
 ---
 

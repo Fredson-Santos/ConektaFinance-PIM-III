@@ -1,0 +1,109 @@
+@startuml Modelo_Relacional
+title Modelo de Dados Relacional - Conekta
+
+class USUARIO {
+  --Atributos--
+  usuario_id: INT [PK]
+  email: VARCHAR(255) [UNIQUE]
+  senha_hash: VARCHAR(255)
+  nome_completo: VARCHAR(255)
+  tipo_conta: VARCHAR(50)
+  data_criacao: TIMESTAMP
+  data_atualizacao: TIMESTAMP
+  --
+  +autenticar(email, senha): boolean
+  +obterDashboard(): Dashboard
+  +listarTransacoes(): List<Transacao>
+}
+
+class CATEGORIA {
+  --Atributos--
+  categoria_id: INT [PK]
+  nome: VARCHAR(100)
+  descricao: TEXT
+  codigo_cor: VARCHAR(7)
+  icone: VARCHAR(50)
+  data_criacao: TIMESTAMP
+  --
+  +obterCor(): String
+  +obterIcone(): String
+}
+
+class TRANSACAO {
+  --Atributos--
+  transacao_id: INT [PK]
+  usuario_id: INT [FK]
+  categoria_id: INT [FK]
+  descricao: VARCHAR(255)
+  valor: DECIMAL(10,2)
+  data_transacao: DATE
+  observacao: TEXT
+  eh_recorrente: BOOLEAN
+  status: VARCHAR(20)
+  data_criacao: TIMESTAMP
+  data_atualizacao: TIMESTAMP
+  --
+  +validar(): boolean
+  +gerarAlerta(): Alerta
+  +compararComOrcamento(): boolean
+}
+
+class ORCAMENTO {
+  --Atributos--
+  orcamento_id: INT [PK]
+  usuario_id: INT [FK]
+  categoria_id: INT [FK]
+  valor_limite: DECIMAL(10,2)
+  mes_periodo: INT
+  ano_periodo: INT
+  data_criacao: TIMESTAMP
+  data_atualizacao: TIMESTAMP
+  --
+  +obterPercentualUsado(): float
+  +estaExcedido(): boolean
+  +obterRestante(): decimal
+}
+
+class ALERTA {
+  --Atributos--
+  alerta_id: INT [PK]
+  usuario_id: INT [FK]
+  tipo: VARCHAR(50)
+  mensagem: TEXT
+  categoria_id: INT [FK]
+  foi_lido: BOOLEAN
+  data_criacao: TIMESTAMP
+  --
+  +marcarComoLido(): void
+  +obterDescricao(): String
+}
+
+USUARIO "1" --o "N" TRANSACAO: cria
+USUARIO "1" --o "N" ORCAMENTO: define
+USUARIO "1" --o "N" ALERTA: recebe
+CATEGORIA "1" --o "N" TRANSACAO: classifica
+CATEGORIA "1" --o "N" ORCAMENTO: limita
+TRANSACAO "N" ..> "1" ORCAMENTO: valida contra
+TRANSACAO "N" ..> "1" ALERTA: dispara
+
+note bottom of USUARIO
+  Centro do sistema.
+  Autentica e gerencia dados pessoais.
+end note
+
+note bottom of TRANSACAO
+  Registro de cada movimento financeiro.
+  Pode ser ativo, recorrente ou deletado.
+end note
+
+note bottom of ORCAMENTO
+  Limite mensal por categoria.
+  Valida se transação excede limite.
+end note
+
+note bottom of ALERTA
+  Notificações automáticas
+  ao usuário sobre limite/gastos.
+end note
+
+@enduml
