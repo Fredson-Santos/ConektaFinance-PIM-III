@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinanceControl — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green-50: #EAF3DE; --green-100: #C0DD97; --green-200: #97C459;
+    --green-400: #639922; --green-600: #3B6D11; --green-800: #27500A;
+    --teal-50: #E1F5EE; --teal-100: #9FE1CB; --teal-400: #1D9E75; --teal-600: #0F6E56;
+    --amber-50: #FAEEDA; --amber-100: #FAC775; --amber-400: #BA7517; --amber-600: #854F0B;
+    --red-50: #FCEBEB; --red-100: #F7C1C1; --red-400: #E24B4A; --red-600: #A32D2D;
+    --gray-50: #F1EFE8; --gray-100: #D3D1C7; --gray-200: #B4B2A9; --gray-600: #5F5E5A; --gray-800: #444441;
+    --text: #1a1a18; --text-muted: #5F5E5A; --border: rgba(0,0,0,0.08);
+    --bg: #f4f3ef; --white: #ffffff; --sidebar-bg: #27500A;
+    --accent: #3B6D11;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px; min-height: 100vh; background: var(--sidebar-bg);
+    display: flex; flex-direction: column; padding: 1.5rem 1rem; flex-shrink: 0;
+  }
+  .logo { display: flex; align-items: center; gap: 9px; margin-bottom: 2.5rem; padding: 0 0.5rem; }
+  .logo-icon { width: 32px; height: 32px; background: var(--green-100); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .logo-icon svg { width: 18px; height: 18px; }
+  .logo-name { font-family: 'DM Serif Display', serif; font-size: 17px; color: #fff; }
+
+  .nav-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.35); padding: 0 0.5rem; margin-bottom: 0.5rem; margin-top: 1.5rem; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 0.6rem 0.7rem;
+    border-radius: 8px; color: rgba(255,255,255,0.55); font-size: 14px; cursor: pointer;
+    transition: all 0.15s; text-decoration: none; margin-bottom: 2px;
+  }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); }
+  .nav-item.active { background: rgba(255,255,255,0.12); color: #fff; }
+
+  .sidebar-bottom { margin-top: auto; }
+  .user-pill {
+    display: flex; align-items: center; gap: 10px; padding: 0.6rem 0.7rem;
+    border-radius: 8px; background: rgba(255,255,255,0.07);
+  }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--green-200); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--green-800); }
+  .user-info .name { font-size: 13px; font-weight: 500; color: #fff; }
+  .user-info .role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+  /* MAIN */
+  .main { flex: 1; padding: 2rem 2.5rem; overflow-y: auto; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+  .topbar-left h1 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--text); }
+  .topbar-left p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .btn-add {
+    display: flex; align-items: center; gap: 7px; padding: 0.55rem 1rem;
+    background: var(--accent); color: #fff; border: none; border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer;
+  }
+  .btn-add svg { width: 16px; height: 16px; }
+
+  .month-select {
+    display: flex; align-items: center; gap: 8px; padding: 0.5rem 0.9rem;
+    background: var(--white); border: 1px solid var(--border); border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-muted); cursor: pointer;
+  }
+
+  /* CARDS GRID */
+  .cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 1.8rem; }
+
+  .metric-card {
+    background: var(--white); border-radius: 12px; padding: 1.2rem; border: 1px solid var(--border);
+  }
+  .metric-card .mc-label { font-size: 12px; color: var(--text-muted); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 6px; }
+  .metric-card .mc-label svg { width: 14px; height: 14px; }
+  .metric-card .mc-value { font-family: 'DM Serif Display', serif; font-size: 1.8rem; color: var(--text); }
+  .metric-card .mc-sub { font-size: 12px; margin-top: 4px; }
+  .mc-sub.up { color: var(--red-400); }
+  .mc-sub.ok { color: var(--teal-400); }
+  .mc-sub.warn { color: var(--amber-400); }
+
+  .metric-card.accent-green { background: var(--green-800); border-color: var(--green-800); }
+  .metric-card.accent-green .mc-label { color: rgba(255,255,255,0.5); }
+  .metric-card.accent-green .mc-value { color: var(--green-100); }
+  .metric-card.accent-green .mc-sub { color: rgba(255,255,255,0.5); }
+
+  /* CHARTS ROW */
+  .charts-row { display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; margin-bottom: 1.8rem; }
+
+  .chart-card { background: var(--white); border-radius: 12px; padding: 1.4rem; border: 1px solid var(--border); }
+  .chart-card h3 { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 1rem; }
+  .chart-canvas-wrap { position: relative; height: 200px; }
+
+  /* BOTTOM ROW */
+  .bottom-row { display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; }
+
+  .table-card { background: var(--white); border-radius: 12px; padding: 1.4rem; border: 1px solid var(--border); }
+  .table-card h3 { font-size: 14px; font-weight: 500; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+  .table-card h3 a { font-size: 12px; font-weight: 400; color: var(--accent); text-decoration: none; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); padding: 0 0 8px; text-align: left; border-bottom: 1px solid var(--border); }
+  td { font-size: 13px; padding: 9px 0; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+
+  .cat-badge {
+    display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px;
+    border-radius: 20px; font-size: 11px; font-weight: 500;
+  }
+  .cat-food { background: var(--teal-50); color: var(--teal-600); }
+  .cat-transport { background: var(--amber-50); color: var(--amber-600); }
+  .cat-leisure { background: var(--green-50); color: var(--green-600); }
+  .cat-health { background: var(--red-50); color: var(--red-600); }
+
+  .amount-neg { font-weight: 500; color: var(--red-400); }
+
+  /* ALERTS CARD */
+  .alerts-card { background: var(--white); border-radius: 12px; padding: 1.4rem; border: 1px solid var(--border); }
+  .alerts-card h3 { font-size: 14px; font-weight: 500; margin-bottom: 1rem; }
+
+  .alert-item {
+    display: flex; align-items: flex-start; gap: 10px; padding: 10px;
+    border-radius: 8px; margin-bottom: 8px;
+  }
+  .alert-item:last-child { margin-bottom: 0; }
+  .alert-warn { background: var(--amber-50); }
+  .alert-danger { background: var(--red-50); }
+  .alert-ok { background: var(--teal-50); }
+
+  .alert-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .alert-warn .alert-icon { background: var(--amber-100); }
+  .alert-danger .alert-icon { background: var(--red-100); }
+  .alert-ok .alert-icon { background: var(--teal-100); }
+  .alert-icon svg { width: 14px; height: 14px; }
+  .alert-warn .alert-icon svg { stroke: var(--amber-600); }
+  .alert-danger .alert-icon svg { stroke: var(--red-600); }
+  .alert-ok .alert-icon svg { stroke: var(--teal-600); }
+
+  .alert-text .alert-title { font-size: 12px; font-weight: 500; color: var(--text); }
+  .alert-text .alert-desc { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+  /* PROGRESS BAR */
+  .budget-list { }
+  .budget-item { margin-bottom: 14px; }
+  .budget-item:last-child { margin-bottom: 0; }
+  .budget-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .budget-cat { font-size: 13px; font-weight: 500; color: var(--text); }
+  .budget-values { font-size: 12px; color: var(--text-muted); }
+  .progress-bar { height: 6px; background: var(--gray-50); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+  .fill-ok { background: var(--teal-400); }
+  .fill-warn { background: var(--amber-400); }
+  .fill-over { background: var(--red-400); }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#27500A" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 6v6l4 2"/>
+      </svg>
+    </div>
+    <span class="logo-name">FinanceControl</span>
+  </div>
+
+  <span class="nav-label">Principal</span>
+
+  <a class="nav-item active" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+    </svg>
+    Dashboard
+  </a>
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+      <path d="M12 8v4l3 3"/>
+    </svg>
+    Gastos
+  </a>
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M3 7h18M3 12h18M3 17h18"/>
+    </svg>
+    Categorias
+  </a>
+
+  <span class="nav-label">Análise</span>
+
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M18 20V10M12 20V4M6 20v-6"/>
+    </svg>
+    Relatórios
+  </a>
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </svg>
+    Alertas
+  </a>
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+    </svg>
+    IA Simulada
+  </a>
+
+  <div class="sidebar-bottom">
+    <div class="user-pill">
+      <div class="avatar">JS</div>
+      <div class="user-info">
+        <div class="name">João Silva</div>
+        <div class="role">Conta pessoal</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Dashboard</h1>
+      <p>Maio 2025 — visão geral das suas finanças</p>
+    </div>
+    <div class="topbar-right">
+      <div class="month-select">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Maio 2025
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <button class="btn-add">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo gasto
+      </button>
+    </div>
+  </div>
+
+  <div class="cards-grid">
+    <div class="metric-card accent-green">
+      <div class="mc-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Saldo restante
+      </div>
+      <div class="mc-value">R$ 1.240</div>
+      <div class="mc-sub">de R$ 3.000 do orçamento</div>
+    </div>
+    <div class="metric-card">
+      <div class="mc-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Total gasto
+      </div>
+      <div class="mc-value">R$ 1.760</div>
+      <div class="mc-sub up">+12% vs abril</div>
+    </div>
+    <div class="metric-card">
+      <div class="mc-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18l-2 13H5L3 6z"/></svg>
+        Gastos registrados
+      </div>
+      <div class="mc-value">24</div>
+      <div class="mc-sub ok">em 5 categorias</div>
+    </div>
+    <div class="metric-card">
+      <div class="mc-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Maior gasto
+      </div>
+      <div class="mc-value">R$ 650</div>
+      <div class="mc-sub warn">Aluguel — fixo mensal</div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>Evolução dos gastos — últimos 6 meses</h3>
+      <div class="chart-canvas-wrap">
+        <canvas id="lineChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>Distribuição por categoria</h3>
+      <div class="chart-canvas-wrap">
+        <canvas id="doughnutChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-row">
+    <div class="table-card">
+      <h3>Últimos gastos <a href="#">Ver todos →</a></h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Descrição</th>
+            <th>Categoria</th>
+            <th>Data</th>
+            <th style="text-align:right">Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Supermercado Extra</td>
+            <td><span class="cat-badge cat-food">Alimentação</span></td>
+            <td style="color:var(--text-muted)">12/05</td>
+            <td class="amount-neg" style="text-align:right">−R$ 187,50</td>
+          </tr>
+          <tr>
+            <td>Uber — reunião cliente</td>
+            <td><span class="cat-badge cat-transport">Transporte</span></td>
+            <td style="color:var(--text-muted)">11/05</td>
+            <td class="amount-neg" style="text-align:right">−R$ 34,00</td>
+          </tr>
+          <tr>
+            <td>Cinema e jantar</td>
+            <td><span class="cat-badge cat-leisure">Lazer</span></td>
+            <td style="color:var(--text-muted)">10/05</td>
+            <td class="amount-neg" style="text-align:right">−R$ 120,00</td>
+          </tr>
+          <tr>
+            <td>Farmácia São João</td>
+            <td><span class="cat-badge cat-health">Saúde</span></td>
+            <td style="color:var(--text-muted)">09/05</td>
+            <td class="amount-neg" style="text-align:right">−R$ 56,80</td>
+          </tr>
+          <tr>
+            <td>iFood — pizza</td>
+            <td><span class="cat-badge cat-food">Alimentação</span></td>
+            <td style="color:var(--text-muted)">08/05</td>
+            <td class="amount-neg" style="text-align:right">−R$ 67,90</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div class="chart-card" style="flex:1">
+        <h3>Orçamento por categoria</h3>
+        <div class="budget-list">
+          <div class="budget-item">
+            <div class="budget-row">
+              <span class="budget-cat">Alimentação</span>
+              <span class="budget-values">R$ 520 / R$ 700</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill fill-warn" style="width:74%"></div></div>
+          </div>
+          <div class="budget-item">
+            <div class="budget-row">
+              <span class="budget-cat">Transporte</span>
+              <span class="budget-values">R$ 180 / R$ 300</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill fill-ok" style="width:60%"></div></div>
+          </div>
+          <div class="budget-item">
+            <div class="budget-row">
+              <span class="budget-cat">Lazer</span>
+              <span class="budget-values">R$ 310 / R$ 250</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill fill-over" style="width:100%"></div></div>
+          </div>
+          <div class="budget-item">
+            <div class="budget-row">
+              <span class="budget-cat">Saúde</span>
+              <span class="budget-values">R$ 130 / R$ 400</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill fill-ok" style="width:33%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alerts-card">
+        <h3>Alertas</h3>
+        <div class="alert-item alert-danger">
+          <div class="alert-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="alert-text">
+            <div class="alert-title">Lazer acima do limite</div>
+            <div class="alert-desc">Orçamento excedido em R$ 60,00</div>
+          </div>
+        </div>
+        <div class="alert-item alert-warn">
+          <div class="alert-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="alert-text">
+            <div class="alert-title">Alimentação — 74% usado</div>
+            <div class="alert-desc">Restam R$ 180 até o fim do mês</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const lineCtx = document.getElementById('lineChart').getContext('2d');
+new Chart(lineCtx, {
+  type: 'line',
+  data: {
+    labels: ['Dez', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai'],
+    datasets: [{
+      label: 'Gastos (R$)',
+      data: [2100, 1870, 2300, 1950, 1570, 1760],
+      borderColor: '#3B6D11',
+      backgroundColor: 'rgba(59,109,17,0.08)',
+      borderWidth: 2,
+      pointBackgroundColor: '#3B6D11',
+      pointRadius: 4,
+      fill: true,
+      tension: 0.4
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 11 }, color: '#888' } },
+      x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#888' } }
+    }
+  }
+});
+
+const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+new Chart(doughnutCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Alimentação', 'Aluguel', 'Transporte', 'Lazer', 'Saúde'],
+    datasets: [{
+      data: [520, 650, 180, 310, 100],
+      backgroundColor: ['#1D9E75', '#27500A', '#BA7517', '#639922', '#E24B4A'],
+      borderWidth: 0,
+      hoverOffset: 4
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '65%',
+    plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10 } } }
+  }
+});
+</script>
+</body>
+</html>

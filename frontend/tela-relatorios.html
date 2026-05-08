@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinanceControl — Relatórios</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green-50: #EAF3DE; --green-100: #C0DD97; --green-200: #97C459;
+    --green-400: #639922; --green-600: #3B6D11; --green-800: #27500A;
+    --teal-50: #E1F5EE; --teal-100: #9FE1CB; --teal-400: #1D9E75; --teal-600: #0F6E56;
+    --amber-50: #FAEEDA; --amber-100: #FAC775; --amber-400: #BA7517; --amber-600: #854F0B;
+    --red-50: #FCEBEB; --red-100: #F7C1C1; --red-400: #E24B4A; --red-600: #A32D2D;
+    --gray-50: #F1EFE8; --gray-100: #D3D1C7; --gray-200: #B4B2A9; --gray-600: #5F5E5A; --gray-800: #444441;
+    --text: #1a1a18; --text-muted: #5F5E5A; --border: rgba(0,0,0,0.08);
+    --bg: #f4f3ef; --white: #fff; --sidebar-bg: #27500A; --accent: #3B6D11;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+  .sidebar { width: 220px; min-height: 100vh; background: var(--sidebar-bg); display: flex; flex-direction: column; padding: 1.5rem 1rem; flex-shrink: 0; }
+  .logo { display: flex; align-items: center; gap: 9px; margin-bottom: 2.5rem; padding: 0 0.5rem; }
+  .logo-icon { width: 32px; height: 32px; background: var(--green-100); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .logo-icon svg { width: 18px; height: 18px; }
+  .logo-name { font-family: 'DM Serif Display', serif; font-size: 17px; color: #fff; }
+  .nav-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.35); padding: 0 0.5rem; margin-bottom: 0.5rem; margin-top: 1.5rem; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 0.6rem 0.7rem; border-radius: 8px; color: rgba(255,255,255,0.55); font-size: 14px; cursor: pointer; transition: all 0.15s; text-decoration: none; margin-bottom: 2px; }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); }
+  .nav-item.active { background: rgba(255,255,255,0.12); color: #fff; }
+  .sidebar-bottom { margin-top: auto; }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 0.6rem 0.7rem; border-radius: 8px; background: rgba(255,255,255,0.07); }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--green-200); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--green-800); }
+  .user-info .name { font-size: 13px; font-weight: 500; color: #fff; }
+  .user-info .role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+  .main { flex: 1; padding: 2rem 2.5rem; overflow-y: auto; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+  .topbar-left h1 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; }
+  .topbar-left p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+  .topbar-right { display: flex; gap: 10px; }
+  .period-tabs { display: flex; background: var(--white); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .period-tab { padding: 0.45rem 0.9rem; font-size: 13px; color: var(--text-muted); cursor: pointer; border: none; background: transparent; font-family: 'DM Sans', sans-serif; }
+  .period-tab.active { background: var(--accent); color: #fff; }
+
+  .btn-export { display: flex; align-items: center; gap: 6px; padding: 0.45rem 0.9rem; background: var(--white); border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-muted); cursor: pointer; }
+  .btn-export svg { width: 14px; height: 14px; }
+
+  /* KPIs row */
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 1.8rem; }
+  .kpi { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.4rem; }
+  .kpi-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+  .kpi-value { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--text); }
+  .kpi-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 8px; border-radius: 20px; margin-top: 6px; font-weight: 500; }
+  .badge-up { background: var(--red-50); color: var(--red-600); }
+  .badge-ok { background: var(--teal-50); color: var(--teal-600); }
+  .badge-warn { background: var(--amber-50); color: var(--amber-600); }
+
+  /* charts */
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 1.8rem; }
+  .chart-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1.4rem; }
+  .chart-card h3 { font-size: 14px; font-weight: 500; margin-bottom: 1rem; color: var(--text); }
+  .chart-canvas-wrap { height: 220px; position: relative; }
+
+  /* category table */
+  .cat-report { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1.4rem; margin-bottom: 1.8rem; }
+  .cat-report h3 { font-size: 14px; font-weight: 500; margin-bottom: 1.2rem; }
+
+  .cat-rows { }
+  .cat-row {
+    display: grid; grid-template-columns: 200px 1fr 100px 90px 80px;
+    align-items: center; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .cat-row:last-child { border-bottom: none; }
+  .cat-row-head { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); font-weight: 500; padding-bottom: 8px; }
+
+  .cat-info { display: flex; align-items: center; gap: 9px; }
+  .cat-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .cat-name { font-size: 13px; font-weight: 500; }
+
+  .bar-outer { height: 6px; background: var(--gray-50); border-radius: 3px; }
+  .bar-inner { height: 100%; border-radius: 3px; }
+
+  .col-right { text-align: right; font-size: 13px; }
+  .col-spent { font-weight: 500; }
+  .col-budget { color: var(--text-muted); }
+
+  .pct-badge { font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 20px; text-align: center; }
+  .pct-ok { background: var(--teal-50); color: var(--teal-600); }
+  .pct-warn { background: var(--amber-50); color: var(--amber-600); }
+  .pct-over { background: var(--red-50); color: var(--red-600); }
+
+  /* IA insights */
+  .insights { background: var(--green-800); border-radius: 12px; padding: 1.6rem; }
+  .insights h3 { font-family: 'DM Serif Display', serif; font-size: 1.15rem; color: #fff; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 9px; }
+  .insights-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .insight-item { background: rgba(255,255,255,0.07); border-radius: 10px; padding: 1rem; }
+  .insight-icon { width: 30px; height: 30px; background: rgba(255,255,255,0.12); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.7rem; }
+  .insight-icon svg { width: 16px; height: 16px; stroke: var(--green-100); }
+  .insight-text { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.5; }
+  .insight-text strong { color: var(--green-100); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#27500A" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+    <span class="logo-name">FinanceControl</span>
+  </div>
+  <span class="nav-label">Principal</span>
+  <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+  <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Gastos</a>
+  <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 7h18M3 12h18M3 17h18"/></svg>Categorias</a>
+  <span class="nav-label">Análise</span>
+  <a class="nav-item active" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Relatórios</a>
+  <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Alertas</a>
+  <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3"/></svg>IA Simulada</a>
+  <div class="sidebar-bottom">
+    <div class="user-pill">
+      <div class="avatar">JS</div>
+      <div class="user-info"><div class="name">João Silva</div><div class="role">Conta pessoal</div></div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Relatórios</h1>
+      <p>Análise detalhada dos seus gastos</p>
+    </div>
+    <div class="topbar-right">
+      <div class="period-tabs">
+        <button class="period-tab">Semana</button>
+        <button class="period-tab active">Mês</button>
+        <button class="period-tab">Trimestre</button>
+        <button class="period-tab">Ano</button>
+      </div>
+      <button class="btn-export">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar PDF
+      </button>
+    </div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi">
+      <div class="kpi-label">Total gasto — Maio 2025</div>
+      <div class="kpi-value">R$ 1.760</div>
+      <div class="kpi-badge badge-up">↑ 12% vs abril</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Orçamento mensal</div>
+      <div class="kpi-value">R$ 3.000</div>
+      <div class="kpi-badge badge-ok">59% utilizado</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Saldo restante</div>
+      <div class="kpi-value">R$ 1.240</div>
+      <div class="kpi-badge badge-ok">18 dias restantes</div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>Gastos diários — Maio 2025</h3>
+      <div class="chart-canvas-wrap"><canvas id="barChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Comparativo mensal (R$)</h3>
+      <div class="chart-canvas-wrap"><canvas id="compareChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="cat-report">
+    <h3>Relatório por categoria — Maio 2025</h3>
+    <div class="cat-rows">
+      <div class="cat-row cat-row-head">
+        <span>Categoria</span>
+        <span>Progresso</span>
+        <span style="text-align:right">Gasto</span>
+        <span style="text-align:right">Orçamento</span>
+        <span style="text-align:center">% Usado</span>
+      </div>
+      <div class="cat-row">
+        <div class="cat-info"><div class="cat-dot" style="background:#1D9E75"></div><span class="cat-name">Alimentação</span></div>
+        <div class="bar-outer"><div class="bar-inner" style="width:74%;background:#1D9E75"></div></div>
+        <div class="col-right col-spent">R$ 520</div>
+        <div class="col-right col-budget">R$ 700</div>
+        <div style="text-align:center"><span class="pct-badge pct-warn">74%</span></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-info"><div class="cat-dot" style="background:#27500A"></div><span class="cat-name">Moradia</span></div>
+        <div class="bar-outer"><div class="bar-inner" style="width:100%;background:#27500A"></div></div>
+        <div class="col-right col-spent">R$ 650</div>
+        <div class="col-right col-budget">R$ 650</div>
+        <div style="text-align:center"><span class="pct-badge pct-ok">100%</span></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-info"><div class="cat-dot" style="background:#BA7517"></div><span class="cat-name">Transporte</span></div>
+        <div class="bar-outer"><div class="bar-inner" style="width:60%;background:#BA7517"></div></div>
+        <div class="col-right col-spent">R$ 180</div>
+        <div class="col-right col-budget">R$ 300</div>
+        <div style="text-align:center"><span class="pct-badge pct-ok">60%</span></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-info"><div class="cat-dot" style="background:#E24B4A"></div><span class="cat-name">Lazer</span></div>
+        <div class="bar-outer"><div class="bar-inner" style="width:100%;background:#E24B4A"></div></div>
+        <div class="col-right col-spent" style="color:var(--red-400)">R$ 310</div>
+        <div class="col-right col-budget">R$ 250</div>
+        <div style="text-align:center"><span class="pct-badge pct-over">124%</span></div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-info"><div class="cat-dot" style="background:#639922"></div><span class="cat-name">Saúde</span></div>
+        <div class="bar-outer"><div class="bar-inner" style="width:33%;background:#639922"></div></div>
+        <div class="col-right col-spent">R$ 130</div>
+        <div class="col-right col-budget">R$ 400</div>
+        <div style="text-align:center"><span class="pct-badge pct-ok">33%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insights">
+    <h3>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green-100)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Insights da IA Simulada
+    </h3>
+    <div class="insights-grid">
+      <div class="insight-item">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
+        <div class="insight-text">Seu gasto com <strong>Lazer</strong> está 24% acima do orçamento definido. Considere reduzir saídas na segunda quinzena.</div>
+      </div>
+      <div class="insight-item">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 6v6l4 2"/></svg></div>
+        <div class="insight-text">Mantendo o ritmo atual, você vai <strong>economizar R$ 1.240</strong> este mês — ótimo desempenho geral.</div>
+      </div>
+      <div class="insight-item">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 6h18l-2 13H5L3 6z"/></svg></div>
+        <div class="insight-text"><strong>Alimentação</strong> consome 30% do total gasto. Compras no supermercado representam a maior parte.</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const barCtx = document.getElementById('barChart').getContext('2d');
+new Chart(barCtx, {
+  type: 'bar',
+  data: {
+    labels: ['1','2','3','4','5','6','7','8','9','10','11','12'],
+    datasets: [{
+      label: 'Gastos (R$)',
+      data: [0,0,0,0,650,0,0,56.8,67.9,120,34,187.5],
+      backgroundColor: '#3B6D11',
+      borderRadius: 4,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 11 }, color: '#888' } },
+      x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#888' } }
+    }
+  }
+});
+
+const compareCtx = document.getElementById('compareChart').getContext('2d');
+new Chart(compareCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Dez', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai'],
+    datasets: [
+      { label: 'Gasto', data: [2100, 1870, 2300, 1950, 1570, 1760], backgroundColor: '#3B6D11', borderRadius: 4 },
+      { label: 'Orçamento', data: [3000, 3000, 3000, 3000, 3000, 3000], backgroundColor: 'rgba(59,109,17,0.15)', borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10 } } },
+    scales: {
+      y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 11 }, color: '#888' } },
+      x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#888' } }
+    }
+  }
+});
+</script>
+</body>
+</html>

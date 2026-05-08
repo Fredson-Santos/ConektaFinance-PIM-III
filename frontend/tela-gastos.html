@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinanceControl — Gastos</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green-50: #EAF3DE; --green-100: #C0DD97; --green-200: #97C459;
+    --green-600: #3B6D11; --green-800: #27500A;
+    --teal-50: #E1F5EE; --teal-400: #1D9E75; --teal-600: #0F6E56;
+    --amber-50: #FAEEDA; --amber-100: #FAC775; --amber-400: #BA7517; --amber-600: #854F0B;
+    --red-50: #FCEBEB; --red-400: #E24B4A; --red-600: #A32D2D;
+    --gray-50: #F1EFE8; --gray-100: #D3D1C7; --gray-200: #B4B2A9; --gray-600: #5F5E5A; --gray-800: #444441;
+    --text: #1a1a18; --text-muted: #5F5E5A; --border: rgba(0,0,0,0.09);
+    --bg: #f4f3ef; --white: #fff; --sidebar-bg: #27500A; --accent: #3B6D11;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 220px; min-height: 100vh; background: var(--sidebar-bg);
+    display: flex; flex-direction: column; padding: 1.5rem 1rem; flex-shrink: 0;
+  }
+  .logo { display: flex; align-items: center; gap: 9px; margin-bottom: 2.5rem; padding: 0 0.5rem; }
+  .logo-icon { width: 32px; height: 32px; background: var(--green-100); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .logo-icon svg { width: 18px; height: 18px; }
+  .logo-name { font-family: 'DM Serif Display', serif; font-size: 17px; color: #fff; }
+  .nav-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.35); padding: 0 0.5rem; margin-bottom: 0.5rem; margin-top: 1.5rem; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 0.6rem 0.7rem; border-radius: 8px; color: rgba(255,255,255,0.55); font-size: 14px; cursor: pointer; transition: all 0.15s; text-decoration: none; margin-bottom: 2px; }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); }
+  .nav-item.active { background: rgba(255,255,255,0.12); color: #fff; }
+  .sidebar-bottom { margin-top: auto; }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 0.6rem 0.7rem; border-radius: 8px; background: rgba(255,255,255,0.07); }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--green-200); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--green-800); }
+  .user-info .name { font-size: 13px; font-weight: 500; color: #fff; }
+  .user-info .role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+  .main { flex: 1; padding: 2rem 2.5rem; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+  .topbar-left h1 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; }
+  .topbar-left p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+  .btn-add { display: flex; align-items: center; gap: 7px; padding: 0.55rem 1rem; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; }
+
+  .content-grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
+
+  /* TABLE SIDE */
+  .expenses-card { background: var(--white); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+
+  .expenses-toolbar {
+    display: flex; align-items: center; gap: 12px; padding: 1rem 1.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .search-box {
+    display: flex; align-items: center; gap: 8px; flex: 1;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.45rem 0.9rem;
+  }
+  .search-box svg { width: 15px; height: 15px; color: var(--text-muted); flex-shrink: 0; }
+  .search-box input { border: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); outline: none; width: 100%; }
+
+  .filter-btn {
+    display: flex; align-items: center; gap: 6px; padding: 0.45rem 0.9rem;
+    background: var(--white); border: 1px solid var(--border); border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-muted); cursor: pointer;
+  }
+  .filter-btn svg { width: 14px; height: 14px; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--gray-50); }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); padding: 10px 1.4rem; text-align: left; font-weight: 500; }
+  td { font-size: 13px; padding: 12px 1.4rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--gray-50); }
+
+  .cat-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .cat-food { background: var(--teal-50); color: var(--teal-600); }
+  .cat-transport { background: var(--amber-50); color: var(--amber-600); }
+  .cat-leisure { background: var(--green-50); color: var(--green-600); }
+  .cat-health { background: var(--red-50); color: var(--red-600); }
+  .cat-housing { background: #F1EFE8; color: #444441; }
+
+  .amount { font-weight: 500; color: var(--red-400); }
+
+  .actions { display: flex; gap: 6px; opacity: 0; transition: opacity 0.15s; }
+  tr:hover .actions { opacity: 1; }
+  .action-btn { width: 28px; height: 28px; border-radius: 6px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .action-btn svg { width: 13px; height: 13px; color: var(--text-muted); }
+  .action-btn:hover { background: var(--red-50); border-color: var(--red-400); }
+  .action-btn:hover svg { color: var(--red-400); }
+  .action-btn.edit:hover { background: var(--green-50); border-color: var(--green-600); }
+  .action-btn.edit:hover svg { color: var(--green-600); }
+
+  /* FORM SIDE */
+  .form-card { background: var(--white); border-radius: 12px; border: 1px solid var(--border); padding: 1.6rem; height: fit-content; position: sticky; top: 2rem; }
+  .form-card h3 { font-family: 'DM Serif Display', serif; font-size: 1.25rem; margin-bottom: 1.4rem; }
+
+  .field { margin-bottom: 1.1rem; }
+  .field label { display: block; font-size: 12px; font-weight: 500; color: var(--gray-800); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .field input, .field select, .field textarea {
+    width: 100%; border: 1px solid var(--border); border-radius: 8px;
+    padding: 0 12px; height: 42px; font-family: 'DM Sans', sans-serif; font-size: 14px;
+    color: var(--text); background: var(--bg); outline: none; transition: border-color 0.15s, background 0.15s;
+  }
+  .field input:focus, .field select:focus { border-color: var(--accent); background: #fff; }
+  .field textarea { height: 70px; padding: 10px 12px; resize: none; }
+
+  .amount-field { position: relative; }
+  .amount-field .prefix { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--text-muted); font-weight: 500; }
+  .amount-field input { padding-left: 36px; font-size: 18px; font-weight: 500; color: var(--text); }
+
+  .row-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .form-divider { height: 1px; background: var(--border); margin: 1.2rem 0; }
+
+  .btn-row { display: flex; gap: 10px; }
+  .btn-primary { flex: 1; height: 44px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; }
+  .btn-secondary { height: 44px; padding: 0 1rem; background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; }
+
+  .recurrence { display: flex; align-items: center; gap: 10px; }
+  .toggle { position: relative; width: 38px; height: 22px; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: var(--gray-100); border-radius: 22px; transition: background 0.2s; }
+  .toggle-slider::before { content: ''; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
+  .toggle input:checked + .toggle-slider { background: var(--accent); }
+  .toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+  .toggle-label { font-size: 13px; color: var(--text-muted); }
+
+  .pagination { display: flex; align-items: center; justify-content: space-between; padding: 12px 1.4rem; border-top: 1px solid var(--border); }
+  .pagination-info { font-size: 12px; color: var(--text-muted); }
+  .pagination-btns { display: flex; gap: 6px; }
+  .page-btn { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-muted); }
+  .page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .page-btn svg { width: 14px; height: 14px; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#27500A" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+      </svg>
+    </div>
+    <span class="logo-name">FinanceControl</span>
+  </div>
+
+  <span class="nav-label">Principal</span>
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </a>
+  <a class="nav-item active" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    Gastos
+  </a>
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+    Categorias
+  </a>
+
+  <span class="nav-label">Análise</span>
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+    Relatórios
+  </a>
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    Alertas
+  </a>
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3"/></svg>
+    IA Simulada
+  </a>
+
+  <div class="sidebar-bottom">
+    <div class="user-pill">
+      <div class="avatar">JS</div>
+      <div class="user-info">
+        <div class="name">João Silva</div>
+        <div class="role">Conta pessoal</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Gastos</h1>
+      <p>24 lançamentos em maio 2025</p>
+    </div>
+    <button class="btn-add">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Novo gasto
+    </button>
+  </div>
+
+  <div class="content-grid">
+    <div>
+      <div class="expenses-card">
+        <div class="expenses-toolbar">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Buscar gasto...">
+          </div>
+          <button class="filter-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+            Filtrar
+          </button>
+          <button class="filter-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Maio 2025
+          </button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Descrição</th>
+              <th>Categoria</th>
+              <th>Data</th>
+              <th style="text-align:right">Valor</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="font-weight:500">Supermercado Extra</strong><br><span style="font-size:11px;color:var(--text-muted)">Compra mensal</span></td>
+              <td><span class="cat-badge cat-food">Alimentação</span></td>
+              <td style="color:var(--text-muted)">12/05/2025</td>
+              <td class="amount" style="text-align:right">−R$ 187,50</td>
+              <td><div class="actions"><button class="action-btn edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button></div></td>
+            </tr>
+            <tr>
+              <td><strong style="font-weight:500">Uber — reunião cliente</strong><br><span style="font-size:11px;color:var(--text-muted)">Corrida</span></td>
+              <td><span class="cat-badge cat-transport">Transporte</span></td>
+              <td style="color:var(--text-muted)">11/05/2025</td>
+              <td class="amount" style="text-align:right">−R$ 34,00</td>
+              <td><div class="actions"><button class="action-btn edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button></div></td>
+            </tr>
+            <tr>
+              <td><strong style="font-weight:500">Cinema e jantar</strong><br><span style="font-size:11px;color:var(--text-muted)">Final de semana</span></td>
+              <td><span class="cat-badge cat-leisure">Lazer</span></td>
+              <td style="color:var(--text-muted)">10/05/2025</td>
+              <td class="amount" style="text-align:right">−R$ 120,00</td>
+              <td><div class="actions"><button class="action-btn edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button></div></td>
+            </tr>
+            <tr>
+              <td><strong style="font-weight:500">Farmácia São João</strong><br><span style="font-size:11px;color:var(--text-muted)">Medicamentos</span></td>
+              <td><span class="cat-badge cat-health">Saúde</span></td>
+              <td style="color:var(--text-muted)">09/05/2025</td>
+              <td class="amount" style="text-align:right">−R$ 56,80</td>
+              <td><div class="actions"><button class="action-btn edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button></div></td>
+            </tr>
+            <tr>
+              <td><strong style="font-weight:500">iFood — pizza</strong><br><span style="font-size:11px;color:var(--text-muted)">Delivery</span></td>
+              <td><span class="cat-badge cat-food">Alimentação</span></td>
+              <td style="color:var(--text-muted)">08/05/2025</td>
+              <td class="amount" style="text-align:right">−R$ 67,90</td>
+              <td><div class="actions"><button class="action-btn edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button></div></td>
+            </tr>
+            <tr>
+              <td><strong style="font-weight:500">Aluguel — maio</strong><br><span style="font-size:11px;color:var(--text-muted)">Fixo mensal</span></td>
+              <td><span class="cat-badge cat-housing">Moradia</span></td>
+              <td style="color:var(--text-muted)">05/05/2025</td>
+              <td class="amount" style="text-align:right">−R$ 650,00</td>
+              <td><div class="actions"><button class="action-btn edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button></div></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination">
+          <span class="pagination-info">Mostrando 6 de 24 registros</span>
+          <div class="pagination-btns">
+            <button class="page-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <div class="form-card">
+      <h3>Registrar gasto</h3>
+
+      <div class="field">
+        <label>Valor</label>
+        <div class="amount-field">
+          <span class="prefix">R$</span>
+          <input type="number" placeholder="0,00">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Descrição</label>
+        <input type="text" placeholder="Ex: Supermercado, Uber...">
+      </div>
+
+      <div class="row-two">
+        <div class="field">
+          <label>Categoria</label>
+          <select>
+            <option>Alimentação</option>
+            <option>Transporte</option>
+            <option>Lazer</option>
+            <option>Saúde</option>
+            <option>Moradia</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Data</label>
+          <input type="date" value="2025-05-12">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Observação (opcional)</label>
+        <textarea placeholder="Detalhes adicionais..."></textarea>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div style="margin-bottom:1.2rem">
+        <div class="recurrence">
+          <label class="toggle">
+            <input type="checkbox">
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-label">Gasto recorrente (mensal)</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-secondary">Limpar</button>
+        <button class="btn-primary">Salvar gasto</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>
