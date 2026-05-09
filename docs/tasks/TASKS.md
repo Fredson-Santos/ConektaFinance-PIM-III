@@ -240,16 +240,16 @@
   - [x] Banco de dados: **SQLite** (portabilidade, zero config) ✅
   - [x] Stack definida: .NET 8, EF Core 8, JWT, BCrypt, FluentValidation ✅
 
-- [ ] TASK-010.1: Setup projeto .NET
-  - [ ] Criar projeto: `dotnet new web -n PIM-III-Backend`
-  - [ ] Estrutura de pastas: API, Application, Domain, Infrastructure, Common
-  - [ ] Instalar NuGet packages (SQLite, JWT, BCrypt, FluentValidation, Swagger)
-  - [ ] appsettings.json configurado (Data Source=financeiro.db)
+- [x] TASK-010.1: Setup projeto .NET
+  - [x] Criar projeto: `dotnet new web -n PIM-III-Backend`
+  - [x] Estrutura de pastas: API, Application, Domain, Infrastructure, Common
+  - [x] Instalar NuGet packages (SQLite, JWT, BCrypt, FluentValidation, Swagger)
+  - [x] appsettings.json configurado (Data Source=financeiro.db)
 
-- [ ] TASK-010.2: Banco de dados
-  - [ ] AppDbContext com `UseSqlite()`
-  - [ ] Migrations automatizadas (`dotnet ef migrations add InitialCreate`)
-  - [ ] Seed de categorias padrão
+- [x] TASK-010.2: Banco de dados
+  - [x] AppDbContext com `UseSqlite()`
+  - [x] Migrations automatizadas (`dotnet ef migrations add InitialCreate`)
+  - [x] Seed de categorias padrão
 
 - [ ] TASK-010.3: Autenticação JWT
   - [ ] Middleware JWT
