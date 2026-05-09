@@ -112,23 +112,24 @@
   - [x] Breakpoints: 375px (mobile), 768px (tablet), 1024px (desktop)
   - [x] Arquivo: `docs/design-system.md` ✅
 
-- [x] TASK-006.2: Protótipos HTML (4 telas MVP)
+- [x] TASK-006.2: Protótipos HTML (5 telas MVP)
   - [x] Tela Login (HTML + CSS, responsive) ✅
   - [x] Tela Cadastro (HTML + CSS, responsive) ✅
   - [x] Tela Dashboard (HTML + CSS, responsive, sem API) ✅
   - [x] Tela Gastos (HTML + CSS, responsive, sem API) ✅
+  - [x] Tela Relatórios (HTML + CSS, responsive, sem API) ✅
   - [x] CSS semântico com variáveis do design system ✅
   - [x] Mobile-first: 375px, 768px, 1024px ✅
 
 **Entrada:** Personas (TASK-005)  
-**Saída:** `docs/design-system.md` + 4 telas HTML/CSS responsivas (protótipos estáticos) ✅
+**Saída:** `docs/design-system.md` + 5 telas HTML/CSS responsivas (protótipos estáticos) ✅
 
 ---
 
 ## 🔴 FASE 5 — Desenvolvimento Frontend [🔴 EM ANDAMENTO]
 
 ### TASK-007: Modal Criar/Editar Gasto + Tela Categorias
-**Status:** ⏳ Não iniciado  
+**Status:** 🟡 Em andamento  
 **Prioridade:** P0  
 **Assignee:** Frontend Developer
 
@@ -226,19 +227,28 @@
 ## 🔴 FASE 5B — Desenvolvimento Backend [NÃO INICIADO]
 
 ### TASK-010: Estrutura Base .NET + Autenticação JWT
-**Status:** ⏳ Não iniciado  
+**Status:** 🟡 Em andamento — Setup iniciado em 09/05  
 **Prioridade:** P0  
 **Assignee:** Backend Developer
 
+> **🏗️ Arquitetura Definida:** ASP.NET Core com **Controllers** + **SQLite** (EF Core 8).
+> Documentação completa em `.project/TASK-010-ARQUITETURA.md`.
+
 #### Subtasks:
+- [x] TASK-010.0: Definição de arquitetura
+  - [x] Padrão de API: Controllers (vs Minimal API) → Controllers ✅
+  - [x] Banco de dados: **SQLite** (portabilidade, zero config) ✅
+  - [x] Stack definida: .NET 8, EF Core 8, JWT, BCrypt, FluentValidation ✅
+
 - [ ] TASK-010.1: Setup projeto .NET
-  - [ ] Criar solução C# (.NET 6+)
-  - [ ] Estrutura: Models, Controllers, Services, Data
-  - [ ] appsettings.json configurado
+  - [ ] Criar projeto: `dotnet new web -n PIM-III-Backend`
+  - [ ] Estrutura de pastas: API, Application, Domain, Infrastructure, Common
+  - [ ] Instalar NuGet packages (SQLite, JWT, BCrypt, FluentValidation, Swagger)
+  - [ ] appsettings.json configurado (Data Source=financeiro.db)
 
 - [ ] TASK-010.2: Banco de dados
-  - [ ] Entity Framework Core + MySQL/PostgreSQL
-  - [ ] Migrations automatizadas
+  - [ ] AppDbContext com `UseSqlite()`
+  - [ ] Migrations automatizadas (`dotnet ef migrations add InitialCreate`)
   - [ ] Seed de categorias padrão
 
 - [ ] TASK-010.3: Autenticação JWT
@@ -248,7 +258,8 @@
   - [ ] Refresh token
 
 **Entrada:** Modelo de dados (TASK-004)  
-**Saída:** API base com autenticação funcionando
+**Saída:** API base com autenticação funcionando  
+**Referência:** `.project/TASK-010-ARQUITETURA.md`
 
 ---
 
