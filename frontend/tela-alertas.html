@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ConektaFinance — Alertas</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green-50: #EAF3DE; --green-100: #C0DD97; --green-200: #97C459;
+    --green-600: #3B6D11; --green-800: #27500A;
+    --amber-50: #FAEEDA; --amber-100: #FAC775; --amber-400: #BA7517; --amber-600: #854F0B;
+    --red-50: #FCEBEB; --red-400: #E24B4A; --red-600: #A32D2D;
+    --gray-50: #F1EFE8; --gray-100: #D3D1C7; --gray-200: #B4B2A9; --gray-600: #5F5E5A; --gray-800: #444441;
+    --text: #1a1a18; --text-muted: #5F5E5A; --border: rgba(0,0,0,0.08);
+    --bg: #f4f3ef; --white: #fff; --sidebar-bg: #27500A; --accent: #3B6D11;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+  /* SIDEBAR REUSÁVEL */
+  .sidebar { width: 220px; min-height: 100vh; background: var(--sidebar-bg); display: flex; flex-direction: column; padding: 1.5rem 1rem; flex-shrink: 0; }
+  .logo { display: flex; align-items: center; gap: 9px; margin-bottom: 2.5rem; padding: 0 0.5rem; }
+  .logo-icon { width: 32px; height: 32px; background: var(--green-100); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .logo-icon svg { width: 18px; height: 18px; }
+  .logo-name { font-family: 'DM Serif Display', serif; font-size: 17px; color: #fff; }
+  .nav-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.35); padding: 0 0.5rem; margin-bottom: 0.5rem; margin-top: 1.5rem; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 0.6rem 0.7rem; border-radius: 8px; color: rgba(255,255,255,0.55); font-size: 14px; cursor: pointer; transition: all 0.15s; text-decoration: none; margin-bottom: 2px; }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); }
+  .nav-item.active { background: rgba(255,255,255,0.12); color: #fff; }
+  .sidebar-bottom { margin-top: auto; }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 0.6rem 0.7rem; border-radius: 8px; background: rgba(255,255,255,0.07); }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--green-200); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--green-800); }
+  .user-info .name { font-size: 13px; font-weight: 500; color: #fff; }
+  .user-info .role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+  .main { flex: 1; padding: 2rem 2.5rem; overflow-y: auto; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+  .topbar-left h1 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; }
+  .topbar-left p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+  .toolbar { display: flex; gap: 10px; margin-bottom: 1.5rem; }
+  .filter-btn { display: flex; align-items: center; gap: 6px; padding: 0.45rem 1rem; background: var(--white); border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-muted); cursor: pointer; }
+  .filter-btn.active { background: var(--gray-50); color: var(--text); font-weight: 500; border-color: var(--gray-200); }
+
+  /* ALERT CARDS */
+  .alerts-list { display: flex; flex-direction: column; gap: 12px; max-width: 800px; }
+  .alert-card {
+    background: var(--white); border: 1px solid var(--border); border-radius: 12px;
+    padding: 1.2rem 1.5rem; display: flex; gap: 16px; align-items: flex-start;
+    transition: box-shadow 0.2s; position: relative; overflow: hidden;
+  }
+  .alert-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+  .alert-card.unread::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent);
+  }
+
+  .alert-icon {
+    width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .alert-icon svg { width: 20px; height: 20px; }
+
+  /* VARIATIONS */
+  .alert-danger .alert-icon { background: var(--red-50); color: var(--red-600); }
+  .alert-danger.unread::before { background: var(--red-400); }
+  
+  .alert-warning .alert-icon { background: var(--amber-50); color: var(--amber-600); }
+  .alert-warning.unread::before { background: var(--amber-400); }
+
+  .alert-info .alert-icon { background: var(--green-50); color: var(--green-600); }
+  .alert-info.unread::before { background: var(--green-400); }
+
+  .alert-content { flex: 1; }
+  .alert-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .alert-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .alert-time { font-size: 12px; color: var(--text-muted); }
+  .alert-message { font-size: 13.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; }
+
+  .alert-actions { display: flex; gap: 8px; }
+  .btn-action { 
+    display: flex; align-items: center; gap: 5px; padding: 0.35rem 0.7rem; 
+    border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; 
+  }
+  .btn-read { background: var(--gray-50); border: 1px solid var(--border); color: var(--text-muted); }
+  .btn-read:hover { background: var(--gray-100); color: var(--text); }
+  .btn-del { background: transparent; border: 1px solid transparent; color: var(--text-muted); }
+  .btn-del:hover { color: var(--red-400); background: var(--red-50); }
+
+  /* RESPONSIVE */
+  @media (max-width: 1023px) {
+    .sidebar { width: 180px; padding: 1rem 0.75rem; }
+    .logo-name { font-size: 15px; }
+    .nav-item { padding: 0.5rem 0.6rem; font-size: 13px; }
+    .main { padding: 1.5rem 2rem; }
+  }
+
+  @media (max-width: 767px) {
+    body { flex-direction: column; }
+    .sidebar { width: 100%; min-height: auto; flex-direction: row; align-items: center; padding: 1rem; overflow-x: auto; }
+    .logo { margin-bottom: 0; margin-right: 1rem; flex-shrink: 0; }
+    .logo-name { font-size: 14px; }
+    .nav-label { display: none; }
+    .nav-item { padding: 0.4rem 0.6rem; font-size: 12px; flex-shrink: 0; }
+    .sidebar-bottom { display: none; }
+
+    .main { padding: 1rem; }
+    .alert-card { flex-direction: column; padding: 1rem; gap: 12px; }
+    .alert-icon { width: 36px; height: 36px; }
+    .alert-header { flex-direction: column; align-items: flex-start; gap: 2px; }
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#27500A" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+    <span class="logo-name">ConektaFinance</span>
+  </div>
+  <span class="nav-label">Principal</span>
+  <a class="nav-item" href="tela-dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+  <a class="nav-item" href="tela-gastos.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Gastos</a>
+  <a class="nav-item" href="tela-categorias.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 7h18M3 12h18M3 17h18"/></svg>Categorias</a>
+  <span class="nav-label">Análise</span>
+  <a class="nav-item" href="tela-relatorios.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Relatórios</a>
+  <a class="nav-item active" href="tela-alertas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Alertas</a>
+  <a class="nav-item" href="tela-insights.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3"/></svg>IA Simulada</a>
+  <div class="sidebar-bottom">
+    <div class="user-pill"><div class="avatar">JS</div><div class="user-info"><div class="name">João Silva</div><div class="role">Conta pessoal</div></div></div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Central de Alertas</h1>
+      <p>Acompanhe eventos importantes sobre seu orçamento</p>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="filter-btn active">Todos (4)</button>
+    <button class="filter-btn">Não lidos (2)</button>
+    <button class="filter-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Marcar todos como lidos
+    </button>
+  </div>
+
+  <div class="alerts-list">
+    
+    <!-- Orçamento Excedido (Danger) -->
+    <div class="alert-card alert-danger unread">
+      <div class="alert-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="alert-content">
+        <div class="alert-header">
+          <div class="alert-title">Orçamento excedido: Lazer</div>
+          <div class="alert-time">Há 2 horas</div>
+        </div>
+        <div class="alert-message">Você ultrapassou o orçamento mensal de <strong>R$ 250,00</strong> para a categoria <strong>Lazer</strong>. O gasto atual é de R$ 310,00 (124%).</div>
+        <div class="alert-actions">
+          <button class="btn-action btn-read"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Marcar como lido</button>
+          <button class="btn-action btn-del"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg> Excluir</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Limite Próximo (Warning) -->
+    <div class="alert-card alert-warning unread">
+      <div class="alert-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div class="alert-content">
+        <div class="alert-header">
+          <div class="alert-title">Aviso de Limite: Alimentação</div>
+          <div class="alert-time">Ontem às 18:40</div>
+        </div>
+        <div class="alert-message">Você atingiu <strong>74%</strong> do orçamento planejado para <strong>Alimentação</strong> (Gasto: R$ 520 / R$ 700). Faltam 18 dias para o fechamento do mês.</div>
+        <div class="alert-actions">
+          <button class="btn-action btn-read"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Marcar como lido</button>
+          <button class="btn-action btn-del"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg> Excluir</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transação Alta (Info) -->
+    <div class="alert-card alert-info">
+      <div class="alert-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="alert-content">
+        <div class="alert-header">
+          <div class="alert-title">Novo gasto elevado detectado</div>
+          <div class="alert-time">05 de Maio</div>
+        </div>
+        <div class="alert-message">Um lançamento de <strong>R$ 650,00</strong> (Aluguel — maio) foi registrado na categoria Moradia. Ele representa 36% do seu gasto mensal atual.</div>
+        <div class="alert-actions">
+          <button class="btn-action btn-del"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg> Excluir</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dica de Economia (Info) -->
+    <div class="alert-card alert-info">
+      <div class="alert-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+      </div>
+      <div class="alert-content">
+        <div class="alert-header">
+          <div class="alert-title">Relatório semanal disponível</div>
+          <div class="alert-time">03 de Maio</div>
+        </div>
+        <div class="alert-message">O seu relatório da primeira semana de maio já foi gerado. Você reduziu seus gastos com transporte em 12% em comparação com abril.</div>
+        <div class="alert-actions">
+          <button class="btn-action btn-del"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg> Excluir</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+</body>
+</html>

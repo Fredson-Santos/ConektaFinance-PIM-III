@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ConektaFinance — Insights da IA</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green-50: #EAF3DE; --green-100: #C0DD97; --green-200: #97C459;
+    --green-600: #3B6D11; --green-800: #27500A;
+    --amber-50: #FAEEDA; --amber-100: #FAC775; --amber-400: #BA7517; --amber-600: #854F0B;
+    --red-50: #FCEBEB; --red-400: #E24B4A; --red-600: #A32D2D;
+    --teal-50: #E1F5EE; --teal-400: #1D9E75; --teal-600: #0F6E56;
+    --gray-50: #F1EFE8; --gray-100: #D3D1C7; --gray-200: #B4B2A9; --gray-600: #5F5E5A; --gray-800: #444441;
+    --text: #1a1a18; --text-muted: #5F5E5A; --border: rgba(0,0,0,0.08);
+    --bg: #f4f3ef; --white: #fff; --sidebar-bg: #27500A; --accent: #3B6D11;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+  /* SIDEBAR REUSÁVEL */
+  .sidebar { width: 220px; min-height: 100vh; background: var(--sidebar-bg); display: flex; flex-direction: column; padding: 1.5rem 1rem; flex-shrink: 0; }
+  .logo { display: flex; align-items: center; gap: 9px; margin-bottom: 2.5rem; padding: 0 0.5rem; }
+  .logo-icon { width: 32px; height: 32px; background: var(--green-100); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .logo-icon svg { width: 18px; height: 18px; }
+  .logo-name { font-family: 'DM Serif Display', serif; font-size: 17px; color: #fff; }
+  .nav-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.35); padding: 0 0.5rem; margin-bottom: 0.5rem; margin-top: 1.5rem; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 0.6rem 0.7rem; border-radius: 8px; color: rgba(255,255,255,0.55); font-size: 14px; cursor: pointer; transition: all 0.15s; text-decoration: none; margin-bottom: 2px; }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); }
+  .nav-item.active { background: rgba(255,255,255,0.12); color: #fff; }
+  .sidebar-bottom { margin-top: auto; }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 0.6rem 0.7rem; border-radius: 8px; background: rgba(255,255,255,0.07); }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--green-200); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--green-800); }
+  .user-info .name { font-size: 13px; font-weight: 500; color: #fff; }
+  .user-info .role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+  .main { flex: 1; padding: 2rem 2.5rem; overflow-y: auto; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+  .topbar-left h1 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; display: flex; align-items: center; gap: 10px; }
+  .topbar-left h1 svg { color: var(--accent); }
+  .topbar-left p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+  .topbar-right { display: flex; gap: 10px; }
+  .period-tabs { display: flex; background: var(--white); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .period-tab { padding: 0.45rem 0.9rem; font-size: 13px; color: var(--text-muted); cursor: pointer; border: none; background: transparent; font-family: 'DM Sans', sans-serif; }
+  .period-tab.active { background: var(--accent); color: #fff; }
+
+  /* INSIGHT HERO */
+  .hero-insight {
+    background: linear-gradient(135deg, var(--green-800) 0%, var(--green-600) 100%);
+    border-radius: 16px; padding: 2rem; color: #fff; margin-bottom: 2rem;
+    position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 1rem;
+  }
+  .hero-insight::after {
+    content: ''; position: absolute; right: -50px; bottom: -50px; width: 250px; height: 250px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%); border-radius: 50%;
+  }
+  .hero-label { display: inline-block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 20px; font-weight: 600; width: fit-content; }
+  .hero-title { font-family: 'DM Serif Display', serif; font-size: 2rem; line-height: 1.2; max-width: 600px; }
+  .hero-action { margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; font-size: 14px; color: var(--green-100); text-decoration: none; }
+  .hero-action:hover { color: #fff; }
+
+  /* INSIGHTS GRID */
+  .insights-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+
+  .insight-card {
+    background: var(--white); border-radius: 12px; border: 1px solid var(--border);
+    padding: 1.5rem; display: flex; flex-direction: column; gap: 12px; transition: transform 0.2s;
+  }
+  .insight-card:hover { transform: translateY(-3px); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .card-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .card-icon svg { width: 20px; height: 20px; }
+  .impact-badge { font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 6px; }
+
+  .card-content h3 { font-size: 1.1rem; color: var(--text); margin-bottom: 6px; }
+  .card-content p { font-size: 13.5px; color: var(--text-muted); line-height: 1.5; }
+
+  .card-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+  .btn-apply { padding: 0.5rem 1rem; background: var(--green-50); color: var(--green-800); border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .btn-apply:hover { background: var(--green-100); }
+  .btn-dismiss { padding: 0.5rem 1rem; background: transparent; color: var(--text-muted); border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; }
+
+  /* THEMES */
+  .theme-save .card-icon { background: var(--teal-50); color: var(--teal-600); }
+  .theme-save .impact-badge { background: var(--teal-50); color: var(--teal-600); }
+  
+  .theme-warn .card-icon { background: var(--amber-50); color: var(--amber-600); }
+  .theme-warn .impact-badge { background: var(--amber-50); color: var(--amber-600); }
+
+  .theme-opt .card-icon { background: var(--green-50); color: var(--green-600); }
+  .theme-opt .impact-badge { background: var(--green-50); color: var(--green-600); }
+
+  /* RESPONSIVE */
+  @media (max-width: 1023px) {
+    .sidebar { width: 180px; padding: 1rem 0.75rem; }
+    .logo-name { font-size: 15px; }
+    .main { padding: 1.5rem 2rem; }
+    .hero-title { font-size: 1.6rem; }
+  }
+
+  @media (max-width: 767px) {
+    body { flex-direction: column; }
+    .sidebar { width: 100%; min-height: auto; flex-direction: row; align-items: center; padding: 1rem; overflow-x: auto; }
+    .logo { margin-bottom: 0; margin-right: 1rem; flex-shrink: 0; }
+    .nav-label, .sidebar-bottom { display: none; }
+    .nav-item { padding: 0.4rem 0.6rem; font-size: 12px; flex-shrink: 0; }
+
+    .main { padding: 1rem; }
+    .topbar { flex-direction: column; gap: 1rem; align-items: flex-start; }
+    .hero-title { font-size: 1.4rem; }
+    .hero-insight { padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#27500A" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+    <span class="logo-name">ConektaFinance</span>
+  </div>
+  <span class="nav-label">Principal</span>
+  <a class="nav-item" href="tela-dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+  <a class="nav-item" href="tela-gastos.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Gastos</a>
+  <a class="nav-item" href="tela-categorias.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 7h18M3 12h18M3 17h18"/></svg>Categorias</a>
+  <span class="nav-label">Análise</span>
+  <a class="nav-item" href="tela-relatorios.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Relatórios</a>
+  <a class="nav-item" href="tela-alertas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Alertas</a>
+  <a class="nav-item active" href="tela-insights.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3"/></svg>IA Simulada</a>
+  <div class="sidebar-bottom">
+    <div class="user-pill"><div class="avatar">JS</div><div class="user-info"><div class="name">João Silva</div><div class="role">Conta pessoal</div></div></div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Insights</h1>
+      <p>Recomendações inteligentes baseadas no seu padrão de gastos</p>
+    </div>
+    <div class="topbar-right">
+      <div class="period-tabs">
+        <button class="period-tab">Este Mês</button>
+        <button class="period-tab active">Últimos 3 Meses</button>
+        <button class="period-tab">Este Ano</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-insight">
+    <span class="hero-label">Destaque do Período</span>
+    <h2 class="hero-title">Você está no caminho certo! Seus gastos com assinaturas diminuíram 15% neste trimestre.</h2>
+    <a href="#" class="hero-action">Ver detalhes do relatório <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+  </div>
+
+  <div class="insights-grid">
+    
+    <!-- Insight 1 -->
+    <div class="insight-card theme-save">
+      <div class="card-header">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <span class="impact-badge">ALTO IMPACTO</span>
+      </div>
+      <div class="card-content">
+        <h3>Reduza gastos com Delivery</h3>
+        <p>Você gastou R$ 450 com iFood e UberEats nos últimos 30 dias. Reduzir em 50% esses pedidos pode gerar uma economia de <strong>R$ 225 por mês</strong>.</p>
+      </div>
+      <div class="card-footer">
+        <button class="btn-apply">Ver análise detalhada</button>
+        <button class="btn-dismiss">Ocultar</button>
+      </div>
+    </div>
+
+    <!-- Insight 2 -->
+    <div class="insight-card theme-warn">
+      <div class="card-header">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <span class="impact-badge">ALERTA DE TENDÊNCIA</span>
+      </div>
+      <div class="card-content">
+        <h3>Atenção com Transporte</h3>
+        <p>Sua média mensal de gastos com Uber subiu 30% em relação ao trimestre passado. Considere alternativas de mobilidade ou caronas.</p>
+      </div>
+      <div class="card-footer">
+        <button class="btn-apply">Criar limite para categoria</button>
+        <button class="btn-dismiss">Ocultar</button>
+      </div>
+    </div>
+
+    <!-- Insight 3 -->
+    <div class="insight-card theme-opt">
+      <div class="card-header">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg></div>
+        <span class="impact-badge">OTIMIZAÇÃO</span>
+      </div>
+      <div class="card-content">
+        <h3>Padrão de pagamentos</h3>
+        <p>Identificamos que a maior parte das suas contas vence dia 10. Você pode renegociar o vencimento do cartão para o dia 15 e ter melhor fluxo de caixa.</p>
+      </div>
+      <div class="card-footer">
+        <button class="btn-apply">Revisar calendários</button>
+        <button class="btn-dismiss">Ocultar</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>
