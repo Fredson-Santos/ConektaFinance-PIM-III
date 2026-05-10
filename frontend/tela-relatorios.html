@@ -147,22 +147,8 @@
     </div>
   </div>
 
-  <div class="kpis">
-    <div class="kpi">
-      <div class="kpi-label">Total gasto — Maio 2025</div>
-      <div class="kpi-value">R$ 1.760</div>
-      <div class="kpi-badge badge-up">↑ 12% vs abril</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Orçamento mensal</div>
-      <div class="kpi-value">R$ 3.000</div>
-      <div class="kpi-badge badge-ok">59% utilizado</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Saldo restante</div>
-      <div class="kpi-value">R$ 1.240</div>
-      <div class="kpi-badge badge-ok">18 dias restantes</div>
-    </div>
+  <div class="kpis" id="kpisContainer">
+    <!-- Dynamic KPIs -->
   </div>
 
   <div class="charts-row">
@@ -177,50 +163,9 @@
   </div>
 
   <div class="cat-report">
-    <h3>Relatório por categoria — Maio 2025</h3>
-    <div class="cat-rows">
-      <div class="cat-row cat-row-head">
-        <span>Categoria</span>
-        <span>Progresso</span>
-        <span style="text-align:right">Gasto</span>
-        <span style="text-align:right">Orçamento</span>
-        <span style="text-align:center">% Usado</span>
-      </div>
-      <div class="cat-row">
-        <div class="cat-info"><div class="cat-dot" style="background:#1D9E75"></div><span class="cat-name">Alimentação</span></div>
-        <div class="bar-outer"><div class="bar-inner" style="width:74%;background:#1D9E75"></div></div>
-        <div class="col-right col-spent">R$ 520</div>
-        <div class="col-right col-budget">R$ 700</div>
-        <div style="text-align:center"><span class="pct-badge pct-warn">74%</span></div>
-      </div>
-      <div class="cat-row">
-        <div class="cat-info"><div class="cat-dot" style="background:#27500A"></div><span class="cat-name">Moradia</span></div>
-        <div class="bar-outer"><div class="bar-inner" style="width:100%;background:#27500A"></div></div>
-        <div class="col-right col-spent">R$ 650</div>
-        <div class="col-right col-budget">R$ 650</div>
-        <div style="text-align:center"><span class="pct-badge pct-ok">100%</span></div>
-      </div>
-      <div class="cat-row">
-        <div class="cat-info"><div class="cat-dot" style="background:#BA7517"></div><span class="cat-name">Transporte</span></div>
-        <div class="bar-outer"><div class="bar-inner" style="width:60%;background:#BA7517"></div></div>
-        <div class="col-right col-spent">R$ 180</div>
-        <div class="col-right col-budget">R$ 300</div>
-        <div style="text-align:center"><span class="pct-badge pct-ok">60%</span></div>
-      </div>
-      <div class="cat-row">
-        <div class="cat-info"><div class="cat-dot" style="background:#E24B4A"></div><span class="cat-name">Lazer</span></div>
-        <div class="bar-outer"><div class="bar-inner" style="width:100%;background:#E24B4A"></div></div>
-        <div class="col-right col-spent" style="color:var(--red-400)">R$ 310</div>
-        <div class="col-right col-budget">R$ 250</div>
-        <div style="text-align:center"><span class="pct-badge pct-over">124%</span></div>
-      </div>
-      <div class="cat-row">
-        <div class="cat-info"><div class="cat-dot" style="background:#639922"></div><span class="cat-name">Saúde</span></div>
-        <div class="bar-outer"><div class="bar-inner" style="width:33%;background:#639922"></div></div>
-        <div class="col-right col-spent">R$ 130</div>
-        <div class="col-right col-budget">R$ 400</div>
-        <div style="text-align:center"><span class="pct-badge pct-ok">33%</span></div>
-      </div>
+    <h3>Relatório por categoria</h3>
+    <div class="cat-rows" id="catReportRows">
+      <!-- Dynamic Categories -->
     </div>
   </div>
 
@@ -246,8 +191,73 @@
   </div>
 </main>
 
+<script src="js/api.js"></script>
 <script>
-const barCtx = document.getElementById('barChart').getContext('2d');
+async function loadReports() {
+  Utils.showLoading('kpisContainer');
+  Utils.showLoading('catReportRows');
+  
+  try {
+    const summary = await ReportService.getSummary();
+    const kpisContainer = document.getElementById('kpisContainer');
+    kpisContainer.innerHTML = `
+      <div class="kpi">
+        <div class="kpi-label">Total Gasto (Mês)</div>
+        <div class="kpi-value">${Utils.formatCurrency(summary.totalSpent)}</div>
+        <div class="kpi-badge badge-ok">Até agora</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Orçamento Restante</div>
+        <div class="kpi-value">${Utils.formatCurrency(summary.remainingBudget)}</div>
+        <div class="kpi-badge ${summary.overallPercentage > 80 ? 'badge-up' : 'badge-ok'}">${summary.overallPercentage.toFixed(1)}% utilizado</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Maior Gasto</div>
+        <div class="kpi-value">${summary.largestExpense ? Utils.formatCurrency(summary.largestExpense.amount) : 'R$ 0,00'}</div>
+        <div class="kpi-badge badge-warn">${summary.largestExpense ? summary.largestExpense.description : '-'}</div>
+      </div>
+    `;
+
+    const byCategory = await ReportService.getByCategory();
+    const catContainer = document.getElementById('catReportRows');
+    
+    let html = `
+      <div class="cat-row cat-row-head">
+        <span>Categoria</span>
+        <span>Progresso</span>
+        <span style="text-align:right">Gasto</span>
+        <span style="text-align:right">Orçamento</span>
+        <span style="text-align:center">% Usado</span>
+      </div>
+    `;
+    
+    byCategory.forEach(cat => {
+      let pctClass = 'pct-ok';
+      if(cat.percentageUsed >= 80) pctClass = 'pct-warn';
+      if(cat.percentageUsed >= 100) pctClass = 'pct-over';
+      
+      const width = cat.percentageUsed > 100 ? 100 : cat.percentageUsed;
+      
+      html += `
+        <div class="cat-row">
+          <div class="cat-info"><div class="cat-dot" style="background:#27500A"></div><span class="cat-name">${cat.categoryName}</span></div>
+          <div class="bar-outer"><div class="bar-inner" style="width:${width}%;background:#27500A"></div></div>
+          <div class="col-right col-spent">${Utils.formatCurrency(cat.totalSpent)}</div>
+          <div class="col-right col-budget">${cat.budgetLimit ? Utils.formatCurrency(cat.budgetLimit) : 'Sem limite'}</div>
+          <div style="text-align:center"><span class="pct-badge ${pctClass}">${cat.percentageUsed.toFixed(0)}%</span></div>
+        </div>
+      `;
+    });
+    
+    catContainer.innerHTML = html;
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+loadReports();
+
 new Chart(barCtx, {
   type: 'bar',
   data: {

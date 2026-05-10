@@ -157,58 +157,61 @@
     <a href="#" class="hero-action">Ver detalhes do relatório <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
   </div>
 
-  <div class="insights-grid">
-    
-    <!-- Insight 1 -->
-    <div class="insight-card theme-save">
-      <div class="card-header">
-        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-        <span class="impact-badge">ALTO IMPACTO</span>
-      </div>
-      <div class="card-content">
-        <h3>Reduza gastos com Delivery</h3>
-        <p>Você gastou R$ 450 com iFood e UberEats nos últimos 30 dias. Reduzir em 50% esses pedidos pode gerar uma economia de <strong>R$ 225 por mês</strong>.</p>
-      </div>
-      <div class="card-footer">
-        <button class="btn-apply">Ver análise detalhada</button>
-        <button class="btn-dismiss">Ocultar</button>
-      </div>
-    </div>
-
-    <!-- Insight 2 -->
-    <div class="insight-card theme-warn">
-      <div class="card-header">
-        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
-        <span class="impact-badge">ALERTA DE TENDÊNCIA</span>
-      </div>
-      <div class="card-content">
-        <h3>Atenção com Transporte</h3>
-        <p>Sua média mensal de gastos com Uber subiu 30% em relação ao trimestre passado. Considere alternativas de mobilidade ou caronas.</p>
-      </div>
-      <div class="card-footer">
-        <button class="btn-apply">Criar limite para categoria</button>
-        <button class="btn-dismiss">Ocultar</button>
-      </div>
-    </div>
-
-    <!-- Insight 3 -->
-    <div class="insight-card theme-opt">
-      <div class="card-header">
-        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg></div>
-        <span class="impact-badge">OTIMIZAÇÃO</span>
-      </div>
-      <div class="card-content">
-        <h3>Padrão de pagamentos</h3>
-        <p>Identificamos que a maior parte das suas contas vence dia 10. Você pode renegociar o vencimento do cartão para o dia 15 e ter melhor fluxo de caixa.</p>
-      </div>
-      <div class="card-footer">
-        <button class="btn-apply">Revisar calendários</button>
-        <button class="btn-dismiss">Ocultar</button>
-      </div>
-    </div>
-
+  <div class="insights-grid" id="insightsGrid">
+    <!-- Dynamic Insights -->
   </div>
+
 </main>
+
+<script src="js/api.js"></script>
+<script>
+  async function loadInsights() {
+    const grid = document.getElementById('insightsGrid');
+    Utils.showLoading('insightsGrid');
+
+    try {
+      const insights = await InsightService.getAll();
+      
+      if (insights.length === 0) {
+        grid.innerHTML = '<p style="text-align:center;grid-column:1/-1;">Não há insights suficientes no momento. Continue registrando seus gastos.</p>';
+        return;
+      }
+
+      grid.innerHTML = insights.map(i => {
+        let themeClass = 'theme-opt';
+        let iconHtml = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+        
+        if (i.category === 'Economia') {
+          themeClass = 'theme-save';
+          iconHtml = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
+        } else if (i.category === 'Alerta') {
+          themeClass = 'theme-warn';
+          iconHtml = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>';
+        }
+
+        return `
+          <div class="insight-card ${themeClass}">
+            <div class="card-header">
+              <div class="card-icon">${iconHtml}</div>
+              <span class="impact-badge">${i.priority === 'Alto' ? 'ALTO IMPACTO' : i.priority.toUpperCase()}</span>
+            </div>
+            <div class="card-content">
+              <h3>${i.title}</h3>
+              <p>${i.description}</p>
+            </div>
+            <div class="card-footer">
+              <button class="btn-apply">Ver análise</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch (err) {
+      grid.innerHTML = '<p style="color:red;grid-column:1/-1;">Erro ao carregar insights.</p>';
+    }
+  }
+
+  loadInsights();
+</script>
 
 </body>
 </html>

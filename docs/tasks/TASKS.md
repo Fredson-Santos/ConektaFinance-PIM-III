@@ -181,43 +181,43 @@
 ---
 
 ### TASK-009: Integração com Backend (API + JavaScript)
-**Status:** ⏳ Não iniciado  
+**Status:** ✅ Concluído  
 **Prioridade:** P0  
 **Assignee:** Frontend Developer
 
 #### Subtasks:
-- [ ] TASK-009.1: Configuração de API
-  - [ ] Base URL configurável
-  - [ ] Headers padrão (Content-Type, Authorization)
-  - [ ] Tratamento de erro global (toast)
+- [x] TASK-009.1: Configuração de API
+  - [x] Base URL configurável
+  - [x] Headers padrão (Content-Type, Authorization)
+  - [x] Tratamento de erro global (toast)
 
-- [ ] TASK-009.2: Autenticação
-  - [ ] Login (POST /auth/login)
-  - [ ] Cadastro (POST /auth/register)
-  - [ ] Token JWT (localStorage)
-  - [ ] Logout + redirect para login
+- [x] TASK-009.2: Autenticação
+  - [x] Login (POST /auth/login) *(Mockado temporariamente)*
+  - [x] Cadastro (POST /auth/register) *(Mockado temporariamente)*
+  - [x] Token JWT (localStorage)
+  - [x] Logout + redirect para login
 
-- [ ] TASK-009.3: CRUD Gastos
-  - [ ] GET /expenses (listar, popular tabela)
-  - [ ] POST /expenses (modal criar)
-  - [ ] PUT /expenses/:id (modal editar)
-  - [ ] DELETE /expenses/:id (com confirmação)
+- [x] TASK-009.3: CRUD Gastos
+  - [x] GET /expenses (listar, popular tabela)
+  - [x] POST /expenses (modal criar)
+  - [x] PUT /expenses/:id (modal editar)
+  - [x] DELETE /expenses/:id (com confirmação)
 
-- [ ] TASK-009.4: CRUD Categorias
-  - [ ] GET /categories (listar, popular cards)
-  - [ ] POST /categories (modal criar)
-  - [ ] PUT /categories/:id (modal editar)
-  - [ ] DELETE /categories/:id (com confirmação)
+- [x] TASK-009.4: CRUD Categorias
+  - [x] GET /categories (listar, popular cards)
+  - [x] POST /categories (modal criar)
+  - [x] PUT /categories/:id (modal editar)
+  - [x] DELETE /categories/:id (com confirmação)
 
-- [ ] TASK-009.5: Dashboards dinâmicos
-  - [ ] GET /reports/summary (popular KPIs)
-  - [ ] GET /alerts (popular lista alertas)
-  - [ ] GET /insights (popular insights)
+- [x] TASK-009.5: Dashboards dinâmicos
+  - [x] GET /reports/summary (popular KPIs)
+  - [x] GET /alerts (popular lista alertas)
+  - [x] GET /insights (popular insights)
 
-- [ ] TASK-009.6: UX melhorada
-  - [ ] Toast sucesso/erro
-  - [ ] Loading states (spinner)
-  - [ ] Validação client-side antes envio
+- [x] TASK-009.6: UX melhorada
+  - [x] Toast sucesso/erro
+  - [x] Loading states (spinner)
+  - [x] Validação client-side antes envio
 
 **Entrada:** TASK-008  
 **Saída:** Frontend integrado com API funcional, todas as 7 telas operacionais
