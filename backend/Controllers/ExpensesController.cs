@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using PIM_III_Backend.Application.Dtos.Expenses;
 using PIM_III_Backend.Application.Services;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace PIM_III_Backend.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ExpensesController : ControllerBase
@@ -17,7 +20,7 @@ public class ExpensesController : ControllerBase
         _alertService = alertService;
     }
 
-    private int GetCurrentUserId() => 1; // TODO: Obter do JWT Claim quando Autenticação for implementada
+    private int GetCurrentUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ExpenseResponse>>> GetUserExpenses([FromQuery] DateTime? start, [FromQuery] DateTime? end, [FromQuery] int? categoryId)

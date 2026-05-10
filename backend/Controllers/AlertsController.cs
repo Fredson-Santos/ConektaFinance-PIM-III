@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using PIM_III_Backend.Application.Dtos.Alerts;
 using PIM_III_Backend.Application.Services;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace PIM_III_Backend.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class AlertsController : ControllerBase
@@ -12,7 +15,7 @@ public class AlertsController : ControllerBase
 
     public AlertsController(IAlertService service) => _service = service;
 
-    private int GetCurrentUserId() => 1;
+    private int GetCurrentUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AlertResponse>>> GetAlerts([FromQuery] bool unreadOnly = false)

@@ -251,11 +251,11 @@
   - [x] Migrations automatizadas (`dotnet ef migrations add InitialCreate`)
   - [x] Seed de categorias padrão
 
-- [ ] TASK-010.3: Autenticação JWT
-  - [ ] Middleware JWT
-  - [ ] Endpoints: /auth/register, /auth/login
-  - [ ] Token geração/validação
-  - [ ] Refresh token
+- [x] TASK-010.3: Autenticação JWT
+  - [x] Middleware JWT
+  - [x] Endpoints: /auth/register, /auth/login
+  - [x] Token geração/validação
+  - [x] Refresh token (Apenas token longa duração no MVP)
 
 **Entrada:** Modelo de dados (TASK-004)  
 **Saída:** API base com autenticação funcionando  
