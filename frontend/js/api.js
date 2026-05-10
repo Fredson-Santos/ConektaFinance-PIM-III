@@ -48,12 +48,15 @@ function showToast(message, type = 'success') {
 
 // Wrapper para Fetch API
 async function apiFetch(endpoint, options = {}) {
-  const token = localStorage.getItem('pim_token') || 'mocked_token_for_now';
+  const token = localStorage.getItem('pim_token');
   
   const defaultHeaders = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
+    'Content-Type': 'application/json'
   };
+
+  if (token) {
+    defaultHeaders['Authorization'] = `Bearer ${token}`;
+  }
 
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -89,26 +92,28 @@ async function apiFetch(endpoint, options = {}) {
 // ==========================================
 
 const AuthService = {
-  // MOCK until backend Auth is ready
   async login(email, password) {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (email && password) {
-          localStorage.setItem('pim_token', 'mock_jwt_token_123');
-          resolve({ token: 'mock_jwt_token_123', user: { name: 'João Silva', email }});
-        } else {
-          reject(new Error('Credenciais inválidas'));
-        }
-      }, 500);
+    const response = await apiFetch('/Auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password })
     });
+    if (response.token) {
+      localStorage.setItem('pim_token', response.token);
+      localStorage.setItem('pim_user', JSON.stringify(response.user));
+    }
+    return response;
   },
   
   async register(data) {
-    return new Promise(resolve => setTimeout(() => resolve(true), 500));
+    return apiFetch('/Auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
   },
   
   logout() {
     localStorage.removeItem('pim_token');
+    localStorage.removeItem('pim_user');
     window.location.href = 'tela-login.html';
   }
 };

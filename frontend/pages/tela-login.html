@@ -8,7 +8,9 @@
 <link rel="stylesheet" href="../css/global.css">
 </head>
 <body>
-<main class="split">
+
+<a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
+<main class="split" id="main-content">
   <section class="panel-left" aria-labelledby="hero-title">
     <div class="logo">
       <div class="logo-icon" aria-hidden="true">
@@ -122,6 +124,7 @@
   </section>
 </main>
 
+<script src="../js/api.js"></script>
 <script>
 function showTab(name, el) {
   document.querySelectorAll('.tab').forEach(t => {
@@ -146,6 +149,59 @@ function showTabByName(name) {
   document.querySelectorAll('.form-section').forEach(s => s.classList.add('hidden'));
   document.getElementById(name).classList.remove('hidden');
 }
+
+// LOGIN LOGIC
+document.querySelector('#login form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email-login').value;
+  const password = document.getElementById('password-login').value;
+  const btn = e.target.querySelector('button[type="submit"]');
+  const oldText = btn.textContent;
+
+  try {
+    btn.textContent = 'Entrando...';
+    btn.disabled = true;
+    await AuthService.login(email, password);
+    showToast('Bem-vindo!');
+    setTimeout(() => window.location.href = 'tela-dashboard.html', 800);
+  } catch (err) {
+    btn.textContent = oldText;
+    btn.disabled = false;
+  }
+});
+
+// REGISTER LOGIC
+document.querySelector('#cadastro form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nome = document.getElementById('nome').value;
+  const sobrenome = document.getElementById('sobrenome').value;
+  const email = document.getElementById('email-cadastro').value;
+  const password = document.getElementById('password-cadastro').value;
+  const confirm = document.getElementById('password-confirm').value;
+  const btn = e.target.querySelector('button[type="submit"]');
+
+  if (password !== confirm) {
+    showToast('As senhas não coincidem', 'error');
+    return;
+  }
+
+  try {
+    btn.textContent = 'Criando conta...';
+    btn.disabled = true;
+    await AuthService.register({ fullName: `${nome} ${sobrenome}`, email, password });
+    showToast('Conta criada com sucesso! Faça login para continuar.');
+    
+    // Popula o campo de login com o email recém cadastrado
+    document.getElementById('email-login').value = email;
+    document.getElementById('password-login').value = '';
+    
+    showTabByName('login');
+  } catch (err) {
+  } finally {
+    btn.textContent = 'Criar conta';
+    btn.disabled = false;
+  }
+});
 </script>
 </body>
 </html>

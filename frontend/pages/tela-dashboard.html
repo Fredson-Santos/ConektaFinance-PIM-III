@@ -10,6 +10,8 @@
 </head>
 <body>
 
+<a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
+
 <aside class="sidebar" role="navigation" aria-label="Menu principal">
   <div class="logo">
     <div class="logo-icon">
@@ -76,7 +78,7 @@
   </div>
 </aside>
 
-<main class="main" role="main">
+<main class="main" id="main-content" role="main">
   <div class="topbar">
     <div class="topbar-left">
       <h1>Dashboard</h1>
@@ -88,7 +90,7 @@
         Maio 2025
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <button class="btn-add" aria-label="Adicionar novo gasto">
+      <button class="btn-add" id="dashboardNewExpenseBtn" aria-label="Adicionar novo gasto">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Novo gasto
       </button>
@@ -140,7 +142,7 @@
     <div class="chart-card">
       <h3>Distribuição por categoria</h3>
       <div class="chart-canvas-wrap">
-        <canvas id="doughnutChart"></canvas>
+        <canvas id="doughnutChart" role="img" aria-label="Gráfico de pizza mostrando a distribuição de gastos por categoria"></canvas>
       </div>
     </div>
   </div>
@@ -252,52 +254,103 @@
   </div>
 </main>
 
+<script src="../js/api.js"></script>
 <script>
-const lineCtx = document.getElementById('lineChart').getContext('2d');
-new Chart(lineCtx, {
-  type: 'line',
-  data: {
-    labels: ['Dez', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai'],
-    datasets: [{
-      label: 'Gastos (R$)',
-      data: [2100, 1870, 2300, 1950, 1570, 1760],
-      borderColor: '#3B6D11',
-      backgroundColor: 'rgba(59,109,17,0.08)',
-      borderWidth: 2,
-      pointBackgroundColor: '#3B6D11',
-      pointRadius: 4,
-      fill: true,
-      tension: 0.4
-    }]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
-    scales: {
-      y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 11 }, color: '#888' } },
-      x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#888' } }
+async function initDashboard() {
+  try {
+    const summary = await ReportService.getSummary();
+    const lastExpenses = await ExpenseService.getAll(); // Or a specific getRecent if implemented
+    const categories = await CategoryService.getAll();
+
+    // Update KPI cards
+    if (summary) {
+      document.querySelector('.metric-card.accent-green .mc-value').textContent = Utils.formatCurrency(summary.remainingBudget);
+      document.querySelector('.metric-card.accent-green .mc-sub').textContent = `de ${Utils.formatCurrency(summary.totalBudget)} do orçamento`;
+      
+      const kpis = document.querySelectorAll('.metric-card .mc-value');
+      kpis[1].textContent = Utils.formatCurrency(summary.totalSpent);
+      kpis[2].textContent = lastExpenses.length;
+      kpis[3].textContent = summary.largestExpense ? Utils.formatCurrency(summary.largestExpense.amount) : 'R$ 0,00';
     }
+
+    // Update Table
+    const tbody = document.querySelector('table tbody');
+    tbody.innerHTML = lastExpenses.slice(0, 5).map(e => {
+      const cat = categories.find(c => c.id === e.categoryId);
+      return `
+        <tr>
+          <td>${e.description}</td>
+          <td><span class="cat-badge" style="background:${cat?.colorHex}22; color:${cat?.colorHex}">${cat?.name || 'Sem Categoria'}</span></td>
+          <td style="color:var(--text-muted)">${Utils.formatDate(e.date).substring(0, 5)}</td>
+          <td class="amount-neg" style="text-align:right">−${Utils.formatCurrency(e.amount)}</td>
+        </tr>
+      `;
+    }).join('');
+
+    // Update Charts
+    updateCharts(summary, categories);
+
+  } catch (err) {
+    console.error('Erro ao carregar dashboard:', err);
   }
+}
+
+function updateCharts(summary, categories) {
+  // Line Chart
+  const lineCtx = document.getElementById('lineChart').getContext('2d');
+  new Chart(lineCtx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai'],
+      datasets: [{
+        label: 'Gastos (R$)',
+        data: [1870, 2300, 1950, 1570, summary?.totalSpent || 0],
+        borderColor: '#3B6D11',
+        backgroundColor: 'rgba(59,109,17,0.08)',
+        borderWidth: 2,
+        pointBackgroundColor: '#3B6D11',
+        pointRadius: 4,
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 11 }, color: '#888' } },
+        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#888' } }
+      }
+    }
+  });
+
+  // Doughnut Chart
+  const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+  new Chart(doughnutCtx, {
+    type: 'doughnut',
+    data: {
+      labels: categories.slice(0, 5).map(c => c.name),
+      datasets: [{
+        data: categories.slice(0, 5).map(c => Math.random() * 500), // Placeholder logic if no category breakdown in summary
+        backgroundColor: categories.slice(0, 5).map(c => c.colorHex),
+        borderWidth: 0,
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10 } } }
+    }
+  });
+}
+
+// Add event listener to "Novo gasto" button
+document.getElementById('dashboardNewExpenseBtn').addEventListener('click', () => {
+  window.location.href = 'tela-gastos.html';
 });
 
-const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
-new Chart(doughnutCtx, {
-  type: 'doughnut',
-  data: {
-    labels: ['Alimentação', 'Aluguel', 'Transporte', 'Lazer', 'Saúde'],
-    datasets: [{
-      data: [520, 650, 180, 310, 100],
-      backgroundColor: ['#1D9E75', '#27500A', '#BA7517', '#639922', '#E24B4A'],
-      borderWidth: 0,
-      hoverOffset: 4
-    }]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    cutout: '65%',
-    plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10 } } }
-  }
-});
+initDashboard();
 </script>
 </body>
 </html>
