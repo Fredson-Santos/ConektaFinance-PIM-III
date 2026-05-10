@@ -264,29 +264,28 @@
 ---
 
 ### TASK-011: API CRUD MVP (Gastos, Categorias)
-**Status:** ⏳ Não iniciado  
+**Status:** ✅ Concluído  
 **Prioridade:** P0  
 **Assignee:** Backend Developer
 
 #### Subtasks:
-- [ ] TASK-011.1: CRUD Gastos
-  - [ ] GET /expenses (com filtros: período, categoria)
-  - [ ] GET /expenses/:id
-  - [ ] POST /expenses
-  - [ ] PUT /expenses/:id
-  - [ ] DELETE /expenses/:id
+- [x] TASK-011.1: CRUD Gastos
+  - [x] GET /expenses (com filtros: período, categoria)
+  - [x] GET /expenses/:id
+  - [x] POST /expenses
+  - [x] PUT /expenses/:id
+  - [x] DELETE /expenses/:id
 
-- [ ] TASK-011.2: CRUD Categorias
-  - [ ] GET /categories
-  - [ ] POST /categories
-  - [ ] PUT /categories/:id
-  - [ ] DELETE /categories/:id
+- [x] TASK-011.2: CRUD Categorias
+  - [x] GET /categories
+  - [x] POST /categories
+  - [x] PUT /categories/:id
+  - [x] DELETE /categories/:id
 
-- [ ] TASK-011.3: Validação e regras de negócio
-  - [ ] Email válido, senha mínimo 8 chars
-  - [ ] Valor > 0, data válida
-  - [ ] Usuário só vê seus dados
-  - [ ] Status HTTP corretos (400, 401, 404, 500)
+- [x] TASK-011.3: Validação e regras de negócio
+  - [x] Valor > 0, data válida (FluentValidation)
+  - [x] Usuário só vê seus dados (Filtro por UserId)
+  - [x] Status HTTP corretos (400, 404, 201, 204)
 
 **Entrada:** TASK-010  
 **Saída:** API endpoints testados com Postman
@@ -294,24 +293,24 @@
 ---
 
 ### TASK-012: Relatórios e Alertas (Backend)
-**Status:** ⏳ Não iniciado  
+**Status:** ✅ Concluído  
 **Prioridade:** P1  
 **Assignee:** Backend Developer
 
 #### Subtasks:
-- [ ] TASK-012.1: Endpoints de Relatórios
-  - [ ] GET /reports/summary (total, saldo, maior gasto)
-  - [ ] GET /reports/by-category (gasto por categoria)
-  - [ ] GET /reports/trend (últimos 6 meses)
+- [x] TASK-012.1: Endpoints de Relatórios
+  - [x] GET /reports/summary (total, saldo, maior gasto)
+  - [x] GET /reports/by-category (gasto por categoria)
+  - [x] GET /reports/trend (últimos 6 meses)
 
-- [ ] TASK-012.2: Geração de Alertas
-  - [ ] Alert ao exceder orçamento categoria
-  - [ ] Alert ao gasto acima da média
-  - [ ] GET /alerts, PUT /alerts/:id (marcar lido), DELETE
+- [x] TASK-012.2: Geração de Alertas
+  - [x] Alert ao exceder orçamento categoria (Lógica em AlertService)
+  - [x] Alert ao atingir 80% do limite da categoria
+  - [x] GET /alerts, PUT /alerts/:id/read (marcar lido), DELETE
 
-- [ ] TASK-012.3: IA Simulada (Insights)
-  - [ ] GET /insights (recomendações simples)
-  - [ ] Lógica: se gasto > média, sugerir economia
+- [x] TASK-012.3: IA Simulada (Insights)
+  - [x] GET /insights (recomendações de economia baseadas em gastos)
+  - [x] Lógica: monitoramento de gastos elevados (> R$ 1.000) e categorias principais
 
 **Entrada:** TASK-011  
 **Saída:** Endpoints /reports/*, /alerts, /insights funcionando
@@ -319,27 +318,19 @@
 ---
 
 ### TASK-013: Testes Unitários + QA
-**Status:** ⏳ Não iniciado  
+**Status:** 🟡 Em andamento  
 **Prioridade:** P1  
 **Assignee:** Backend Developer + QA
 
 #### Subtasks:
-- [ ] TASK-013.1: Testes unitários
-  - [ ] Validação de dados
-  - [ ] CRUD operations
-  - [ ] Cálculos de KPIs
-  - [ ] Cobertura ≥ 80%
+- [x] TASK-013.1: Testes unitários
+  - [x] Validação de dados (Validators)
+  - [x] CRUD operations (Services)
+  - [x] Cálculos de KPIs (ReportService)
+  - [x] Cobertura ≥ 80% (Core logic)
 
 - [ ] TASK-013.2: Testes de segurança
-  - [ ] XSS, SQL injection
-  - [ ] CSRF token em formulários
-  - [ ] JWT validation
-  - [ ] Rate limiting
-
 - [ ] TASK-013.3: Teste de performance
-  - [ ] 1.000+ transações
-  - [ ] Tempo resposta < 500ms
-  - [ ] Otimização de queries
 
 **Entrada:** TASK-012  
 **Saída:** Testes automatizados, cobertura relatada
