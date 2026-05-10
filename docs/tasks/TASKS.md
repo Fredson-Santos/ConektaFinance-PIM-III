@@ -337,6 +337,8 @@
 
 ---
 
+## 🟠 FASE 6 — Integração e QA [NÃO INICIADO]
+
 ### TASK-014: Acessibilidade (WCAG AA)
 **Status:** ⏳ Não iniciado  
 **Prioridade:** P1  
@@ -373,8 +375,6 @@
 **Saída:** Relatório de testes
 
 ---
-
-## 🟠 FASE 6 — Integração e QA [NÃO INICIADO]
 
 ### TASK-016: Integração Frontend + Backend (E2E)
 **Status:** ⏳ Não iniciado  
