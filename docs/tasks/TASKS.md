@@ -329,8 +329,8 @@
   - [x] Cálculos de KPIs (ReportService)
   - [x] Cobertura ≥ 80% (Core logic)
 
-- [ ] TASK-013.2: Testes de segurança
-- [ ] TASK-013.3: Teste de performance
+- [x] TASK-013.2: Testes de segurança
+- [x] TASK-013.3: Teste de performance
 
 **Entrada:** TASK-012  
 **Saída:** Testes automatizados, cobertura relatada
