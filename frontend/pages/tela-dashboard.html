@@ -10,10 +10,10 @@
 </head>
 <body>
 
-<aside class="sidebar">
+<aside class="sidebar" role="navigation" aria-label="Menu principal">
   <div class="logo">
     <div class="logo-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#27500A" stroke-width="2" stroke-linecap="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#27500A" stroke-width="2" stroke-linecap="round" aria-hidden="true">
         <circle cx="12" cy="12" r="10"/>
         <path d="M12 6v6l4 2"/>
       </svg>
@@ -23,22 +23,22 @@
 
   <span class="nav-label">Principal</span>
 
-  <a class="nav-item active" href="#">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+  <a class="nav-item active" href="#" aria-current="page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
       <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
       <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
     </svg>
     Dashboard
   </a>
-  <a class="nav-item" href="#">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+  <a class="nav-item" href="tela-gastos.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
       <path d="M12 8v4l3 3"/>
     </svg>
     Gastos
   </a>
-  <a class="nav-item" href="#">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+  <a class="nav-item" href="tela-categorias.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
       <path d="M3 7h18M3 12h18M3 17h18"/>
     </svg>
     Categorias
@@ -46,28 +46,28 @@
 
   <span class="nav-label">Análise</span>
 
-  <a class="nav-item" href="#">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+  <a class="nav-item" href="tela-relatorios.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
       <path d="M18 20V10M12 20V4M6 20v-6"/>
     </svg>
     Relatórios
   </a>
-  <a class="nav-item" href="#">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+  <a class="nav-item" href="tela-alertas.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
       <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
     </svg>
     Alertas
   </a>
-  <a class="nav-item" href="#">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+  <a class="nav-item" href="tela-insights.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
       <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
     </svg>
     IA Simulada
   </a>
 
   <div class="sidebar-bottom">
-    <div class="user-pill">
-      <div class="avatar">JS</div>
+    <div class="user-pill" role="group" aria-label="Informações do usuário">
+      <div class="avatar" aria-hidden="true">JS</div>
       <div class="user-info">
         <div class="name">João Silva</div>
         <div class="role">Conta pessoal</div>
@@ -76,58 +76,58 @@
   </div>
 </aside>
 
-<main class="main">
+<main class="main" role="main">
   <div class="topbar">
     <div class="topbar-left">
       <h1>Dashboard</h1>
       <p>Maio 2025 — visão geral das suas finanças</p>
     </div>
     <div class="topbar-right">
-      <div class="month-select">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <button class="month-select" aria-haspopup="listbox" aria-expanded="false" aria-label="Selecionar mês">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         Maio 2025
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-      <button class="btn-add">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <button class="btn-add" aria-label="Adicionar novo gasto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Novo gasto
       </button>
     </div>
   </div>
 
   <div class="cards-grid">
-    <div class="metric-card accent-green">
-      <div class="mc-label">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    <section class="metric-card accent-green" aria-labelledby="label-saldo">
+      <div class="mc-label" id="label-saldo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         Saldo restante
       </div>
       <div class="mc-value">R$ 1.240</div>
       <div class="mc-sub">de R$ 3.000 do orçamento</div>
-    </div>
-    <div class="metric-card">
-      <div class="mc-label">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </section>
+    <section class="metric-card" aria-labelledby="label-total-gasto">
+      <div class="mc-label" id="label-total-gasto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         Total gasto
       </div>
       <div class="mc-value">R$ 1.760</div>
-      <div class="mc-sub up">+12% vs abril</div>
-    </div>
-    <div class="metric-card">
-      <div class="mc-label">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18l-2 13H5L3 6z"/></svg>
+      <div class="mc-sub up" aria-label="Aumento de 12% em relação a abril">+12% vs abril</div>
+    </section>
+    <section class="metric-card" aria-labelledby="label-gastos-reg">
+      <div class="mc-label" id="label-gastos-reg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18l-2 13H5L3 6z"/></svg>
         Gastos registrados
       </div>
       <div class="mc-value">24</div>
       <div class="mc-sub ok">em 5 categorias</div>
-    </div>
-    <div class="metric-card">
-      <div class="mc-label">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    </section>
+    <section class="metric-card" aria-labelledby="label-maior-gasto">
+      <div class="mc-label" id="label-maior-gasto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
         Maior gasto
       </div>
       <div class="mc-value">R$ 650</div>
       <div class="mc-sub warn">Aluguel — fixo mensal</div>
-    </div>
+    </section>
   </div>
 
   <div class="charts-row">
