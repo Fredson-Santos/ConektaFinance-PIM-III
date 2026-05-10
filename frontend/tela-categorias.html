@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ConektaFinance — Categorias</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green-50: #EAF3DE; --green-100: #C0DD97; --green-200: #97C459;
+    --green-600: #3B6D11; --green-800: #27500A;
+    --teal-50: #E1F5EE; --teal-400: #1D9E75; --teal-600: #0F6E56;
+    --amber-50: #FAEEDA; --amber-100: #FAC775; --amber-400: #BA7517; --amber-600: #854F0B;
+    --red-50: #FCEBEB; --red-400: #E24B4A; --red-600: #A32D2D;
+    --gray-50: #F1EFE8; --gray-100: #D3D1C7; --gray-200: #B4B2A9; --gray-600: #5F5E5A; --gray-800: #444441;
+    --text: #1a1a18; --text-muted: #5F5E5A; --border: rgba(0,0,0,0.09);
+    --bg: #f4f3ef; --white: #fff; --sidebar-bg: #27500A; --accent: #3B6D11;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+  .sidebar { width: 220px; min-height: 100vh; background: var(--sidebar-bg); display: flex; flex-direction: column; padding: 1.5rem 1rem; flex-shrink: 0; }
+  .logo { display: flex; align-items: center; gap: 9px; margin-bottom: 2.5rem; padding: 0 0.5rem; }
+  .logo-icon { width: 32px; height: 32px; background: var(--green-100); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .logo-icon svg { width: 18px; height: 18px; }
+  .logo-name { font-family: 'DM Serif Display', serif; font-size: 17px; color: #fff; }
+  .nav-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.35); padding: 0 0.5rem; margin-bottom: 0.5rem; margin-top: 1.5rem; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 0.6rem 0.7rem; border-radius: 8px; color: rgba(255,255,255,0.55); font-size: 14px; cursor: pointer; transition: all 0.15s; text-decoration: none; margin-bottom: 2px; }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); }
+  .nav-item.active { background: rgba(255,255,255,0.12); color: #fff; }
+  .sidebar-bottom { margin-top: auto; }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 0.6rem 0.7rem; border-radius: 8px; background: rgba(255,255,255,0.07); }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--green-200); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--green-800); }
+  .user-info .name { font-size: 13px; font-weight: 500; color: #fff; }
+  .user-info .role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+  .main { flex: 1; padding: 2rem 2.5rem; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+  .topbar-left h1 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; }
+  .topbar-left p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+  .btn-add { display: flex; align-items: center; gap: 7px; padding: 0.55rem 1rem; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; }
+
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .cat-card {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .cat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+
+  .cat-header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .cat-icon-box {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cat-icon-box svg { width: 22px; height: 22px; }
+  
+  .cat-info h3 { font-size: 1.1rem; margin-top: 10px; margin-bottom: 4px; }
+  .cat-info p { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
+
+  .cat-actions {
+    display: flex; gap: 8px; border-top: 1px solid var(--border);
+    padding-top: 12px; margin-top: auto;
+  }
+
+  .action-btn { width: 32px; height: 32px; border-radius: 6px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; }
+  .action-btn svg { width: 14px; height: 14px; color: var(--text-muted); }
+  .action-btn.edit:hover { background: var(--green-50); border-color: var(--green-600); }
+  .action-btn.edit:hover svg { color: var(--green-600); }
+  .action-btn.delete:hover { background: var(--red-50); border-color: var(--red-400); }
+  .action-btn.delete:hover svg { color: var(--red-400); }
+
+  /* MOCK THEMES FOR CARDS */
+  .theme-food { background: var(--teal-50); color: var(--teal-600); }
+  .theme-transport { background: var(--amber-50); color: var(--amber-600); }
+  .theme-leisure { background: var(--green-50); color: var(--green-600); }
+  .theme-health { background: var(--red-50); color: var(--red-600); }
+  .theme-housing { background: #F1EFE8; color: #444441; }
+
+  /* MODALS */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center;
+    z-index: 1000; padding: 1rem; opacity: 0; transition: opacity 0.2s;
+  }
+  .modal-overlay.active { display: flex; opacity: 1; }
+  .modal-content {
+    background: var(--white); border-radius: 12px; width: 100%; max-width: 420px;
+    padding: 1.6rem; position: relative; transform: translateY(20px); transition: transform 0.2s;
+  }
+  .modal-overlay.active .modal-content { transform: translateY(0); }
+  .modal-close { position: absolute; top: 1.2rem; right: 1.2rem; background: none; border: none; cursor: pointer; color: var(--text-muted); }
+  .modal-header { margin-bottom: 1.4rem; }
+  .modal-header h3 { font-family: 'DM Serif Display', serif; font-size: 1.25rem; }
+
+  .field { margin-bottom: 1.1rem; }
+  .field label { display: block; font-size: 12px; font-weight: 500; color: var(--gray-800); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .field input, .field select, .field textarea {
+    width: 100%; border: 1px solid var(--border); border-radius: 8px;
+    padding: 0 12px; height: 42px; font-family: 'DM Sans', sans-serif; font-size: 14px;
+    color: var(--text); background: var(--bg); outline: none; transition: border-color 0.15s, background 0.15s;
+  }
+  .field input:focus, .field select:focus { border-color: var(--accent); background: #fff; }
+  
+  .btn-row { display: flex; gap: 10px; margin-top: 1.5rem; }
+  .btn-primary { flex: 1; height: 44px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; }
+  .btn-danger { flex: 1; height: 44px; background: var(--red-400); color: #fff; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; }
+  .btn-secondary { height: 44px; padding: 0 1rem; background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; }
+
+  /* Confirm Modal specific */
+  .confirm-modal-content { text-align: center; max-width: 380px; }
+  .confirm-icon { width: 50px; height: 50px; background: var(--red-50); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--red-400); }
+  .confirm-modal-content p { color: var(--text-muted); font-size: 14px; margin-bottom: 1.5rem; }
+
+  /* RESPONSIVE */
+  @media (max-width: 1023px) {
+    .sidebar { width: 180px; padding: 1rem 0.75rem; }
+    .logo-name { font-size: 15px; }
+    .nav-item { padding: 0.5rem 0.6rem; font-size: 13px; }
+    .main { padding: 1.5rem 2rem; }
+  }
+
+  @media (max-width: 767px) {
+    body { flex-direction: column; }
+    .sidebar { width: 100%; min-height: auto; flex-direction: row; align-items: center; padding: 1rem; overflow-x: auto; }
+    .logo { margin-bottom: 0; margin-right: 1rem; flex-shrink: 0; }
+    .logo-name { font-size: 14px; }
+    .nav-label { display: none; }
+    .nav-item { padding: 0.4rem 0.6rem; font-size: 12px; flex-shrink: 0; }
+    .sidebar-bottom { margin-left: auto; margin-top: 0; }
+    .user-pill { padding: 0.4rem 0.6rem; }
+    .user-info { display: none; }
+
+    .main { padding: 1rem; }
+    .topbar { flex-direction: column; gap: 1rem; align-items: flex-start; }
+    .btn-add { width: 100%; justify-content: center; }
+    
+    .categories-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#27500A" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    </div>
+    <span class="logo-name">ConektaFinance</span>
+  </div>
+
+  <span class="nav-label">Principal</span>
+  <a class="nav-item" href="tela-dashboard.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </a>
+  <a class="nav-item" href="tela-gastos.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    Gastos
+  </a>
+  <a class="nav-item active" href="tela-categorias.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+    Categorias
+  </a>
+
+  <span class="nav-label">Análise</span>
+  <a class="nav-item" href="tela-relatorios.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+    Relatórios
+  </a>
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    Alertas
+  </a>
+
+  <div class="sidebar-bottom">
+    <div class="user-pill">
+      <div class="avatar">JS</div>
+      <div class="user-info">
+        <div class="name">João Silva</div>
+        <div class="role">Conta pessoal</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Categorias</h1>
+      <p>Gerencie as tags para classificar seus gastos</p>
+    </div>
+    <button class="btn-add" id="btnNewCategory">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nova categoria
+    </button>
+  </div>
+
+  <div class="categories-grid">
+    <!-- Card 1 -->
+    <div class="cat-card">
+      <div class="cat-header">
+        <div class="cat-icon-box theme-food">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+        </div>
+      </div>
+      <div class="cat-info">
+        <h3>Alimentação</h3>
+        <p>Restaurantes, supermercado, delivery, lanches e feiras.</p>
+      </div>
+      <div class="cat-actions">
+        <button class="action-btn edit btn-edit-category" aria-label="Editar categoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <button class="action-btn delete btn-delete-category" aria-label="Excluir categoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="cat-card">
+      <div class="cat-header">
+        <div class="cat-icon-box theme-transport">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="8" rx="2" ry="2"/><circle cx="7" cy="15" r="1"/><circle cx="17" cy="15" r="1"/><path d="m14 6-4-4-4 4"/><path d="M10 2v9"/></svg>
+        </div>
+      </div>
+      <div class="cat-info">
+        <h3>Transporte</h3>
+        <p>Uber, táxi, combustível, manutenção do veículo e transporte público.</p>
+      </div>
+      <div class="cat-actions">
+        <button class="action-btn edit btn-edit-category" aria-label="Editar categoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <button class="action-btn delete btn-delete-category" aria-label="Excluir categoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="cat-card">
+      <div class="cat-header">
+        <div class="cat-icon-box theme-leisure">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14h20"/><path d="M2 10h20"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>
+        </div>
+      </div>
+      <div class="cat-info">
+        <h3>Lazer</h3>
+        <p>Cinema, assinaturas, festas, hobbies e compras não essenciais.</p>
+      </div>
+      <div class="cat-actions">
+        <button class="action-btn edit btn-edit-category" aria-label="Editar categoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <button class="action-btn delete btn-delete-category" aria-label="Excluir categoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- MODAL CATEOGORIA -->
+<div class="modal-overlay" id="categoryModal" role="dialog" aria-modal="true" aria-labelledby="catModalTitle">
+  <div class="modal-content">
+    <button class="modal-close" id="closeCatModalBtn" aria-label="Fechar modal">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="modal-header">
+      <h3 id="catModalTitle">Nova categoria</h3>
+    </div>
+
+    <div class="field">
+      <label>Nome da categoria</label>
+      <input type="text" placeholder="Ex: Educação" id="catName">
+    </div>
+
+    <div class="field">
+      <label>Descrição</label>
+      <input type="text" placeholder="Ex: Cursos, livros, faculdade..." id="catDesc">
+    </div>
+
+    <div class="field">
+      <label>Cor / Tema visual</label>
+      <select id="catColor">
+        <option>Verde (Padrão)</option>
+        <option>Azul/Teal (Alimentação)</option>
+        <option>Amarelo (Transporte)</option>
+        <option>Vermelho (Saúde)</option>
+        <option>Cinza (Moradia)</option>
+      </select>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" id="cancelCatModalBtn">Cancelar</button>
+      <button class="btn-primary" id="saveCatBtn">Salvar categoria</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAÇÃO DELETAR -->
+<div class="modal-overlay" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="delModalTitle">
+  <div class="modal-content confirm-modal-content">
+    <div class="confirm-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <h3 id="delModalTitle" style="font-family:'DM Serif Display',serif; font-size:1.3rem; margin-bottom:8px;">Excluir categoria?</h3>
+    <p>Tem certeza que deseja excluir esta categoria? Os gastos vinculados a ela poderão ficar sem classificação.</p>
+    
+    <div class="btn-row">
+      <button class="btn-secondary" id="cancelDelModalBtn">Cancelar</button>
+      <button class="btn-danger" id="confirmDelBtn">Sim, excluir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Category Modal Logic
+  const catModal = document.getElementById('categoryModal');
+  const btnNewCat = document.getElementById('btnNewCategory');
+  const btnCloseCat = document.getElementById('closeCatModalBtn');
+  const btnCancelCat = document.getElementById('cancelCatModalBtn');
+  const btnsEditCat = document.querySelectorAll('.btn-edit-category');
+  const catModalTitle = document.getElementById('catModalTitle');
+  const catNameInput = document.getElementById('catName');
+
+  function openCatModal(isEdit = false) {
+    catModalTitle.textContent = isEdit ? 'Editar categoria' : 'Nova categoria';
+    catModal.style.display = 'flex';
+    catModal.offsetHeight; // force reflow
+    catModal.classList.add('active');
+    catNameInput.focus();
+  }
+
+  function closeCatModal() {
+    catModal.classList.remove('active');
+    setTimeout(() => { catModal.style.display = 'none'; }, 200);
+  }
+
+  btnNewCat.addEventListener('click', () => openCatModal(false));
+  btnCloseCat.addEventListener('click', closeCatModal);
+  btnCancelCat.addEventListener('click', closeCatModal);
+  btnsEditCat.forEach(btn => btn.addEventListener('click', () => openCatModal(true)));
+
+  // Delete Modal Logic
+  const delModal = document.getElementById('deleteModal');
+  const btnsDeleteCat = document.querySelectorAll('.btn-delete-category');
+  const btnCancelDel = document.getElementById('cancelDelModalBtn');
+  const btnConfirmDel = document.getElementById('confirmDelBtn');
+
+  function openDelModal() {
+    delModal.style.display = 'flex';
+    delModal.offsetHeight;
+    delModal.classList.add('active');
+  }
+
+  function closeDelModal() {
+    delModal.classList.remove('active');
+    setTimeout(() => { delModal.style.display = 'none'; }, 200);
+  }
+
+  btnsDeleteCat.forEach(btn => btn.addEventListener('click', openDelModal));
+  btnCancelDel.addEventListener('click', closeDelModal);
+  btnConfirmDel.addEventListener('click', closeDelModal);
+
+  // Global Handlers
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (catModal.classList.contains('active')) closeCatModal();
+      if (delModal.classList.contains('active')) closeDelModal();
+    }
+  });
+
+  window.addEventListener('click', (e) => {
+    if (e.target === catModal) closeCatModal();
+    if (e.target === delModal) closeDelModal();
+  });
+</script>
+
+</body>
+</html>
