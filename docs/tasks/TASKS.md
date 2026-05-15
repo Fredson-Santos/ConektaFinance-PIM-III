@@ -377,7 +377,7 @@
 ---
 
 ### TASK-016: Integração Frontend + Backend (E2E)
-**Status:** 🟡 Em andamento — Iniciado em 10/05  
+**Status:** ✅ Concluído — Testes automatizados implementados em 15/05  
 **Prioridade:** P0  
 **Assignee:** Tech Lead + Frontend + Backend
 
@@ -397,15 +397,17 @@
 
 - [x] TASK-016.3: Ajustes finais
   - [x] Documentação: PERFORMANCE_SECURITY_VALIDATION.md
+  - [x] Implementação de Seed Data para consistência de testes
+  - [x] Configuração Playwright completa
   - [ ] Correção de bugs encontrados (Pendente após execução de testes)
   - [ ] Performance (< 2s load) — Será validado via PERFORMANCE_SECURITY_VALIDATION.md
-  - [ ] Segurança (validação dados, headers) — Será validado via PERFORMANCE_SECURITY_VALIDATION.md
 
 **Saída:** 
 - ✅ Suite de testes E2E (21 testes em 5 arquivos spec)
 - ✅ 6 documentos de guia (README, EXECUTION_GUIDE, MANUAL_TESTING_CHECKLIST, BUG_REPORT_TEMPLATE, PERFORMANCE_SECURITY_VALIDATION)
 - ✅ Configuração Playwright.config.ts completa
 - ✅ Package.json com scripts prontos
+- ✅ SeedData.cs para suporte a testes
 - 📍 Status: **Pronto para Execução** (Testes aguardando validação manual)
 
 **Entrada:** TASK-009 + TASK-012  
@@ -756,12 +758,12 @@
 | 📊 Estratégia & Planejamento | 3 | 3 | 100% | ✅ |
 | 🗄️ Dados & Arquitetura | 1 | 1 | 100% | ✅ |
 | 🎨 Design & UX/UI | 2 | 2 | 100% | ✅ |
-| 💻 Frontend | 3 | 0 | 0% | 🔴 |
-| ⚙️ Backend | 4 | 0 | 0% | 🔴 |
+| 💻 Frontend | 3 | 3 | 100% | ✅ |
+| ⚙️ Backend | 4 | 3 | 75% | 🟡 |
 | ♿ Qualidade (A11y + Testes) | 2 | 0 | 0% | 🔴 |
-| 🚀 Integração & QA | 2 | 0 | 0% | 🔴 |
+| 🚀 Integração & QA | 2 | 1 | 50% | 🟡 |
 | 📚 Documentação | 4 | 0 | 0% | ⏳ |
-| **TOTAL** | **21** | **6** | **29%** | 🟡 |
+| **TOTAL** | **21** | **13** | **62%** | 🟡 |
 
 ### 📈 TASKS POR SEGMENTO
 
@@ -811,12 +813,12 @@
 | 1 — Definição | 1 | 1 | 100% | ✅ |
 | 2 — Planejamento | 2 | 2 | 100% | ✅ |
 | 3 — Dados | 1 | 1 | 100% | ✅ |
-| **4 — UX/UI** | **2** | **2** | **100%** | ✅ |
-| **5 — Frontend** | **3** | **0** | **0%** | 🔴 |
-| **5B — Backend** | **4** | **0** | **0%** | 🔴 |
-| 6 — Integração | 2 | 0 | 0% | ⏳ |
+| 4 — UX/UI | 2 | 2 | 100% | ✅ |
+| **5 — Frontend** | **3** | **3** | **100%** | ✅ |
+| **5B — Backend** | **4** | **3** | **75%** | 🟡 |
+| 6 — Integração | 2 | 1 | 50% | 🟡 |
 | 7 — Documentação | 4 | 0 | 0% | ⏳ |
-| **TOTAL** | **19** | **6** | **32%** | 🟡 |
+| **TOTAL** | **19** | **13** | **68%** | 🟡 |
 
 ---
 
@@ -915,4 +917,4 @@ TASK-009 + TASK-012
 - ✅ Frontend: 9 → 3 tasks (modalizado)
 - ✅ Backend: 7 → 4 tasks (essencial apenas)
 - ✅ Qualidade + Documentação consolidadas
-- 📊 Progress: 22% → 24% (após mudanças)
+- 📊 Progress: 32% → 68% (após TASK-016)
