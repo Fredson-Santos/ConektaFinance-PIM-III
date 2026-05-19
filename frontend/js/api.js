@@ -1,8 +1,15 @@
 const API_BASE_URL = 'http://localhost:5041/api';
 
+// Função de sanitização contra XSS
+function sanitizeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str; // textContent escapa caracteres HTML
+  return div.innerHTML;
+}
+
 // Configuração de Toast (UX)
 function showToast(message, type = 'success') {
-  // Remover toast existente
   const existingToast = document.getElementById('app-toast');
   if (existingToast) existingToast.remove();
 
@@ -11,7 +18,6 @@ function showToast(message, type = 'success') {
   toast.className = `toast toast-${type}`;
   toast.textContent = message;
 
-  // Estilos inline do toast para evitar quebrar o CSS existente
   Object.assign(toast.style, {
     position: 'fixed',
     bottom: '20px',
@@ -32,13 +38,11 @@ function showToast(message, type = 'success') {
 
   document.body.appendChild(toast);
 
-  // Animar entrada
   requestAnimationFrame(() => {
     toast.style.opacity = '1';
     toast.style.transform = 'translateY(0)';
   });
 
-  // Remover após 3 segundos
   setTimeout(() => {
     toast.style.opacity = '0';
     toast.style.transform = 'translateY(20px)';
@@ -76,7 +80,6 @@ async function apiFetch(endpoint, options = {}) {
       throw new Error(errorMessage);
     }
 
-    // Retornar null se for 204 No Content
     if (response.status === 204) return null;
     
     return await response.json();
@@ -115,6 +118,21 @@ const AuthService = {
     localStorage.removeItem('pim_token');
     localStorage.removeItem('pim_user');
     window.location.href = 'tela-login.html';
+  },
+
+  loadUser() {
+    const userStr = localStorage.getItem('pim_user');
+    const token = localStorage.getItem('pim_token');
+    
+    if (!userStr || !token) {
+      return null;
+    }
+    
+    try {
+      return JSON.parse(userStr);
+    } catch (e) {
+      return null;
+    }
   }
 };
 
@@ -125,6 +143,14 @@ const ExpenseService = {
   update: (id, data) => apiFetch(`/expenses/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: (id) => apiFetch(`/expenses/${id}`, { method: 'DELETE' })
 };
+
+const IncomeService = {
+  getAll: () => apiFetch('/incomes'),
+  getById: (id) => apiFetch(`/incomes/${id}`),
+  create: (data) => apiFetch('/incomes', { method: 'POST', body: JSON.stringify(data) }),
+  delete: (id) => apiFetch(`/incomes/${id}`, { method: 'DELETE' })
+};
+
 
 const CategoryService = {
   getAll: () => apiFetch('/categories'),
@@ -168,3 +194,42 @@ const Utils = {
     if (el) el.innerHTML = '<div style="display:flex; justify-content:center; padding: 2rem;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div><style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>';
   }
 };
+
+// ==========================================
+// GERENCIAMENTO DE SESSÃO / USUÁRIO (DOM)
+// ==========================================
+function updateUserInfo() {
+  const userStr = localStorage.getItem('pim_user');
+  if (!userStr) return;
+
+  try {
+    const user = JSON.parse(userStr);
+    const nameElem = document.querySelector('.user-pill .name');
+    const roleElem = document.querySelector('.user-pill .role');
+    const avatarElem = document.querySelector('.user-pill .avatar');
+
+    if (nameElem && user.fullName) {
+      nameElem.textContent = user.fullName;
+    }
+
+    if (roleElem) {
+      roleElem.textContent = user.accountType === 'Standard' ? 'Conta pessoal' : (user.accountType || 'Conta pessoal');
+    }
+
+    if (avatarElem && user.fullName) {
+      const parts = user.fullName.trim().split(/\s+/);
+      let initials = '';
+      if (parts.length >= 2) {
+        initials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      } else if (parts.length === 1 && parts[0].length > 0) {
+        initials = parts[0].substring(0, 2).toUpperCase();
+      }
+      avatarElem.textContent = initials;
+    }
+  } catch (err) {
+    console.error('Erro ao atualizar informações do usuário:', err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', updateUserInfo);
+updateUserInfo();

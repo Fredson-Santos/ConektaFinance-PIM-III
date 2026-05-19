@@ -60,10 +60,15 @@
   .nav-item:hover { background: rgba(255,255,255,0.15); color: #fff; }
   .nav-item.active { background: rgba(255,255,255,0.12); color: #fff; }
   .sidebar-bottom { margin-top: auto; }
-  .user-pill { display: flex; align-items: center; gap: 10px; padding: 0.6rem 0.7rem; border-radius: 8px; background: rgba(255,255,255,0.07); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 0.6rem 0.7rem; border-radius: 8px; background: rgba(255,255,255,0.07); cursor: pointer; transition: all 0.15s; }
+  .user-pill:hover { background: rgba(255,255,255,0.15); }
   .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--green-200); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--green-800); }
   .user-info .name { font-size: 13px; font-weight: 500; color: #fff; }
   .user-info .role { font-size: 11px; color: rgba(255,255,255,0.7); }
+  .btn-logout { background: transparent; border: none; color: rgba(255,255,255,0.55); cursor: pointer; padding: 4px; margin-left: auto; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: all 0.15s; }
+  .btn-logout:hover { color: #E24B4A; background: rgba(226, 75, 74, 0.15); }
+  .btn-logout-top { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+  .btn-logout-top:hover { color: var(--red-400); background: var(--red-50); border-color: var(--red-400); }
 
   .main { flex: 1; padding: 2rem 2.5rem; overflow-y: auto; }
   .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
@@ -715,6 +720,16 @@
   .metric-card.accent-green .mc-label { color: rgba(255,255,255,0.5); }
   .metric-card.accent-green .mc-value { color: var(--green-100); }
   .metric-card.accent-green .mc-sub { color: rgba(255,255,255,0.5); }
+
+  .metric-card.accent-blue { background: #1B3B57; border-color: #1B3B57; }
+  .metric-card.accent-blue .mc-label { color: rgba(255,255,255,0.65); }
+  .metric-card.accent-blue .mc-value { color: #93C5FD; }
+  .metric-card.accent-blue .mc-sub { color: rgba(255,255,255,0.65); }
+
+  .metric-card.accent-red { background: #7A2323; border-color: #7A2323; }
+  .metric-card.accent-red .mc-label { color: rgba(255,255,255,0.65); }
+  .metric-card.accent-red .mc-value { color: #F7C1C1; }
+  .metric-card.accent-red .mc-sub { color: rgba(255,255,255,0.65); }
 
   /* CHARTS ROW */
   .charts-row { display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; margin-bottom: 1.8rem; }

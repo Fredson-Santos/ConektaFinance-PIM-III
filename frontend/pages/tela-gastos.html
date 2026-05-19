@@ -46,15 +46,15 @@
   </a>
   <a class="nav-item" href="tela-insights.html">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3"/></svg>
-    IA Simulada
+    Insights
   </a>
 
   <div class="sidebar-bottom">
-    <div class="user-pill" role="group" aria-label="Informações do usuário">
-      <div class="avatar" aria-hidden="true">JS</div>
+    <div class="user-pill" role="button" tabindex="0" onclick="AuthService.logout()" aria-label="Informações do usuário. Clique para sair do sistema" title="Clique para sair (Logoff)">
+      <div class="avatar" aria-hidden="true">...</div>
       <div class="user-info">
-        <div class="name">João Silva</div>
-        <div class="role">Conta pessoal</div>
+        <div class="name">Carregando...</div>
+        <div class="role">...</div>
       </div>
     </div>
   </div>
@@ -66,10 +66,15 @@
       <h1>Gastos</h1>
       <p>24 lançamentos em maio 2025</p>
     </div>
-    <button class="btn-add" id="openModalBtn" aria-label="Registrar novo gasto">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Novo gasto
-    </button>
+    <div class="topbar-right">
+      <button class="btn-add" id="openModalBtn" aria-label="Registrar novo gasto">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo gasto
+      </button>
+      <!-- <button class="btn-logout-top" onclick="AuthService.logout()" aria-label="Sair do sistema" title="Sair">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+      </button> -->
+    </div>
   </div>
 
   <div class="content-grid">
@@ -85,10 +90,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
             Filtrar
           </button>
-          <button class="filter-btn" aria-label="Selecionar período">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            Maio 2025
-          </button>
+          <input type="month" id="filterMonthInput" class="filter-btn" value="2025-05" aria-label="Selecionar período" style="font-family:'DM Sans', sans-serif; font-size:13px; font-weight:500; color:var(--text-muted); background:var(--white); border:1px solid var(--border); border-radius:8px; padding:0.45rem 0.8rem; cursor:pointer; outline:none; height:38px;">
         </div>
         <table>
           <caption>Lista de gastos de Maio 2025</caption>
@@ -237,15 +239,15 @@
       
       return `
       <tr>
-        <td data-label="Descrição"><strong style="font-weight:500">${e.description}</strong><br><span style="font-size:11px;color:var(--text-muted)">${e.observation || ''}</span></td>
+        <td data-label="Descrição"><strong style="font-weight:500">${sanitizeHtml(e.description)}</strong><br><span style="font-size:11px;color:var(--text-muted)">${sanitizeHtml(e.observation || '')}</span></td>
         <td data-label="Categoria">
-          ${cat ? `<span class="cat-badge" style="background:${cat.colorHex}22; color:${cat.colorHex}">${cat.name}</span>` : `<span class="cat-badge cat-housing">Sem Categoria</span>`}
+          ${cat ? `<span class="cat-badge" style="background:${cat.colorHex}22; color:${cat.colorHex}">${sanitizeHtml(cat.name)}</span>` : `<span class="cat-badge cat-housing">Sem Categoria</span>`}
         </td>
         <td data-label="Data" style="color:var(--text-muted)">${Utils.formatDate(e.date)}</td>
         <td data-label="Valor" class="amount" style="text-align:right">−${Utils.formatCurrency(e.amount)}</td>
         <td>
           <div class="actions">
-            <button class="action-btn edit" onclick="editExpense(${e.id}, this)" aria-label="Editar gasto ${e.description}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            <button class="action-btn edit" onclick="editExpense(${e.id}, this)" aria-label="Editar gasto ${sanitizeHtml(e.description)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
             <button class="action-btn" onclick="deleteExpense(${e.id})" aria-label="Excluir gasto ${e.description}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
           </div>
         </td>
@@ -372,6 +374,19 @@
   modal.addEventListener('click', (e) => {
     if (e.target === modal) closeModal();
   });
+
+  // Filter Month Input
+  const filterMonthInput = document.getElementById('filterMonthInput');
+  if (filterMonthInput) {
+    filterMonthInput.addEventListener('change', (e) => {
+      const [year, month] = e.target.value.split('-');
+      const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+      const nomeMes = meses[parseInt(month) - 1] || month;
+      document.querySelector('.topbar-left p').textContent = `24 lançamentos em ${nomeMes.toLowerCase()} ${year}`;
+      showToast(`Filtrando despesas para ${nomeMes} de ${year}...`);
+      loadExpenses();
+    });
+  }
 
   // Start app
   init();

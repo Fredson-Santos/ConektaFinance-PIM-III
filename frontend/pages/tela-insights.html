@@ -6,6 +6,21 @@
 <title>ConektaFinance — Insights da IA</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/global.css">
+<style>
+  .insight-card { transition: all 0.3s ease; }
+  .insight-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  .theme-save { border-left: 4px solid #27500A; }
+  .theme-warn { border-left: 4px solid #FF6B35; }
+  .theme-opt { border-left: 4px solid #0066FF; }
+  .filter-group { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .filter-btn { padding: 8px 16px; border: 1px solid var(--border-color); border-radius: 6px; background: white; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+  .filter-btn.active { background: #27500A; color: white; border-color: #27500A; }
+  .filter-btn:hover { border-color: #27500A; }
+  .insights-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .stat-card { background: linear-gradient(135deg, #f5f7fa 0%, #f9fbfd 100%); padding: 20px; border-radius: 8px; text-align: center; }
+  .stat-num { font-size: 28px; font-weight: 600; color: #27500A; }
+  .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+</style>
 </head>
 <body>
 
@@ -23,31 +38,62 @@
   <span class="nav-label">Análise</span>
   <a class="nav-item" href="tela-relatorios.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Relatórios</a>
   <a class="nav-item" href="tela-alertas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Alertas</a>
-  <a class="nav-item active" href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3"/></svg>IA Simulada</a>
+  <a class="nav-item active" href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>Insights</a>
   <div class="sidebar-bottom">
-    <div class="user-pill" role="group" aria-label="Informações do usuário"><div class="avatar" aria-hidden="true">JS</div><div class="user-info"><div class="name">João Silva</div><div class="role">Conta pessoal</div></div></div>
+    <div class="user-pill" role="button" tabindex="0" onclick="AuthService.logout()" aria-label="Informações do usuário. Clique para sair do sistema" title="Clique para sair (Logoff)">
+      <div class="avatar" aria-hidden="true">...</div>
+      <div class="user-info"><div class="name">Carregando...</div><div class="role">...</div></div>
+    </div>
   </div>
 </aside>
 
 <main class="main" id="main-content" role="main">
   <header class="topbar">
     <div class="topbar-left">
-      <h1><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Insights</h1>
+      <h1><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Insights</h1>
       <p>Recomendações inteligentes baseadas no seu padrão de gastos</p>
     </div>
     <nav class="topbar-right" aria-label="Seleção de período">
       <div class="period-tabs">
-        <button class="period-tab" aria-pressed="false">Este Mês</button>
-        <button class="period-tab active" aria-pressed="true">Últimos 3 Meses</button>
-        <button class="period-tab" aria-pressed="false">Este Ano</button>
+        <button class="period-tab" data-period="month" aria-pressed="false">Este Mês</button>
+        <button class="period-tab active" data-period="quarter" aria-pressed="true">Últimos 3 Meses</button>
+        <button class="period-tab" data-period="year" aria-pressed="false">Este Ano</button>
       </div>
     </nav>
   </header>
 
   <section class="hero-insight" aria-labelledby="hero-insight-title">
-    <span class="hero-label">Destaque do Período</span>
-    <h2 id="hero-insight-title" class="hero-title">Você está no caminho certo! Seus gastos com assinaturas diminuíram 15% neste trimestre.</h2>
+    <span class="hero-label">✨ Destaque do Período</span>
+    <h2 id="hero-insight-title" class="hero-title">Analisando seus gastos...</h2>
     <a href="tela-relatorios.html" class="hero-action" aria-label="Ver detalhes do relatório de gastos">Ver detalhes do relatório <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+  </section>
+
+  <section aria-labelledby="stats-title">
+    <h2 id="stats-title" class="sr-only">Estatísticas de insights</h2>
+    <div class="insights-stats" id="statsContainer">
+      <div class="stat-card">
+        <div class="stat-num" id="totalInsights">0</div>
+        <div class="stat-label">Insights Ativos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="highPriority">0</div>
+        <div class="stat-label">Prioridade Alta</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="savingsOpportunity">-</div>
+        <div class="stat-label">Economia Potencial</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="filterSection" aria-labelledby="filter-title">
+    <h2 id="filter-title" class="sr-only">Filtrar insights</h2>
+    <div class="filter-group">
+      <button class="filter-btn active" data-filter="all">Todos</button>
+      <button class="filter-btn" data-filter="Economia">💰 Economia</button>
+      <button class="filter-btn" data-filter="Alerta">⚠️ Alerta</button>
+      <button class="filter-btn" data-filter="Otimização">⚡ Otimização</button>
+    </div>
   </section>
 
   <section id="insightsListSection" aria-labelledby="grid-title">
@@ -61,55 +107,153 @@
 
 <script src="../js/api.js"></script>
 <script>
+  let allInsights = [];
+  let currentFilter = 'all';
+
   async function loadInsights() {
     const grid = document.getElementById('insightsGrid');
     Utils.showLoading('insightsGrid');
 
     try {
       const insights = await InsightService.getAll();
+      allInsights = insights || [];
       
-      if (insights.length === 0) {
-        grid.innerHTML = '<p style="text-align:center;grid-column:1/-1;">Não há insights suficientes no momento. Continue registrando seus gastos.</p>';
+      if (allInsights.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;"><p style="font-size:16px;color:var(--text-muted)">Não há insights suficientes no momento.</p><p style="font-size:14px;color:var(--text-muted);margin-top:8px;">Continue registrando seus gastos para obter recomendações personalizadas.</p></div>';
+        updateStats([]);
         return;
       }
 
-      grid.innerHTML = insights.map(i => {
-        let themeClass = 'theme-opt';
-        let iconHtml = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
-        let catLabel = 'Otimização';
-        
-        if (i.category === 'Economia') {
-          themeClass = 'theme-save';
-          catLabel = 'Economia';
-          iconHtml = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
-        } else if (i.category === 'Alerta') {
-          themeClass = 'theme-warn';
-          catLabel = 'Alerta';
-          iconHtml = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>';
-        }
+      updateStats(allInsights);
+      renderInsights(allInsights);
 
-        return `
-          <article class="insight-card ${themeClass}" aria-labelledby="insight-title-${i.id}">
-            <div class="card-header">
-              <div class="card-icon" aria-hidden="true">${iconHtml}</div>
-              <span class="impact-badge">${i.priority === 'Alto' ? 'ALTO IMPACTO' : i.priority.toUpperCase()}</span>
-            </div>
-            <div class="card-content">
-              <h3 id="insight-title-${i.id}">${i.title}</h3>
-              <p>${i.description}</p>
-            </div>
-            <div class="card-footer">
-              <button class="btn-apply" aria-label="Ver análise detalhada para ${i.title}">Ver análise</button>
-            </div>
-          </article>
-        `;
-      }).join('');
+      // Update hero
+      const mainInsight = allInsights[0];
+      if (mainInsight) {
+        document.querySelector('.hero-title').textContent = mainInsight.title;
+      }
     } catch (err) {
-      grid.innerHTML = '<p style="color:red;grid-column:1/-1;">Erro ao carregar insights.</p>';
+      grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--error);">Erro ao carregar insights.</div>';
     }
   }
 
-  loadInsights();
+  function updateStats(insights) {
+    document.getElementById('totalInsights').textContent = insights.length;
+    const highCount = insights.filter(i => i.priority === 'Alto').length;
+    document.getElementById('highPriority').textContent = highCount;
+    
+    const savingsTotal = insights
+      .filter(i => i.category === 'Economia')
+      .reduce((sum, i) => sum + (parseFloat(i.impact) || 0), 0);
+    
+    document.getElementById('savingsOpportunity').textContent = savingsTotal > 0 
+      ? Utils.formatCurrency(savingsTotal) 
+      : '-';
+  }
+
+  function renderInsights(insights) {
+    const grid = document.getElementById('insightsGrid');
+    const filtered = currentFilter === 'all' 
+      ? insights 
+      : insights.filter(i => i.category === currentFilter);
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;"><p style="color:var(--text-muted);">Nenhum insight encontrado nesta categoria.</p></div>';
+      return;
+    }
+
+    grid.innerHTML = filtered.map(i => {
+      let themeClass = 'theme-opt';
+      let categoryEmoji = '⚡';
+      let iconHtml = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+      
+      if (i.category === 'Economia') {
+        themeClass = 'theme-save';
+        categoryEmoji = '💰';
+        iconHtml = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
+      } else if (i.category === 'Alerta') {
+        themeClass = 'theme-warn';
+        categoryEmoji = '⚠️';
+        iconHtml = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>';
+      }
+
+      return `
+        <article class="insight-card ${themeClass}" aria-labelledby="insight-title-${i.id}">
+          <div class="card-header">
+            <div class="card-icon" aria-hidden="true">${iconHtml}</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span class="impact-badge" style="background:${i.priority === 'Alto' ? '#FF6B35' : i.priority === 'Médio' ? '#FFA500' : '#27500A'};color:white;padding:4px 12px;border-radius:12px;font-size:11px;font-weight:600;">${i.priority === 'Alto' ? '🔴 ALTO' : i.priority === 'Médio' ? '🟡 MÉDIO' : '🟢 BAIXO'}</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <h3 id="insight-title-${i.id}" style="margin:12px 0 8px;font-size:16px;font-weight:600;">${sanitizeHtml(i.title)}</h3>
+            <p style="color:var(--text-muted);font-size:14px;line-height:1.5;margin:0;">${sanitizeHtml(i.description)}</p>
+            ${i.impact ? `<div style="margin-top:12px;padding:8px 12px;background:rgba(39,80,10,0.05);border-radius:4px;font-size:13px;font-weight:500;color:#27500A;">Impacto potencial: ${Utils.formatCurrency(i.impact)}</div>` : ''}
+          </div>
+          <div class="card-footer" style="display:flex;gap:8px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.05);">
+            <button class="btn-apply" style="flex:1;padding:8px 12px;border:1px solid #27500A;color:#27500A;background:white;border-radius:4px;cursor:pointer;font-weight:500;transition:all 0.2s;" onclick="alert('Funcionalidade disponível em breve')" aria-label="Ver análise detalhada para ${sanitizeHtml(i.title)}">Analisar</button>
+          </div>
+        </article>
+      `;
+    }).join('');
+  }
+
+  // Filter buttons
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      currentFilter = e.target.dataset.filter;
+      renderInsights(allInsights);
+    });
+  });
+
+  // Period tabs
+  document.querySelectorAll('.period-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      document.querySelectorAll('.period-tab').forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-pressed', 'false');
+      });
+      e.target.classList.add('active');
+      e.target.setAttribute('aria-pressed', 'true');
+      loadInsights();
+    });
+  });
+
+  // Utility Functions
+  function sanitizeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Load user info
+  async function loadUserInfo() {
+    try {
+      const user = AuthService.loadUser();
+      if (!user) {
+        console.warn('Usuário não autenticado');
+        // Apenas redireciona se realmente não houver token
+        if (!localStorage.getItem('pim_token')) {
+          window.location.href = 'tela-login.html';
+        }
+      }
+    } catch (err) {
+      console.warn('Erro ao carregar usuário:', err);
+      // Não redireciona em caso de erro, apenas avisa
+    }
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    loadUserInfo();
+    loadInsights();
+  });
+  if (document.readyState !== 'loading') {
+    loadUserInfo();
+    loadInsights();
+  }
 </script>
 </body>
 </html>
