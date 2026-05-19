@@ -25,7 +25,7 @@ public static class SeedData
                 Id = 1,
                 Email = "usuario@teste.com",
                 PasswordHash = HashPassword("senha123"),
-                Name = "Usuário Teste",
+                FullName = "Usuário Teste",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             },
@@ -34,7 +34,7 @@ public static class SeedData
                 Id = 2,
                 Email = "joao@teste.com",
                 PasswordHash = HashPassword("senha456"),
-                Name = "João Silva",
+                FullName = "João Silva",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             },
@@ -43,7 +43,7 @@ public static class SeedData
                 Id = 3,
                 Email = "maria@teste.com",
                 PasswordHash = HashPassword("senha789"),
-                Name = "Maria Santos",
+                FullName = "Maria Santos",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             }
@@ -55,11 +55,11 @@ public static class SeedData
         // Criar orçamentos para as categorias
         var budgets = new List<Budget>
         {
-            new Budget { Id = 1, UserId = 1, CategoryId = 1, MonthlyLimit = 700m, Month = 5, Year = 2026, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new Budget { Id = 2, UserId = 1, CategoryId = 2, MonthlyLimit = 300m, Month = 5, Year = 2026, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new Budget { Id = 3, UserId = 1, CategoryId = 3, MonthlyLimit = 250m, Month = 5, Year = 2026, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new Budget { Id = 4, UserId = 1, CategoryId = 4, MonthlyLimit = 400m, Month = 5, Year = 2026, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new Budget { Id = 5, UserId = 1, CategoryId = 6, MonthlyLimit = 1500m, Month = 5, Year = 2026, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+            new Budget { Id = 1, UserId = 1, CategoryId = 1, LimitValue = 700m, PeriodMonth = 5, PeriodYear = 2026, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Budget { Id = 2, UserId = 1, CategoryId = 2, LimitValue = 300m, PeriodMonth = 5, PeriodYear = 2026, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Budget { Id = 3, UserId = 1, CategoryId = 3, LimitValue = 250m, PeriodMonth = 5, PeriodYear = 2026, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Budget { Id = 4, UserId = 1, CategoryId = 4, LimitValue = 400m, PeriodMonth = 5, PeriodYear = 2026, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Budget { Id = 5, UserId = 1, CategoryId = 6, LimitValue = 1500m, PeriodMonth = 5, PeriodYear = 2026, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
         };
 
         context.Budgets.AddRange(budgets);
@@ -441,7 +441,7 @@ public static class SeedData
                 Id = 3,
                 UserId = 1,
                 CategoryId = 6,
-                Type = AlertType.BudgetWarning,
+                Type = AlertType.CategoryLimit,
                 Title = "Moradia — 87% do orçamento",
                 Message = "Cuidado para não ultrapassar o limite",
                 IsRead = false,

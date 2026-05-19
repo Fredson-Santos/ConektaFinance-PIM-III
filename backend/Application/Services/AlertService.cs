@@ -23,7 +23,9 @@ public class AlertService : IAlertService
         var alerts = await _alertRepository.GetByUserIdAsync(userId, onlyUnread);
         return alerts.Select(a => new AlertResponse(
             a.Id,
-            a.Type,
+            a.Type == AlertType.BudgetExceeded ? "orcamento_excedido" :
+            a.Type == AlertType.CategoryLimit ? "categoria_limite" : "gasto_alto",
+            a.Title,
             a.Message,
             a.CategoryId,
             a.Category?.Name,
@@ -69,9 +71,11 @@ public class AlertService : IAlertService
                     UserId = userId,
                     CategoryId = categoryId,
                     Type = AlertType.BudgetExceeded,
+                    Title = "Orçamento Excedido",
                     Message = $"Orçamento da categoria excedido! Limite: {budget.LimitValue:C2}, Gasto: {totalSpent:C2}",
                     IsRead = false,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
                 });
             }
             else if (totalSpent > budget.LimitValue * 0.8m)
@@ -81,9 +85,11 @@ public class AlertService : IAlertService
                     UserId = userId,
                     CategoryId = categoryId,
                     Type = AlertType.CategoryLimit,
+                    Title = "Quase no Limite",
                     Message = $"Você atingiu 80% do orçamento da categoria. Gasto: {totalSpent:C2}",
                     IsRead = false,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
                 });
             }
         }

@@ -8,9 +8,11 @@ public class Alert
     public int UserId { get; set; }
     public User User { get; set; } = null!;
     public AlertType Type { get; set; }
+    public string Title { get; set; } = string.Empty;
     public string Message { get; set; } = string.Empty;
     public int? CategoryId { get; set; }
     public Category? Category { get; set; }
     public bool IsRead { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }
