@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Serviço do Backend (ASP.NET Core 10.0 Web API)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: conektafinance-backend
+    restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/financeiro.db
+      - Cors__AllowedOrigins__0=http://localhost
+      - Cors__AllowedOrigins__1=http://127.0.0.1
+    volumes:
+      - sqlite_data:/app/data
+
+  # Serviço do Frontend (Nginx servindo arquivos estáticos e atuando como proxy reverso)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: conektafinance-frontend
+    restart: always
+    ports:
+      - "80:80" # Expõe a porta 80 padrão da VPS para acesso público
+    depends_on:
+      - backend
+
+volumes:
+  sqlite_data:
+    driver: local
