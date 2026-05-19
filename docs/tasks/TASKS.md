@@ -227,7 +227,7 @@
 ## 🔴 FASE 5B — Desenvolvimento Backend [NÃO INICIADO]
 
 ### TASK-010: Estrutura Base .NET + Autenticação JWT
-**Status:** 🟡 Em andamento — Setup iniciado em 09/05  
+**Status:** ✅ Concluído  
 **Prioridade:** P0  
 **Assignee:** Backend Developer
 
@@ -780,22 +780,22 @@
 - ✅ TASK-006 — Design System + Protótipos HTML
 
 #### 💻 Frontend (3 tasks)
-- ⏳ TASK-007 — Modal + Categorias
-- ⏳ TASK-008 — Features Adicionais
-- ⏳ TASK-009 — Integração API
+- ✅ TASK-007 — Modal + Categorias
+- ✅ TASK-008 — Features Adicionais
+- ✅ TASK-009 — Integração API
 
 #### ⚙️ Backend (4 tasks)
-- ⏳ TASK-010 — Estrutura Base .NET
-- ⏳ TASK-011 — API CRUD MVP
-- ⏳ TASK-012 — Relatórios e Alertas
-- ⏳ TASK-013 — Testes Unitários
+- ✅ TASK-010 — Estrutura Base .NET
+- ✅ TASK-011 — API CRUD MVP
+- ✅ TASK-012 — Relatórios e Alertas
+- 🟡 TASK-013 — Testes Unitários
 
 #### ♿ Qualidade (2 tasks)
-- ⏳ TASK-014 — Acessibilidade
+- 🟡 TASK-014 — Acessibilidade
 - ⏳ TASK-015 — Testes Responsivos
 
 #### 🚀 Integração & QA (2 tasks)
-- ⏳ TASK-016 — Integração E2E
+- ✅ TASK-016 — Integração E2E
 - ⏳ TASK-017 — Testes de Aceitação
 
 #### 📚 Documentação (4 tasks)
