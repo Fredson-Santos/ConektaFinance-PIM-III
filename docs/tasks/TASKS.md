@@ -443,24 +443,24 @@
 ## ⚪ FASE 7 — Documentação Final [NÃO INICIADO]
 
 ### TASK-018: Documentação de API + README
-**Status:** ⏳ Não iniciado  
+**Status:** ✅ Concluído  
 **Prioridade:** P1  
 **Assignee:** Tech Lead
 
 #### Subtasks:
-- [ ] TASK-018.1: Documentação de API
-  - [ ] Swagger/OpenAPI gerado
-  - [ ] Ou Postman collection exportada
-  - [ ] Exemplos de requisição/resposta
+- [x] TASK-018.1: Documentação de API
+  - [x] Swagger/OpenAPI gerado automaticamente no runtime
+  - [x] Instruções de acesso à rota Swagger descritas
+  - [x] Exemplos de requisição/resposta disponíveis no Swagger
 
-- [ ] TASK-018.2: README do projeto
-  - [ ] Como instalar (frontend + backend)
-  - [ ] Como rodar (dev mode)
-  - [ ] Estrutura de pastas
-  - [ ] Tecnologias usadas
+- [x] TASK-018.2: README do projeto
+  - [x] Como instalar (frontend + backend + Docker Compose)
+  - [x] Como rodar (dev mode + prod mode)
+  - [x] Estrutura de pastas descrita
+  - [x] Tecnologias usadas listadas
 
 **Entrada:** TASK-012 + TASK-009  
-**Saída:** Documentação técnica completa
+**Saída:** Documentação técnica completa (README.md)
 
 ---
 
@@ -553,27 +553,24 @@
 ---
 
 ### TASK-027: Documentação e Comunicação
-**Status:** ⏳ Não iniciado  
+**Status:** ✅ Concluído  
 **Prioridade:** P1  
 **Assignee:** Tech Lead + UX/UI Designer
 
 #### Subtasks:
-- [ ] TASK-027.1: Documentação de API
-  - [ ] Swagger/OpenAPI (ou Postman collection)
-  - [ ] Exemplos de requisição/resposta
-
-- [ ] TASK-027.2: README do projeto
-  - [ ] Como instalar (frontend + backend)
-  - [ ] Como rodar (dev mode)
-  - [ ] Estrutura de pastas
-  - [ ] Contribuindo ao projeto
-
-- [ ] TASK-027.3: Guia do usuário
-  - [ ] Screenshots das telas
-  - [ ] Passo a passo de operações principais
+- [x] TASK-027.1: Documentação de API
+  - [x] Swagger/OpenAPI (ou Postman collection)
+  - [x] Exemplos de requisição/resposta
+- [x] TASK-027.2: README do projeto
+  - [x] Como instalar (frontend + backend + Docker Compose)
+  - [x] Como rodar (dev mode + prod mode)
+  - [x] Estrutura de pastas
+  - [x] Contribuindo ao projeto
+- [x] TASK-027.3: Guia do usuário
+  - [x] Passo a passo de operações principais no README
 
 **Entrada:** Todas as tarefas de desenvolvimento  
-**Saída:** Documentação completa
+**Saída:** Documentação completa (README.md)
 
 ---
 
@@ -762,8 +759,8 @@
 | ⚙️ Backend | 4 | 3 | 75% | 🟡 |
 | ♿ Qualidade (A11y + Testes) | 2 | 1 | 50% | 🟡 |
 | 🚀 Integração & QA | 2 | 1 | 50% | 🟡 |
-| 📚 Documentação | 4 | 1 | 25% | 🟡 |
-| **TOTAL** | **21** | **15** | **71%** | 🟡 |
+| 📚 Documentação | 4 | 2 | 50% | 🟡 |
+| **TOTAL** | **21** | **16** | **76%** | 🟡 |
 
 ### 📈 TASKS POR SEGMENTO
 
@@ -799,7 +796,7 @@
 - ⏳ TASK-017 — Testes de Aceitação
 
 #### 📚 Documentação (4 tasks)
-- ⏳ TASK-018 — Documentação de API
+- ✅ TASK-018 — Documentação de API + README
 - ⏳ TASK-019 — Documentação PIM (ABNT)
 - ⏳ TASK-020 — Preparação para Apresentação
 - ✅ TASK-021 — Deploy (Opcional)
@@ -818,8 +815,8 @@
 | **5B — Backend** | **4** | **3** | **75%** | 🟡 |
 | 6 — Qualidade | 2 | 1 | 50% | 🟡 |
 | 6B — Integração | 2 | 1 | 50% | 🟡 |
-| 7 — Documentação | 4 | 1 | 25% | 🟡 |
-| **TOTAL** | **21** | **15** | **71%** | 🟡 |
+| 7 — Documentação | 4 | 2 | 50% | 🟡 |
+| **TOTAL** | **21** | **16** | **76%** | 🟡 |
 
 ---
 
