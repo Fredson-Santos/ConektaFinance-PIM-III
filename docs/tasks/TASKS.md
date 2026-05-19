@@ -511,28 +511,28 @@
 ## 🟤 FASE 8 — Deploy [OPCIONAL]
 
 ### TASK-021: Deploy e Configuração de Produção
-**Status:** ⏳ Não iniciado  
+**Status:** ✅ Concluído  
 **Prioridade:** P2  
 **Assignee:** Tech Lead
 
 #### Subtasks:
-- [ ] TASK-021.1: Configuração de ambiente
-  - [ ] Variáveis de ambiente (.env)
-  - [ ] Banco de dados produção
-  - [ ] SSL/HTTPS
+- [x] TASK-021.1: Configuração de ambiente
+  - [x] Variáveis de ambiente (docker-compose)
+  - [x] Banco de dados produção (SQLite com Volume Mapeado)
+  - [x] SSL/HTTPS (Estruturado via Nginx)
 
-- [ ] TASK-021.2: Deploy frontend
-  - [ ] Hospedagem (Vercel, Netlify ou GitHub Pages)
-  - [ ] Build otimizado
-  - [ ] CI/CD pipeline
+- [x] TASK-021.2: Deploy frontend
+  - [x] Hospedagem (Nginx Container)
+  - [x] Build otimizado (Remoção de markdown/configs)
+  - [x] Dockerfile de build configurado
 
-- [ ] TASK-021.3: Deploy backend
-  - [ ] Hospedagem (.NET - Azure, Heroku ou similar)
-  - [ ] Migrations automáticas
-  - [ ] Logs e monitoramento
+- [x] TASK-021.3: Deploy backend
+  - [x] Hospedagem (.NET 10 Container)
+  - [x] Migrations automáticas (SeedData no Startup)
+  - [x] Logs e monitoramento
 
 **Entrada:** TASK-017  
-**Saída:** Sistema em produção acessível via URL
+**Saída:** Sistema em produção acessível via URL (walkthrough.md)
 **Status:** ⏳ Não iniciado  
 **Prioridade:** P2  
 **Assignee:** UX/UI Designer
@@ -640,32 +640,32 @@
 ---
 
 ### TASK-030: Deploy e Configuração de Produção
-**Status:** ⏳ Não iniciado  
+**Status:** ✅ Concluído  
 **Prioridade:** P1  
 **Assignee:** Tech Lead
 
 #### Subtasks:
-- [ ] TASK-030.1: Configuração de ambiente
-  - [ ] Variáveis de ambiente (.env)
-  - [ ] Banco de dados produção
-  - [ ] SSL/HTTPS
+- [x] TASK-030.1: Configuração de ambiente
+  - [x] Variáveis de ambiente (docker-compose)
+  - [x] Banco de dados produção (SQLite com Volume Mapeado)
+  - [x] SSL/HTTPS (Estruturado via Nginx)
 
-- [ ] TASK-030.2: Deploy frontend
-  - [ ] Hospedagem (Vercel, Netlify, GitHub Pages)
-  - [ ] Build otimizado
-  - [ ] CI/CD pipeline
+- [x] TASK-030.2: Deploy frontend
+  - [x] Hospedagem (Nginx Container)
+  - [x] Build otimizado (Remoção de markdown/configs)
+  - [x] Dockerfile de build configurado
 
-- [ ] TASK-030.3: Deploy backend
-  - [ ] Hospedagem (Heroku, Azure, AWS)
-  - [ ] Migrations automáticas
-  - [ ] Logs e monitoramento
+- [x] TASK-030.3: Deploy backend
+  - [x] Hospedagem (.NET 10 Container)
+  - [x] Migrations automáticas (SeedData no Startup)
+  - [x] Logs e monitoramento
 
-- [ ] TASK-030.4: Teste de acesso em produção
-  - [ ] Sistema acessível via URL pública
-  - [ ] Todas as funcionalidades testadas
+- [x] TASK-030.4: Teste de acesso em produção
+  - [x] Sistema acessível via URL pública (VPS)
+  - [x] Todas as funcionalidades testadas
 
 **Entrada:** TASK-029  
-**Saída:** Sistema em produção
+**Saída:** Sistema em produção (walkthrough.md)
 
 ---
 
@@ -762,8 +762,8 @@
 | ⚙️ Backend | 4 | 3 | 75% | 🟡 |
 | ♿ Qualidade (A11y + Testes) | 2 | 1 | 50% | 🟡 |
 | 🚀 Integração & QA | 2 | 1 | 50% | 🟡 |
-| 📚 Documentação | 4 | 0 | 0% | ⏳ |
-| **TOTAL** | **21** | **14** | **66%** | 🟡 |
+| 📚 Documentação | 4 | 1 | 25% | 🟡 |
+| **TOTAL** | **21** | **15** | **71%** | 🟡 |
 
 ### 📈 TASKS POR SEGMENTO
 
@@ -802,7 +802,7 @@
 - ⏳ TASK-018 — Documentação de API
 - ⏳ TASK-019 — Documentação PIM (ABNT)
 - ⏳ TASK-020 — Preparação para Apresentação
-- ⏳ TASK-021 — Deploy (Opcional)
+- ✅ TASK-021 — Deploy (Opcional)
 
 ---
 
@@ -818,8 +818,8 @@
 | **5B — Backend** | **4** | **3** | **75%** | 🟡 |
 | 6 — Qualidade | 2 | 1 | 50% | 🟡 |
 | 6B — Integração | 2 | 1 | 50% | 🟡 |
-| 7 — Documentação | 4 | 0 | 0% | ⏳ |
-| **TOTAL** | **21** | **14** | **66%** | 🟡 |
+| 7 — Documentação | 4 | 1 | 25% | 🟡 |
+| **TOTAL** | **21** | **15** | **71%** | 🟡 |
 
 ---
 
