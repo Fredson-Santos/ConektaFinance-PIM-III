@@ -90,7 +90,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
             Filtrar
           </button>
-          <input type="month" id="filterMonthInput" class="filter-btn" value="2026-05" aria-label="Selecionar período" style="font-family:'DM Sans', sans-serif; font-size:13px; font-weight:500; color:var(--text-muted); background:var(--white); border:1px solid var(--border); border-radius:8px; padding:0.45rem 0.8rem; cursor:pointer; outline:none; height:38px;">
+          <input type="month" id="filterMonthInput" class="filter-btn" aria-label="Selecionar período" style="font-family:'DM Sans', sans-serif; font-size:13px; font-weight:500; color:var(--text-muted); background:var(--white); border:1px solid var(--border); border-radius:8px; padding:0.45rem 0.8rem; cursor:pointer; outline:none; height:38px;">
         </div>
         <table>
           <caption>Lista de gastos de Maio 2026</caption>
@@ -160,7 +160,7 @@
         </div>
         <div class="field">
           <label for="expenseDate">Data</label>
-          <input type="date" id="expenseDate" value="2026-05-19" required aria-required="true">
+          <input type="date" id="expenseDate" required aria-required="true">
         </div>
       </div>
 
@@ -381,6 +381,28 @@
     if (e.target === modal) closeModal();
   });
 
+  // Preencher mês/ano e data atual automaticamente
+  function initializeCurrentDateAndMonth() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const currentMonth = `${year}-${month}`;
+    const currentDate = `${year}-${month}-${day}`;
+    
+    // Preencher input de mês
+    const filterMonthInput = document.getElementById('filterMonthInput');
+    if (filterMonthInput) {
+      filterMonthInput.value = currentMonth;
+    }
+    
+    // Preencher input de data na modal
+    const expenseDateInput = document.getElementById('expenseDate');
+    if (expenseDateInput) {
+      expenseDateInput.value = currentDate;
+    }
+  }
+
   // Filter Month Input
   const filterMonthInput = document.getElementById('filterMonthInput');
   if (filterMonthInput) {
@@ -393,6 +415,9 @@
       loadExpenses();
     });
   }
+
+  // Inicializar com data/mês atual
+  initializeCurrentDateAndMonth();
 
   // Start app
   init();

@@ -85,7 +85,7 @@
       <p>Maio 2026 — visão geral das suas finanças</p>
     </div>
     <div class="topbar-right">
-      <input type="month" id="dashboardMonthInput" class="month-select" value="2026-05" aria-label="Selecionar mês" style="font-family:'DM Sans', sans-serif; font-size:13px; font-weight:500; color:var(--text-muted); background:var(--white); border:1px solid var(--border); border-radius:8px; padding:0.45rem 0.8rem; cursor:pointer; outline:none; height:38px;">
+      <input type="month" id="dashboardMonthInput" class="month-select" aria-label="Selecionar mês" style="font-family:'DM Sans', sans-serif; font-size:13px; font-weight:500; color:var(--text-muted); background:var(--white); border:1px solid var(--border); border-radius:8px; padding:0.45rem 0.8rem; cursor:pointer; outline:none; height:38px;">
       <button class="btn-add" id="dashboardNewIncomeBtn" style="background:#3B6D11; border-color:#3B6D11;" aria-label="Adicionar entrada ao saldo">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Adicionar entrada
@@ -476,6 +476,24 @@ incomeForm.addEventListener('submit', async (e) => {
   }
 });
 
+// Preencher mês/ano atual automaticamente
+function initializeCurrentMonth() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const currentMonth = `${year}-${month}`;
+  
+  const monthInput = document.getElementById('dashboardMonthInput');
+  if (monthInput) {
+    monthInput.value = currentMonth;
+    
+    // Atualizar label do topbar
+    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const nomeMes = meses[parseInt(month) - 1];
+    document.querySelector('.topbar-left p').textContent = `${nomeMes} ${year} — visão geral das suas finanças`;
+  }
+}
+
 // Add event listener to Month Input
 const monthInput = document.getElementById('dashboardMonthInput');
 if (monthInput) {
@@ -488,6 +506,8 @@ if (monthInput) {
   });
 }
 
+// Inicializar com mês/ano atual
+initializeCurrentMonth();
 initDashboard();
 </script>
 </body>
