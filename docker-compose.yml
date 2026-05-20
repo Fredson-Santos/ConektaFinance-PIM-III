@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Serviço do Backend (ASP.NET Core 10.0 Web API)
   backend:
