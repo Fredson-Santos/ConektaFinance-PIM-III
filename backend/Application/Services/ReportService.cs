@@ -35,7 +35,6 @@ public class ReportService : IReportService
             currentBudgets = budgets.ToList();
         }
         var totalBudget = currentBudgets.Sum(x => x.LimitValue);
-        if (totalBudget == 0) totalBudget = 3000; // Valor default de orçamento se não houver nenhum cadastrado
 
         var incomes = await _incomeRepository.GetByUserIdAsync(userId);
         var currentMonthIncomes = incomes.Where(x => x.TransactionDate.Year == now.Year && x.TransactionDate.Month == now.Month).ToList();
