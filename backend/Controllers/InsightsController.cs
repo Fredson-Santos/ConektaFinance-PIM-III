@@ -15,7 +15,19 @@ public class InsightsController : ControllerBase
 
     public InsightsController(IInsightService service) => _service = service;
 
-    private int GetCurrentUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+    private int GetCurrentUserId()
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) 
+            ?? User.FindFirstValue("sub") 
+            ?? User.FindFirstValue("user_id");
+        
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+        {
+            throw new UnauthorizedAccessException("Não foi possível extrair o identificador do usuário do token JWT.");
+        }
+        
+        return userId;
+    }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<InsightResponse>>> GetInsights()

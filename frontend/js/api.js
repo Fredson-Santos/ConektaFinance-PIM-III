@@ -54,17 +54,20 @@ function showToast(message, type = 'success') {
   }, 3000);
 }
 
-// Wrapper para Fetch API
+// Wrapper para Fetch API com proteção contra token expirado
 async function apiFetch(endpoint, options = {}) {
   const token = localStorage.getItem('pim_token');
   
-  const defaultHeaders = {
-    'Content-Type': 'application/json'
-  };
-
-  if (token) {
-    defaultHeaders['Authorization'] = `Bearer ${token}`;
+  // Se não houver token, redirecionar para login
+  if (!token) {
+    window.location.href = 'tela-login.html';
+    throw new Error('Token não encontrado. Faça login novamente.');
   }
+  
+  const defaultHeaders = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
 
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -73,9 +76,19 @@ async function apiFetch(endpoint, options = {}) {
     });
 
     if (response.status === 401) {
+      // Token expirado ou inválido - limpar sessão completamente
       localStorage.removeItem('pim_token');
-      window.location.href = 'tela-login.html';
-      throw new Error('Sessão expirada. Faça login novamente.');
+      localStorage.removeItem('pim_user');
+      showToast('Sua sessão expirou. Por favor, faça login novamente.', 'error');
+      setTimeout(() => {
+        window.location.href = 'tela-login.html';
+      }, 1000);
+      throw new Error('Sessão expirada.');
+    }
+
+    if (response.status === 403) {
+      showToast('Você não tem permissão para acessar este recurso.', 'error');
+      throw new Error('Acesso negado.');
     }
 
     if (!response.ok) {
@@ -89,7 +102,10 @@ async function apiFetch(endpoint, options = {}) {
     return await response.json();
   } catch (error) {
     console.error(`API Error na rota ${endpoint}:`, error);
-    showToast(error.message, 'error');
+    // Não mostrar toast se já foi mostrada uma mensagem de expiração
+    if (error.message !== 'Sessão expirada.') {
+      showToast(error.message, 'error');
+    }
     throw error;
   }
 }
@@ -104,9 +120,11 @@ const AuthService = {
       method: 'POST',
       body: JSON.stringify({ email, password })
     });
-    if (response.token) {
+    if (response.token && response.user) {
       localStorage.setItem('pim_token', response.token);
       localStorage.setItem('pim_user', JSON.stringify(response.user));
+      // Validar que o login foi bem-sucedido armazenando também o timestamp
+      localStorage.setItem('pim_login_time', new Date().toISOString());
     }
     return response;
   },
@@ -121,6 +139,7 @@ const AuthService = {
   logout() {
     localStorage.removeItem('pim_token');
     localStorage.removeItem('pim_user');
+    localStorage.removeItem('pim_login_time');
     window.location.href = 'tela-login.html';
   },
 
@@ -202,6 +221,46 @@ const Utils = {
 // ==========================================
 // GERENCIAMENTO DE SESSÃO / USUÁRIO (DOM)
 // ==========================================
+
+// Valida se o usuário ainda está autenticado
+async function validateSession() {
+  const token = localStorage.getItem('pim_token');
+  const userStr = localStorage.getItem('pim_user');
+  
+  // Se não houver token ou usuário, redirecionar para login
+  if (!token || !userStr) {
+    if (window.location.pathname !== '/frontend/pages/tela-login.html' && 
+        !window.location.pathname.includes('tela-login')) {
+      window.location.href = 'tela-login.html';
+    }
+    return false;
+  }
+
+  try {
+    // Tenta fazer uma requisição para validar o token
+    const response = await fetch(`${API_BASE_URL}/expenses`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    // Se não autorizado, limpa sessão e redireciona
+    if (response.status === 401) {
+      localStorage.removeItem('pim_token');
+      localStorage.removeItem('pim_user');
+      window.location.href = 'tela-login.html';
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error('Erro ao validar sessão:', err);
+    return false;
+  }
+}
+
 function updateUserInfo() {
   const userStr = localStorage.getItem('pim_user');
   if (!userStr) return;
@@ -235,5 +294,13 @@ function updateUserInfo() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', updateUserInfo);
-updateUserInfo();
+// Valida a sessão quando a página carrega
+document.addEventListener('DOMContentLoaded', async () => {
+  await validateSession();
+  updateUserInfo();
+});
+
+// Também valida ao focar a aba (em caso de refresh enquanto fora da aba)
+window.addEventListener('focus', async () => {
+  await validateSession();
+});

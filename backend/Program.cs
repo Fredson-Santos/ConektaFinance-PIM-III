@@ -8,6 +8,7 @@ using PIM_III_Backend.Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.IdentityModel.Tokens.Jwt;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -18,6 +19,10 @@ builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 // Swagger com suporte a JWT
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Mapear claims do JWT
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap["sub"] = System.Security.Claims.ClaimTypes.NameIdentifier;
 
 // Autenticação JWT - Secret vem de variável de ambiente
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -42,7 +47,9 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidAudience = jwtSettings["Audience"],
         ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
+        ClockSkew = TimeSpan.Zero,
+        NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
+        RoleClaimType = System.Security.Claims.ClaimTypes.Role
     };
 });
 

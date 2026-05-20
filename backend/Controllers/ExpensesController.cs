@@ -20,7 +20,20 @@ public class ExpensesController : ControllerBase
         _alertService = alertService;
     }
 
-    private int GetCurrentUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+    private int GetCurrentUserId()
+    {
+        // Tentar extrair o userId de múltiplas formas para garantir compatibilidade
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) 
+            ?? User.FindFirstValue("sub") 
+            ?? User.FindFirstValue("user_id");
+        
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+        {
+            throw new UnauthorizedAccessException("Não foi possível extrair o identificador do usuário do token JWT.");
+        }
+        
+        return userId;
+    }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ExpenseResponse>>> GetUserExpenses([FromQuery] DateTime? start, [FromQuery] DateTime? end, [FromQuery] int? categoryId)
