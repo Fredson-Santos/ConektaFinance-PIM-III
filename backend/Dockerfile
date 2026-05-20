@@ -7,7 +7,7 @@ RUN dotnet restore PIM-III-Backend.csproj
 
 # Copiar todo o restante e buildar o projeto
 COPY . ./
-RUN dotnet publish PIM-III-Backend.csproj -c Release -o /app/publish --no-restore
+RUN dotnet publish PIM-III-Backend.csproj -c Release -o /app/publish
 
 # Estágio final de execução
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
