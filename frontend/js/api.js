@@ -230,6 +230,12 @@ const Utils = {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('pt-BR').format(date);
   },
+  sanitizeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str; // textContent escapa caracteres HTML
+    return div.innerHTML;
+  },
   showLoading(elementId) {
     const el = document.getElementById(elementId);
     if (el) el.innerHTML = '<div style="display:flex; justify-content:center; padding: 2rem;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div><style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>';
