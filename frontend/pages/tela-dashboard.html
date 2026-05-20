@@ -106,32 +106,32 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         Saldo restante
       </div>
-      <div class="mc-value">R$ 1.240</div>
-      <div class="mc-sub">de R$ 3.000 do orçamento</div>
+      <div class="mc-value">—</div>
+      <div class="mc-sub">carregando dados...</div>
     </section>
     <section class="metric-card" aria-labelledby="label-total-gasto">
       <div class="mc-label" id="label-total-gasto">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         Total gasto
       </div>
-      <div class="mc-value">R$ 1.760</div>
-      <div class="mc-sub up" aria-label="Aumento de 12% em relação a abril">+12% vs abril</div>
+      <div class="mc-value">—</div>
+      <div class="mc-sub up" aria-label="Aumento de 12% em relação a abril">carregando...</div>
     </section>
     <section class="metric-card" aria-labelledby="label-gastos-reg">
       <div class="mc-label" id="label-gastos-reg">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18l-2 13H5L3 6z"/></svg>
         Gastos registrados
       </div>
-      <div class="mc-value">24</div>
-      <div class="mc-sub ok">em 5 categorias</div>
+      <div class="mc-value">—</div>
+      <div class="mc-sub ok">carregando...</div>
     </section>
     <section class="metric-card" aria-labelledby="label-maior-gasto">
       <div class="mc-label" id="label-maior-gasto">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
         Maior gasto
       </div>
-      <div class="mc-value">R$ 650</div>
-      <div class="mc-sub warn">Aluguel — fixo mensal</div>
+      <div class="mc-value">—</div>
+      <div class="mc-sub warn">carregando...</div>
     </section>
   </div>
 
@@ -163,35 +163,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td data-label="Descrição">Supermercado Extra</td>
-            <td data-label="Categoria"><span class="cat-badge cat-food">Alimentação</span></td>
-            <td data-label="Data" style="color:var(--text-muted)">12/05</td>
-            <td data-label="Valor" class="amount-neg" style="text-align:right">−R$ 187,50</td>
-          </tr>
-          <tr>
-            <td data-label="Descrição">Uber — reunião cliente</td>
-            <td data-label="Categoria"><span class="cat-badge cat-transport">Transporte</span></td>
-            <td data-label="Data" style="color:var(--text-muted)">11/05</td>
-            <td data-label="Valor" class="amount-neg" style="text-align:right">−R$ 34,00</td>
-          </tr>
-          <tr>
-            <td data-label="Descrição">Cinema e jantar</td>
-            <td data-label="Categoria"><span class="cat-badge cat-leisure">Lazer</span></td>
-            <td data-label="Data" style="color:var(--text-muted)">10/05</td>
-            <td data-label="Valor" class="amount-neg" style="text-align:right">−R$ 120,00</td>
-          </tr>
-          <tr>
-            <td data-label="Descrição">Farmácia São João</td>
-            <td data-label="Categoria"><span class="cat-badge cat-health">Saúde</span></td>
-            <td data-label="Data" style="color:var(--text-muted)">09/05</td>
-            <td data-label="Valor" class="amount-neg" style="text-align:right">−R$ 56,80</td>
-          </tr>
-          <tr>
-            <td data-label="Descrição">iFood — pizza</td>
-            <td data-label="Categoria"><span class="cat-badge cat-food">Alimentação</span></td>
-            <td data-label="Data" style="color:var(--text-muted)">08/05</td>
-            <td data-label="Valor" class="amount-neg" style="text-align:right">−R$ 67,90</td>
+          <tr style="display:none">
+            <td></td>
           </tr>
         </tbody>
       </table>
@@ -200,58 +173,14 @@
     <div style="display:flex; flex-direction:column; gap:14px;">
       <div class="chart-card" style="flex:1">
         <h3>Orçamento por categoria</h3>
-        <div class="budget-list">
-          <div class="budget-item">
-            <div class="budget-row">
-              <span class="budget-cat">Alimentação</span>
-              <span class="budget-values">R$ 520 / R$ 700</span>
-            </div>
-            <div class="progress-bar"><div class="progress-fill fill-warn" style="width:74%"></div></div>
-          </div>
-          <div class="budget-item">
-            <div class="budget-row">
-              <span class="budget-cat">Transporte</span>
-              <span class="budget-values">R$ 180 / R$ 300</span>
-            </div>
-            <div class="progress-bar"><div class="progress-fill fill-ok" style="width:60%"></div></div>
-          </div>
-          <div class="budget-item">
-            <div class="budget-row">
-              <span class="budget-cat">Lazer</span>
-              <span class="budget-values">R$ 310 / R$ 250</span>
-            </div>
-            <div class="progress-bar"><div class="progress-fill fill-over" style="width:100%"></div></div>
-          </div>
-          <div class="budget-item">
-            <div class="budget-row">
-              <span class="budget-cat">Saúde</span>
-              <span class="budget-values">R$ 130 / R$ 400</span>
-            </div>
-            <div class="progress-bar"><div class="progress-fill fill-ok" style="width:33%"></div></div>
-          </div>
+        <div class="budget-list" style="min-height:150px; display:flex; align-items:center; justify-content:center; color:var(--text-muted)">
+          Carregando orçamentos...
         </div>
       </div>
 
-      <div class="alerts-card">
-        <h3>Alertas</h3>
-        <div class="alert-item alert-danger">
-          <div class="alert-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          </div>
-          <div class="alert-text">
-            <div class="alert-title">Lazer acima do limite</div>
-            <div class="alert-desc">Orçamento excedido em R$ 60,00</div>
-          </div>
-        </div>
-        <div class="alert-item alert-warn">
-          <div class="alert-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          </div>
-          <div class="alert-text">
-            <div class="alert-title">Alimentação — 74% usado</div>
-            <div class="alert-desc">Restam R$ 180 até o fim do mês</div>
-          </div>
-        </div>
+      <div class="alerts-card" style="min-height:150px; display:flex; align-items:center; justify-content:center; color:var(--text-muted)">
+        <h3 style="position:absolute; top:16px; left:16px">Alertas</h3>
+        <div style="text-align:center">Carregando alertas...</div>
       </div>
     </div>
   </div>
@@ -318,6 +247,7 @@ function getMonthRange() {
 async function initDashboard() {
   try {
     const { startDate, endDate } = getMonthRange();
+    console.log(`[Dashboard] Carregando dados de ${startDate} até ${endDate}`);
     
     const summary = await ReportService.getSummary(startDate, endDate);
     const categoryReport = await ReportService.getByCategory(startDate, endDate);
@@ -325,15 +255,18 @@ async function initDashboard() {
     const lastExpenses = await ExpenseService.getAll();
     const categories = await CategoryService.getAll();
 
+    console.log('[Dashboard] Dados recebidos:', { summary, categoryReport, lastExpenses });
+
     // Update KPI cards
     if (summary) {
+      const kpis = document.querySelectorAll('.metric-card .mc-value');
+      const kpiSubs = document.querySelectorAll('.metric-card .mc-sub');
+      
+      // Saldo restante
+      kpis[0].textContent = Utils.formatCurrency(summary.remainingBudget);
+      kpiSubs[0].textContent = `de ${Utils.formatCurrency(summary.totalBudget)} do orçamento`;
+      
       const saldoCard = document.querySelector('.metric-card[aria-labelledby="label-saldo"]');
-      const saldoValue = saldoCard.querySelector('.mc-value');
-      const saldoSub = saldoCard.querySelector('.mc-sub');
-
-      saldoValue.textContent = Utils.formatCurrency(summary.remainingBudget);
-      saldoSub.textContent = `de ${Utils.formatCurrency(summary.totalBudget)} do orçamento`;
-
       saldoCard.classList.remove('accent-green', 'accent-blue', 'accent-red');
       if (summary.remainingBudget >= 0) {
         saldoCard.classList.add('accent-blue');
@@ -341,60 +274,73 @@ async function initDashboard() {
         saldoCard.classList.add('accent-red');
       }
       
-      const kpis = document.querySelectorAll('.metric-card .mc-value');
+      // Total gasto
       kpis[1].textContent = Utils.formatCurrency(summary.totalSpent);
+      kpiSubs[1].textContent = summary.totalSpent > 0 ? '+0% vs mês anterior' : 'sem gastos';
+      
+      // Gastos registrados
       kpis[2].textContent = lastExpenses.length;
+      const catCount = new Set(lastExpenses.map(e => e.categoryId)).size;
+      kpiSubs[2].textContent = catCount > 0 ? `em ${catCount} categoria${catCount !== 1 ? 's' : ''}` : 'nenhum gasto';
+      
+      // Maior gasto
       kpis[3].textContent = summary.largestExpense ? Utils.formatCurrency(summary.largestExpense.amount) : 'R$ 0,00';
+      kpiSubs[3].textContent = summary.largestExpense ? Utils.sanitizeHtml(summary.largestExpense.description) : 'sem dados';
+    } else {
+      console.warn('[Dashboard] Summary é nulo, dados podem não ter carregado');
     }
 
     // Update Table
     const tbody = document.querySelector('table tbody');
-    tbody.innerHTML = lastExpenses.slice(0, 5).map(e => {
-      const cat = categories.find(c => c.id === e.categoryId);
-      return `
-        <tr>
-          <td data-label="Descrição">${sanitizeHtml(e.description)}</td>
-          <td data-label="Categoria"><span class="cat-badge" style="background:${cat?.colorCode || cat?.colorHex || '#333'}22; color:${cat?.colorCode || cat?.colorHex || '#333'}">${sanitizeHtml(cat?.name || 'Sem Categoria')}</span></td>
-          <td data-label="Data" style="color:var(--text-muted)">${Utils.formatDate(e.date).substring(0, 5)}</td>
-          <td data-label="Valor" class="amount-neg" style="text-align:right">−${Utils.formatCurrency(e.amount)}</td>
-        </tr>
-      `;
-    }).join('');
-
-    if (lastExpenses.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:1rem; color:var(--text-muted)">Nenhum gasto recente.</td></tr>';
+    if (lastExpenses && lastExpenses.length > 0) {
+      tbody.innerHTML = lastExpenses.slice(0, 5).map(e => {
+        const cat = categories.find(c => c.id === e.categoryId);
+        return `
+          <tr>
+            <td data-label="Descrição">${Utils.sanitizeHtml(e.description)}</td>
+            <td data-label="Categoria"><span class="cat-badge" style="background:${cat?.colorCode || cat?.colorHex || '#333'}22; color:${cat?.colorCode || cat?.colorHex || '#333'}">${Utils.sanitizeHtml(cat?.name || 'Sem Categoria')}</span></td>
+            <td data-label="Data" style="color:var(--text-muted)">${Utils.formatDate(e.transactionDate || e.date).substring(0, 5)}</td>
+            <td data-label="Valor" class="amount-neg" style="text-align:right">−${Utils.formatCurrency(e.value || e.amount)}</td>
+          </tr>
+        `;
+      }).join('');
+    } else {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:1rem; color:var(--text-muted)">Nenhum gasto neste período.</td></tr>';
     }
 
     // Update Budget List
     const budgetList = document.querySelector('.budget-list');
-    if (budgetList && categoryReport) {
+    if (budgetList && categoryReport && categoryReport.length > 0) {
       const activeBudgets = categoryReport.filter(c => c.budgetLimit > 0);
-      budgetList.innerHTML = activeBudgets.map(c => {
-        let fillClass = 'fill-ok';
-        if (c.percentageUsed > 100) fillClass = 'fill-over';
-        else if (c.percentageUsed > 80) fillClass = 'fill-warn';
+      if (activeBudgets.length > 0) {
+        budgetList.innerHTML = activeBudgets.map(c => {
+          let fillClass = 'fill-ok';
+          if (c.percentageUsed > 100) fillClass = 'fill-over';
+          else if (c.percentageUsed > 80) fillClass = 'fill-warn';
 
-        return `
-          <div class="budget-item">
-            <div class="budget-row">
-              <span class="budget-cat">${sanitizeHtml(c.categoryName)}</span>
-              <span class="budget-values">${Utils.formatCurrency(c.totalSpent)} / ${Utils.formatCurrency(c.budgetLimit)}</span>
+          return `
+            <div class="budget-item">
+              <div class="budget-row">
+                <span class="budget-cat">${Utils.sanitizeHtml(c.categoryName)}</span>
+                <span class="budget-values">${Utils.formatCurrency(c.totalSpent)} / ${Utils.formatCurrency(c.budgetLimit)}</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill ${fillClass}" style="width:${Math.min(c.percentageUsed, 100)}%"></div></div>
             </div>
-            <div class="progress-bar"><div class="progress-fill ${fillClass}" style="width:${Math.min(c.percentageUsed, 100)}%"></div></div>
-          </div>
-        `;
-      }).join('');
-
-      if (activeBudgets.length === 0) {
-        budgetList.innerHTML = '<div style="padding:1rem; text-align:center; color:var(--text-muted)">Nenhum orçamento configurado.</div>';
+          `;
+        }).join('');
+      } else {
+        budgetList.innerHTML = '<div style="padding:1rem; text-align:center; color:var(--text-muted)">Nenhum orçamento configurado neste período.</div>';
       }
+    } else {
+      budgetList.innerHTML = '<div style="padding:1rem; text-align:center; color:var(--text-muted)">Nenhum orçamento configurado.</div>';
     }
 
     // Update Charts
     updateCharts(summary, categories, categoryReport, trendReport);
 
   } catch (err) {
-    console.error('Erro ao carregar dashboard:', err);
+    console.error('[Dashboard] Erro ao carregar dados:', err);
+    alert('Erro ao carregar dashboard. Verifique a conexão e tente novamente.');
   }
 }
 
