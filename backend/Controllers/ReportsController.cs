@@ -30,20 +30,20 @@ public class ReportsController : ControllerBase
     }
 
     [HttpGet("summary")]
-    public async Task<ActionResult<ReportSummaryResponse>> GetSummary()
+    public async Task<ActionResult<ReportSummaryResponse>> GetSummary([FromQuery] DateTime? start, [FromQuery] DateTime? end)
     {
-        return Ok(await _service.GetSummaryAsync(GetCurrentUserId()));
+        return Ok(await _service.GetSummaryAsync(GetCurrentUserId(), start, end));
     }
 
     [HttpGet("by-category")]
-    public async Task<ActionResult<IEnumerable<CategoryReportResponse>>> GetByCategory()
+    public async Task<ActionResult<IEnumerable<CategoryReportResponse>>> GetByCategory([FromQuery] DateTime? start, [FromQuery] DateTime? end)
     {
-        return Ok(await _service.GetByCategoryAsync(GetCurrentUserId()));
+        return Ok(await _service.GetByCategoryAsync(GetCurrentUserId(), start, end));
     }
 
     [HttpGet("trend")]
-    public async Task<ActionResult<IEnumerable<TrendReportResponse>>> GetTrend()
+    public async Task<ActionResult<IEnumerable<TrendReportResponse>>> GetTrend([FromQuery] DateTime? start, [FromQuery] DateTime? end)
     {
-        return Ok(await _service.GetTrendAsync(GetCurrentUserId()));
+        return Ok(await _service.GetTrendAsync(GetCurrentUserId(), start, end));
     }
 }

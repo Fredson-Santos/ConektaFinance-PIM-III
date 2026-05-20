@@ -16,33 +16,31 @@ public class ReportService : IReportService
         _incomeRepository = incomeRepository;
     }
 
-    public async Task<ReportSummaryResponse> GetSummaryAsync(int userId)
+    public async Task<ReportSummaryResponse> GetSummaryAsync(int userId, DateTime? start = null, DateTime? end = null)
     {
         var now = DateTime.UtcNow;
-        var expenses = await _expenseRepository.GetByUserIdAsync(userId);
-        var currentMonthExpenses = expenses.Where(x => x.TransactionDate.Year == now.Year && x.TransactionDate.Month == now.Month).ToList();
-        var totalSpent = currentMonthExpenses.Sum(x => x.Value);
-        if (!currentMonthExpenses.Any() && expenses.Any()) 
+        
+        // Se não fornecer datas, usar o mês atual
+        if (!start.HasValue || !end.HasValue)
         {
-            totalSpent = expenses.Sum(x => x.Value);
+            start = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+            end = start.Value.AddMonths(1).AddTicks(-1);
         }
+
+        var expenses = await _expenseRepository.GetByUserIdAsync(userId, start, end);
+        var totalSpent = expenses.Sum(x => x.Value);
         var highestExpense = expenses.OrderByDescending(x => x.Value).FirstOrDefault();
 
         var budgets = await _budgetRepository.GetByUserIdAsync(userId);
-        var currentBudgets = budgets.Where(x => x.PeriodYear == now.Year && x.PeriodMonth == now.Month).ToList();
+        var currentBudgets = budgets.Where(x => x.PeriodYear == start.Value.Year && x.PeriodMonth == start.Value.Month).ToList();
         if (!currentBudgets.Any() && budgets.Any())
         {
             currentBudgets = budgets.ToList();
         }
         var totalBudget = currentBudgets.Sum(x => x.LimitValue);
 
-        var incomes = await _incomeRepository.GetByUserIdAsync(userId);
-        var currentMonthIncomes = incomes.Where(x => x.TransactionDate.Year == now.Year && x.TransactionDate.Month == now.Month).ToList();
-        if (!currentMonthIncomes.Any() && incomes.Any())
-        {
-            currentMonthIncomes = incomes.ToList();
-        }
-        var totalIncome = currentMonthIncomes.Sum(x => x.Amount);
+        var incomes = await _incomeRepository.GetByUserIdAsync(userId, start, end);
+        var totalIncome = incomes.Sum(x => x.Amount);
 
         totalBudget += totalIncome;
 
@@ -58,13 +56,21 @@ public class ReportService : IReportService
         );
     }
 
-    public async Task<IEnumerable<CategoryReportResponse>> GetByCategoryAsync(int userId)
+    public async Task<IEnumerable<CategoryReportResponse>> GetByCategoryAsync(int userId, DateTime? start = null, DateTime? end = null)
     {
         var now = DateTime.UtcNow;
-        var expenses = await _expenseRepository.GetByUserIdAsync(userId);
+        
+        // Se não fornecer datas, usar o mês atual
+        if (!start.HasValue || !end.HasValue)
+        {
+            start = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+            end = start.Value.AddMonths(1).AddTicks(-1);
+        }
+
+        var expenses = await _expenseRepository.GetByUserIdAsync(userId, start, end);
         var budgets = await _budgetRepository.GetByUserIdAsync(userId);
         
-        var currentBudgets = budgets.Where(x => x.PeriodYear == now.Year && x.PeriodMonth == now.Month).ToList();
+        var currentBudgets = budgets.Where(x => x.PeriodYear == start.Value.Year && x.PeriodMonth == start.Value.Month).ToList();
         if (!currentBudgets.Any()) currentBudgets = budgets.ToList();
 
         var expensesByCategory = expenses.GroupBy(x => new { x.CategoryId, x.Category.Name }).ToList();
@@ -95,9 +101,15 @@ public class ReportService : IReportService
         return result.OrderByDescending(x => x.TotalSpent);
     }
 
-    public async Task<IEnumerable<TrendReportResponse>> GetTrendAsync(int userId)
+    public async Task<IEnumerable<TrendReportResponse>> GetTrendAsync(int userId, DateTime? start = null, DateTime? end = null)
     {
         var expenses = await _expenseRepository.GetByUserIdAsync(userId);
+        
+        // Se fornecer datas, filtrar pelo intervalo
+        if (start.HasValue && end.HasValue)
+        {
+            expenses = expenses.Where(x => x.TransactionDate >= start.Value && x.TransactionDate <= end.Value).ToList();
+        }
         
         return expenses
             .GroupBy(x => new { x.TransactionDate.Year, x.TransactionDate.Month })

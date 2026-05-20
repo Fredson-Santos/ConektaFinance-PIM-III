@@ -184,9 +184,27 @@ const CategoryService = {
 };
 
 const ReportService = {
-  getSummary: () => apiFetch('/reports/summary'),
-  getByCategory: () => apiFetch('/reports/by-category'),
-  getTrend: () => apiFetch('/reports/trend')
+  getSummary: (startDate, endDate) => {
+    let endpoint = '/reports/summary';
+    if (startDate && endDate) {
+      endpoint += `?start=${startDate}&end=${endDate}`;
+    }
+    return apiFetch(endpoint);
+  },
+  getByCategory: (startDate, endDate) => {
+    let endpoint = '/reports/by-category';
+    if (startDate && endDate) {
+      endpoint += `?start=${startDate}&end=${endDate}`;
+    }
+    return apiFetch(endpoint);
+  },
+  getTrend: (startDate, endDate) => {
+    let endpoint = '/reports/trend';
+    if (startDate && endDate) {
+      endpoint += `?start=${startDate}&end=${endDate}`;
+    }
+    return apiFetch(endpoint);
+  }
 };
 
 const AlertService = {
@@ -222,8 +240,8 @@ const Utils = {
 // GERENCIAMENTO DE SESSÃO / USUÁRIO (DOM)
 // ==========================================
 
-// Valida se o usuário ainda está autenticado
-async function validateSession() {
+// Valida se o usuário ainda está autenticado (verificação básica)
+function validateSession() {
   const token = localStorage.getItem('pim_token');
   const userStr = localStorage.getItem('pim_user');
   
@@ -236,29 +254,7 @@ async function validateSession() {
     return false;
   }
 
-  try {
-    // Tenta fazer uma requisição para validar o token
-    const response = await fetch(`${API_BASE_URL}/expenses`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    // Se não autorizado, limpa sessão e redireciona
-    if (response.status === 401) {
-      localStorage.removeItem('pim_token');
-      localStorage.removeItem('pim_user');
-      window.location.href = 'tela-login.html';
-      return false;
-    }
-
-    return true;
-  } catch (err) {
-    console.error('Erro ao validar sessão:', err);
-    return false;
-  }
+  return true;
 }
 
 function updateUserInfo() {
@@ -295,12 +291,12 @@ function updateUserInfo() {
 }
 
 // Valida a sessão quando a página carrega
-document.addEventListener('DOMContentLoaded', async () => {
-  await validateSession();
+document.addEventListener('DOMContentLoaded', () => {
+  validateSession();
   updateUserInfo();
 });
 
 // Também valida ao focar a aba (em caso de refresh enquanto fora da aba)
-window.addEventListener('focus', async () => {
-  await validateSession();
+window.addEventListener('focus', () => {
+  validateSession();
 });

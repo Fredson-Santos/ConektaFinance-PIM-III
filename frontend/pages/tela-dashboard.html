@@ -299,11 +299,29 @@
 let myLineChart = null;
 let myDoughnutChart = null;
 
+function getMonthRange() {
+  const monthInput = document.getElementById('dashboardMonthInput');
+  let selectedDate = monthInput ? monthInput.value : null;
+  
+  if (!selectedDate) {
+    const now = new Date();
+    selectedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  }
+  
+  const [year, month] = selectedDate.split('-');
+  const startDate = new Date(year, parseInt(month) - 1, 1).toISOString().split('T')[0];
+  const endDate = new Date(year, parseInt(month), 0).toISOString().split('T')[0];
+  
+  return { startDate, endDate };
+}
+
 async function initDashboard() {
   try {
-    const summary = await ReportService.getSummary();
-    const categoryReport = await ReportService.getByCategory();
-    const trendReport = await ReportService.getTrend();
+    const { startDate, endDate } = getMonthRange();
+    
+    const summary = await ReportService.getSummary(startDate, endDate);
+    const categoryReport = await ReportService.getByCategory(startDate, endDate);
+    const trendReport = await ReportService.getTrend(startDate, endDate);
     const lastExpenses = await ExpenseService.getAll();
     const categories = await CategoryService.getAll();
 
