@@ -1,8 +1,16 @@
-const API_BASE_URL = (window.location.protocol === 'file:')
-  ? 'http://localhost:5041/api'
-  : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168.'))
-    ? (window.location.hostname.startsWith('192.168.') ? `http://${window.location.hostname}:5041/api` : 'http://localhost:5041/api')
-    : '/api'; // Relative path for production VPS deployment (proxied by Nginx)
+import * as Turbo from '@hotwired/turbo';
+window.Turbo = Turbo;
+
+// Bug 4.3 corrigido: URL da API gerida via variável de ambiente Vite.
+// Em desenvolvimento (sem .env): fallback automático para localhost.
+// Em produção (build Vite com VITE_API_URL definida): usa a URL configurada.
+const API_BASE_URL = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL)
+  ? import.meta.env.VITE_API_URL
+  : (window.location.protocol === 'file:'
+      ? 'http://localhost:5041/api'
+      : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+          ? 'http://localhost:5041/api'
+          : '/api');
 
 // Função de sanitização contra XSS
 function sanitizeHtml(str) {
@@ -57,17 +65,24 @@ function showToast(message, type = 'success') {
 // Wrapper para Fetch API com proteção contra token expirado
 async function apiFetch(endpoint, options = {}) {
   const token = localStorage.getItem('pim_token');
+  const isAuthRoute = endpoint.startsWith('/Auth/') || endpoint.includes('/login') || endpoint.includes('/register');
   
-  // Se não houver token, redirecionar para login
-  if (!token) {
-    window.location.href = 'tela-login.html';
+  // Se não houver token e não for uma rota de autenticação, redirecionar para login
+  if (!token && !isAuthRoute) {
+    if (window.location.pathname !== '/frontend/pages/tela-login.html' && 
+        !window.location.pathname.includes('tela-login')) {
+      window.location.href = 'tela-login.html';
+    }
     throw new Error('Token não encontrado. Faça login novamente.');
   }
   
   const defaultHeaders = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
+    'Content-Type': 'application/json'
   };
+
+  if (token) {
+    defaultHeaders['Authorization'] = `Bearer ${token}`;
+  }
 
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -204,6 +219,13 @@ const ReportService = {
       endpoint += `?start=${startDate}&end=${endDate}`;
     }
     return apiFetch(endpoint);
+  },
+  getDaily: (startDate, endDate) => {
+    let endpoint = '/reports/daily';
+    if (startDate && endDate) {
+      endpoint += `?start=${startDate}&end=${endDate}`;
+    }
+    return apiFetch(endpoint);
   }
 };
 
@@ -296,13 +318,73 @@ function updateUserInfo() {
   }
 }
 
-// Valida a sessão quando a página carrega
-document.addEventListener('DOMContentLoaded', () => {
+function setupMobileSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  if (!sidebar) return;
+
+  // Criar botão do menu hambúrguer
+  const toggleBtn = document.createElement('button');
+  toggleBtn.className = 'mobile-menu-toggle';
+  toggleBtn.innerHTML = `
+    <svg class="hamburger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+      <line x1="3" y1="12" x2="21" y2="12" class="line-mid"/>
+      <line x1="3" y1="6" x2="21" y2="6" class="line-top"/>
+      <line x1="3" y1="18" x2="21" y2="18" class="line-bot"/>
+    </svg>
+  `;
+  toggleBtn.setAttribute('aria-label', 'Abrir menu de navegação');
+  
+  // Criar overlay escuro para o fundo
+  const overlay = document.createElement('div');
+  overlay.className = 'sidebar-overlay';
+  
+  document.body.appendChild(toggleBtn);
+  document.body.appendChild(overlay);
+  
+  toggleBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+    toggleBtn.classList.toggle('active');
+  });
+  
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+    toggleBtn.classList.remove('active');
+  });
+
+  // Fechar sidebar ao clicar em um nav-item (para suavidade)
+  sidebar.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+      toggleBtn.classList.remove('active');
+    });
+  });
+}
+
+// Valida a sessão quando a página carrega e em transições Turbo
+document.addEventListener('turbo:load', () => {
   validateSession();
   updateUserInfo();
+  setupMobileSidebar();
 });
 
 // Também valida ao focar a aba (em caso de refresh enquanto fora da aba)
 window.addEventListener('focus', () => {
   validateSession();
 });
+
+// Expor objetos para escopo global (Vite compatibilidade com scripts inline)
+window.AuthService = AuthService;
+window.ExpenseService = ExpenseService;
+window.IncomeService = IncomeService;
+window.CategoryService = CategoryService;
+window.ReportService = ReportService;
+window.AlertService = AlertService;
+window.InsightService = InsightService;
+window.Utils = Utils;
+window.showToast = showToast;
+window.validateSession = validateSession;
+window.updateUserInfo = updateUserInfo;
+window.sanitizeHtml = sanitizeHtml;

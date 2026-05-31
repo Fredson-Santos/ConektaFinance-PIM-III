@@ -13,11 +13,13 @@ public class ExpensesController : ControllerBase
 {
     private readonly IExpenseService _service;
     private readonly IAlertService _alertService;
+    private readonly ILogger<ExpensesController> _logger;
 
-    public ExpensesController(IExpenseService service, IAlertService alertService)
+    public ExpensesController(IExpenseService service, IAlertService alertService, ILogger<ExpensesController> logger)
     {
         _service = service;
         _alertService = alertService;
+        _logger = logger;
     }
 
     private int GetCurrentUserId()
@@ -62,7 +64,7 @@ public class ExpensesController : ControllerBase
         catch (Exception ex)
         {
             // Log mas não falha a requisição
-            Console.WriteLine($"Erro ao verificar alertas: {ex.Message}");
+            _logger.LogWarning(ex, "Erro ao verificar alertas para userId={UserId}, categoryId={CategoryId}", GetCurrentUserId(), request.CategoryId);
         }
 
         return CreatedAtAction(nameof(GetById), new { id = expense.Id }, expense);

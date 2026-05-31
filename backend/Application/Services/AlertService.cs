@@ -57,9 +57,11 @@ public class AlertService : IAlertService
         
         if (budget != null)
         {
-            var expenses = await _expenseRepository.GetByUserIdAsync(userId, 
-                new DateTime(now.Year, now.Month, 1), 
-                new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month)), 
+            var monthStart = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+            var monthEnd = monthStart.AddMonths(1).AddTicks(-1); // 23:59:59.9999999 do último dia
+            var expenses = await _expenseRepository.GetByUserIdAsync(userId,
+                monthStart,
+                monthEnd,
                 categoryId);
             
             var totalSpent = expenses.Sum(x => x.Value);

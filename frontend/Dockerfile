@@ -1,23 +1,20 @@
+# Estágio 1: Compilar os assets estáticos com Vite
+FROM node:20-alpine AS build-stage
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+# Recebe a URL da API como build arg (injetada pelo docker-compose)
+ARG VITE_API_URL=/api
+ENV VITE_API_URL=$VITE_API_URL
+RUN npm run build
+
+# Estágio 2: Servir os arquivos compilados com Nginx
 FROM nginx:alpine
-
-# Remover a configuração padrão do nginx
 RUN rm /etc/nginx/conf.d/default.conf
-
-# Copiar a configuração personalizada do nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Copiar os ativos estáticos para o diretório do servidor web do Nginx
-COPY . /usr/share/nginx/html/
-
-# Corrigir permissões dos arquivos
+COPY --from=build-stage /app/dist /usr/share/nginx/html/
 RUN chmod -R 755 /usr/share/nginx/html/
 
-# Limpar arquivos desnecessários na imagem de produção
-RUN rm -rf /usr/share/nginx/html/Dockerfile \
-           /usr/share/nginx/html/nginx.conf \
-           /usr/share/nginx/html/personas.md \
-           /usr/share/nginx/html/design-system.md
-
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]
