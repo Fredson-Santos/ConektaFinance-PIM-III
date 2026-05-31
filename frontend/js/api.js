@@ -1,5 +1,4 @@
-import * as Turbo from '@hotwired/turbo';
-window.Turbo = Turbo;
+// Turbo removido durante a migração para React
 
 // Bug 4.3 corrigido: URL da API gerida via variável de ambiente Vite.
 // Em desenvolvimento (sem .env): fallback automático para localhost.
