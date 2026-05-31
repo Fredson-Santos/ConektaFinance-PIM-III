@@ -66,10 +66,16 @@ body {
   background-color: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  display: flex;
-  align-items: stretch;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  margin: 0;
+}
+
+#root {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 100vh;
 }
 
 /* 2. ACCESSIBILITY */
