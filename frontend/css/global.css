@@ -144,8 +144,10 @@ body {
 }
 
 .sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
   width: 240px;
-  min-height: 100vh;
   background: var(--sidebar-bg);
   display: flex;
   flex-direction: column;
@@ -154,6 +156,25 @@ body {
   border-right: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
   z-index: 10;
+  overflow-y: auto;
+}
+
+/* Barra de rolagem personalizada para a sidebar manter o visual premium */
+.sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .main {
