@@ -87,6 +87,10 @@ builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
 builder.Services.AddScoped<IAlertRepository, AlertRepository>();
 builder.Services.AddScoped<IIncomeRepository, IncomeRepository>();
+builder.Services.AddScoped<IChatRepository, ChatRepository>();
+
+// Http Client
+builder.Services.AddHttpClient();
 
 // Services
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -96,6 +100,7 @@ builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IAlertService, AlertService>();
 builder.Services.AddScoped<IInsightService, InsightService>();
 builder.Services.AddScoped<IIncomeService, IncomeService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 
 var app = builder.Build();
 
