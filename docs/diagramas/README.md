@@ -155,6 +155,5 @@ Estes diagramas cobrem os seguintes requisitos do PIM-III:
 
 ---
 
-**Última atualização:** 02/06/2026
 **Versão:** 2.0
 **Projeto:** Conekta - PIM-III (ADS)
