@@ -12,9 +12,10 @@ O **ConektaFinance** é um sistema completo de gestão de finanças pessoais des
 ## 🛠️ Tecnologias Utilizadas
 
 ### Frontend
-* **Core**: HTML5 semântico, JavaScript (Vanilla ES6)
-* **Estilização**: Vanilla CSS3 com variáveis de design system, fontes modernizadas (Outfit e Playfair Display) e suporte robusto para responsividade (Mobile e Tablet)
-* **Gráficos**: Chart.js integrado para visualização de tendências e divisão de despesas por categoria
+* **Core**: React 19, JavaScript (ES6+), React Router DOM (v7)
+* **Estilização**: Vanilla CSS com variáveis de design system, fontes modernizadas (Outfit e Playfair Display) e suporte robusto para responsividade (Mobile e Tablet)
+* **Ferramenta de Build**: Vite
+* **Gráficos**: Recharts integrado para visualização de tendências e divisão de despesas por categoria
 
 ### Backend
 * **Runtime**: ASP.NET Core 10.0 Web API (Controllers)
@@ -71,13 +72,13 @@ PIM-III/
 │   ├── Properties/           # Configurações de inicialização da API
 │   ├── Dockerfile            # Arquivo de containerização do backend
 │   └── PIM-III-Backend.csproj
-├── frontend/                 # Interface estática do usuário
-│   ├── css/                  # Estilos globais e responsivos
-│   ├── js/                   # Serviços de API, gráficos e scripts de tela
-│   ├── pages/                # Páginas HTML (Dashboard, Gastos, Login, etc)
+├── frontend/                 # Interface do usuário (React + Vite SPA)
+│   ├── src/                  # Código-fonte React (componentes, páginas, rotas e serviços)
+│   ├── index.html            # Ponto de entrada HTML do Vite
+│   ├── vite.config.js        # Configuração do Vite (portas e proxies)
 │   ├── Dockerfile            # Arquivo de containerização do frontend
 │   └── nginx.conf            # Configuração de proxy e rotas do Nginx
-├── docs/                     # Planejamento, especificações e tasks do projeto
+├── docs/                     # Planejamento, especificações, tarefas e manual do usuário
 ├── docker-compose.yml        # Configuração do deploy local/produção em containers
 └── README.md                 # Este documento
 ```
@@ -91,8 +92,9 @@ Você pode rodar o projeto localmente para desenvolvimento ou via Docker Compose
 ### Opção 1: Desenvolvimento Local (Manual)
 
 #### Pré-requisitos
-* [.NET 10.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) instalado.
-* Um servidor web simples para o frontend (Ex: extensões do VS Code como Live Server, Node `http-server` ou Python).
+* [.NET 10.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) instalado para o backend.
+* [Node.js (v18 ou superior)](https://nodejs.org/) instalado para o frontend.
+
 
 #### Passo 1: Executar o Backend
 1. Navegue até a pasta `backend/`.
@@ -104,10 +106,18 @@ Você pode rodar o projeto localmente para desenvolvimento ou via Docker Compose
 
 #### Passo 2: Executar o Frontend
 1. Navegue até a pasta `frontend/`.
-2. Inicie um servidor web na porta `8080` (necessário para compatibilidade com CORS local):
-   * Com Node: `npx http-server -p 8080`
-   * Com Python: `python -m http.server 8080`
-3. Acesse no navegador: `http://localhost:8080/pages/tela-login.html`.
+2. Configure as variáveis de ambiente:
+   * Copie o arquivo `.env.example` para `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   * O arquivo `.env` já vem pré-configurado por padrão com a URL da API local (`http://localhost:5041/api`).
+3. Instale as dependências e inicie o servidor de desenvolvimento:
+   ```bash
+   npm install
+   npm run dev
+   ```
+4. Acesse no navegador: `http://localhost:8080` (o login e demais rotas serão gerenciadas pelo React Router).
 
 ---
 
@@ -125,7 +135,7 @@ Esta opção constrói os containers do frontend e backend, configura o banco SQ
    ```
 2. O Docker compilará a imagem .NET, preparará o Nginx e iniciará os serviços em segundo plano.
 3. Acesse o sistema diretamente na porta padrão:
-   `http://localhost/pages/tela-login.html` (ou o IP/domínio da sua VPS).
+   `http://localhost` (ou o IP/domínio da sua VPS).
 
 #### Comandos Úteis do Docker Compose
 * **Ver logs dos serviços**: `docker compose logs -f`
@@ -149,6 +159,25 @@ Ao iniciar pela primeira vez, o banco SQLite é migrado e populado automaticamen
 
 ---
 
+## 👥 Integrantes do Grupo (PIM III)
+
+* **Fredson Silva dos Santos** — RA: `R427FB0`
+* **Anderson Raulino da Silva** — RA: `F3620J8`
+* **Eduardo de Sousa Pereira** — RA: `H759CH8`
+* **Matheus da Silva Brito** — RA: `R839DA4`
+* **Raphael Caique da S. Negreiros** — RA: `R850765`
+* **Miguel dos Santos M. Siroma** — RA: `R540EA6`
+
+---
+
+## 📘 Manual do Usuário
+
+Para entender em detalhes como utilizar cada funcionalidade do sistema (Dashboard, Gestão de Categorias, Transações, Relatórios, Alertas e Assistente IA), consulte o [Manual do Usuário](file:///c:/Users/Fred/ADS/PIM-III/docs/MANUAL_DO_USUARIO.md) disponível na pasta de documentação.
+
+---
+
 ## 📄 Licença
 
 Este projeto está licenciado sob a licença MIT - consulte o arquivo LICENSE para obter detalhes.
+
+

@@ -1,0 +1,320 @@
+@startuml Diagrama_Classes_Conekta
+title Diagrama de Classes - Conekta (PIM-III)
+
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #F8F9FA
+  BorderColor #343A40
+  ArrowColor #495057
+  HeaderBackgroundColor #4A90D9
+  HeaderFontColor #FFFFFF
+  FontSize 12
+}
+
+' =========================================================
+' ENUMS
+' =========================================================
+
+enum ExpenseStatus {
+  Active
+  Cancelled
+}
+
+enum AlertType {
+  BudgetExceeded
+  HighExpense
+  CategoryLimit
+}
+
+' =========================================================
+' ENTIDADES (Domain Layer)
+' =========================================================
+
+class User {
+  +Id : int
+  +Email : string
+  +PasswordHash : string
+  +FullName : string
+  +AccountType : string
+  +CreatedAt : DateTime
+  +UpdatedAt : DateTime
+  --
+  +Expenses : ICollection<Expense>
+  +Budgets : ICollection<Budget>
+  +Alerts : ICollection<Alert>
+  +Incomes : ICollection<Income>
+}
+
+class Category {
+  +Id : int
+  +Name : string
+  +Description : string
+  +ColorCode : string
+  +Icon : string
+  +CreatedAt : DateTime
+  --
+  +Expenses : ICollection<Expense>
+  +Budgets : ICollection<Budget>
+}
+
+class Expense {
+  +Id : int
+  +UserId : int
+  +CategoryId : int
+  +Description : string
+  +Value : decimal
+  +TransactionDate : DateTime
+  +Observation : string
+  +IsRecurrent : bool
+  +Status : ExpenseStatus
+  +CreatedAt : DateTime
+  +UpdatedAt : DateTime
+  --
+  +User : User
+  +Category : Category
+}
+
+class Income {
+  +Id : int
+  +UserId : int
+  +Description : string
+  +Amount : decimal
+  +TransactionDate : DateTime
+  +CreatedAt : DateTime
+  --
+  +User : User
+}
+
+class Budget {
+  +Id : int
+  +UserId : int
+  +CategoryId : int
+  +LimitValue : decimal
+  +PeriodMonth : int
+  +PeriodYear : int
+  +CreatedAt : DateTime
+  +UpdatedAt : DateTime
+  --
+  +User : User
+  +Category : Category
+}
+
+class Alert {
+  +Id : int
+  +UserId : int
+  +CategoryId : int?
+  +Type : AlertType
+  +Title : string
+  +Message : string
+  +IsRead : bool
+  +CreatedAt : DateTime
+  +UpdatedAt : DateTime
+  --
+  +User : User
+  +Category : Category
+}
+
+class ChatMessage {
+  +Id : int
+  +UserId : int
+  +Role : string
+  +Content : string
+  +CreatedAt : DateTime
+  --
+  +User : User
+}
+
+' =========================================================
+' SERVICES (Application Layer)
+' =========================================================
+
+interface IAuthService {
+  +LoginAsync(request: LoginRequest) : Task<AuthResponse>
+  +RegisterAsync(request: RegisterRequest) : Task<AuthResponse>
+}
+
+interface IServices {
+  +GetExpensesByUserAsync(userId: int) : Task<IEnumerable<Expense>>
+  +CreateExpenseAsync(dto: CreateExpenseDto) : Task<Expense>
+  +UpdateExpenseAsync(id: int, dto: UpdateExpenseDto) : Task<Expense>
+  +DeleteExpenseAsync(id: int) : Task
+  +GetBudgetsAsync(userId: int) : Task<IEnumerable<Budget>>
+  +CreateBudgetAsync(dto: CreateBudgetDto) : Task<Budget>
+  +GetCategoriesAsync() : Task<IEnumerable<Category>>
+}
+
+interface IAdditionalServices {
+  +GetIncomesAsync(userId: int) : Task<IEnumerable<Income>>
+  +CreateIncomeAsync(dto: CreateIncomeDto) : Task<Income>
+  +GetAlertsAsync(userId: int) : Task<IEnumerable<Alert>>
+  +GetInsightsAsync(userId: int) : Task<object>
+  +GenerateReportAsync(userId: int, params: ReportParams) : Task<Report>
+}
+
+class AuthService {
+  -_userRepository : IUserRepository
+  -_config : IConfiguration
+  --
+  +LoginAsync(request: LoginRequest) : Task<AuthResponse>
+  +RegisterAsync(request: RegisterRequest) : Task<AuthResponse>
+  -GenerateJwtToken(user: User) : string
+}
+
+class ExpenseService {
+  -_repository : IExpenseRepository
+  -_alertService : AlertService
+  --
+  +GetExpensesByUserAsync(userId: int) : Task<IEnumerable<Expense>>
+  +CreateExpenseAsync(dto: CreateExpenseDto) : Task<Expense>
+  +UpdateExpenseAsync(id: int, dto: UpdateExpenseDto) : Task<Expense>
+  +DeleteExpenseAsync(id: int) : Task
+}
+
+class IncomeService {
+  -_repository : IIncomeRepository
+  --
+  +GetIncomesAsync(userId: int) : Task<IEnumerable<Income>>
+  +CreateIncomeAsync(dto: CreateIncomeDto) : Task<Income>
+  +DeleteIncomeAsync(id: int) : Task
+}
+
+class AlertService {
+  -_repository : IAlertRepository
+  --
+  +GetAlertsAsync(userId: int) : Task<IEnumerable<Alert>>
+  +CheckAndCreateAlertAsync(userId: int, expense: Expense) : Task
+  +MarkAsReadAsync(alertId: int) : Task
+}
+
+class ReportService {
+  -_expenseRepo : IExpenseRepository
+  -_budgetRepo : IBudgetRepository
+  --
+  +GenerateReportAsync(userId: int, month: int, year: int) : Task<Report>
+  +GetSummaryAsync(userId: int) : Task<Summary>
+}
+
+class InsightService {
+  -_expenseRepo : IExpenseRepository
+  --
+  +GetInsightsAsync(userId: int) : Task<object>
+}
+
+class ChatService {
+  -_chatRepository : IChatRepository
+  --
+  +SendMessageAsync(userId: int, message: string) : Task<string>
+  +GetHistoryAsync(userId: int) : Task<IEnumerable<ChatMessage>>
+  +ClearHistoryAsync(userId: int) : Task
+}
+
+' =========================================================
+' CONTROLLERS (Presentation Layer)
+' =========================================================
+
+class AuthController {
+  -_authService : IAuthService
+  --
+  +Login(request: LoginRequest) : IActionResult
+  +Register(request: RegisterRequest) : IActionResult
+}
+
+class ExpensesController {
+  -_services : IServices
+  --
+  +GetAll() : IActionResult
+  +GetById(id: int) : IActionResult
+  +Create(dto: CreateExpenseDto) : IActionResult
+  +Update(id: int, dto: UpdateExpenseDto) : IActionResult
+  +Delete(id: int) : IActionResult
+}
+
+class IncomesController {
+  -_services : IAdditionalServices
+  --
+  +GetAll() : IActionResult
+  +Create(dto: CreateIncomeDto) : IActionResult
+  +Delete(id: int) : IActionResult
+}
+
+class CategoriesController {
+  -_services : IServices
+  --
+  +GetAll() : IActionResult
+  +Create(dto: CreateCategoryDto) : IActionResult
+  +Update(id: int, dto: UpdateCategoryDto) : IActionResult
+  +Delete(id: int) : IActionResult
+}
+
+class AlertsController {
+  -_services : IAdditionalServices
+  --
+  +GetAll() : IActionResult
+  +MarkAsRead(id: int) : IActionResult
+}
+
+class ReportsController {
+  -_services : IAdditionalServices
+  --
+  +GetReport(month: int, year: int) : IActionResult
+  +GetSummary() : IActionResult
+}
+
+class InsightsController {
+  -_services : IAdditionalServices
+  --
+  +GetInsights() : IActionResult
+}
+
+class ChatController {
+  -_chatService : ChatService
+  --
+  +SendMessage(message: string) : IActionResult
+  +GetHistory() : IActionResult
+  +ClearHistory() : IActionResult
+}
+
+' =========================================================
+' RELACIONAMENTOS - Entidades
+' =========================================================
+
+User "1" *-- "0..*" Expense : possui >
+User "1" *-- "0..*" Income : possui >
+User "1" *-- "0..*" Budget : define >
+User "1" *-- "0..*" Alert : recebe >
+User "1" *-- "0..*" ChatMessage : envia >
+
+Category "1" *-- "0..*" Expense : classifica >
+Category "1" *-- "0..*" Budget : limita >
+Category "1" *-- "0..*" Alert : referencia >
+
+Expense --> ExpenseStatus : usa >
+Alert --> AlertType : usa >
+
+' Relacionamentos - Services
+AuthService ..|> IAuthService
+ExpenseService ..|> IServices
+IncomeService ..|> IAdditionalServices
+AlertService ..|> IAdditionalServices
+ReportService ..|> IAdditionalServices
+InsightService ..|> IAdditionalServices
+
+' Relacionamentos - Controllers -> Services
+AuthController --> IAuthService : usa >
+ExpensesController --> IServices : usa >
+IncomesController --> IAdditionalServices : usa >
+CategoriesController --> IServices : usa >
+AlertsController --> IAdditionalServices : usa >
+ReportsController --> IAdditionalServices : usa >
+InsightsController --> IAdditionalServices : usa >
+ChatController --> ChatService : usa >
+
+' Services -> Entidades
+ExpenseService --> Expense : gerencia >
+IncomeService --> Income : gerencia >
+AlertService --> Alert : gerencia >
+ReportService --> Expense : agrega >
+ReportService --> Budget : compara >
+ChatService --> ChatMessage : persiste >
+
+@enduml
