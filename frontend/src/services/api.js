@@ -37,7 +37,7 @@ export async function apiFetch(endpoint, options = {}) {
       headers: { ...defaultHeaders, ...options.headers }
     });
 
-    if (response.status === 401) {
+    if (response.status === 401 && !isAuthRoute) {
       localStorage.removeItem('pim_token');
       localStorage.removeItem('pim_user');
       throw new Error('Sessão expirada. Por favor, faça login novamente.');
@@ -133,28 +133,28 @@ export const ReportService = {
   getSummary: (startDate, endDate) => {
     let endpoint = '/reports/summary';
     if (startDate && endDate) {
-      endpoint += `?start=${startDate}&end=${endDate}`;
+      endpoint += `?start=${startDate}T00:00:00Z&end=${endDate}T23:59:59Z`;
     }
     return apiFetch(endpoint);
   },
   getByCategory: (startDate, endDate) => {
     let endpoint = '/reports/by-category';
     if (startDate && endDate) {
-      endpoint += `?start=${startDate}&end=${endDate}`;
+      endpoint += `?start=${startDate}T00:00:00Z&end=${endDate}T23:59:59Z`;
     }
     return apiFetch(endpoint);
   },
   getTrend: (startDate, endDate) => {
     let endpoint = '/reports/trend';
     if (startDate && endDate) {
-      endpoint += `?start=${startDate}&end=${endDate}`;
+      endpoint += `?start=${startDate}T00:00:00Z&end=${endDate}T23:59:59Z`;
     }
     return apiFetch(endpoint);
   },
   getDaily: (startDate, endDate) => {
     let endpoint = '/reports/daily';
     if (startDate && endDate) {
-      endpoint += `?start=${startDate}&end=${endDate}`;
+      endpoint += `?start=${startDate}T00:00:00Z&end=${endDate}T23:59:59Z`;
     }
     return apiFetch(endpoint);
   }
@@ -168,6 +168,15 @@ export const AlertService = {
 
 export const InsightService = {
   getAll: () => apiFetch('/insights')
+};
+
+export const ChatService = {
+  getHistory: () => apiFetch('/chat'),
+  sendMessage: (content) => apiFetch('/chat', {
+    method: 'POST',
+    body: JSON.stringify({ content })
+  }),
+  clearHistory: () => apiFetch('/chat', { method: 'DELETE' })
 };
 
 export const Utils = {

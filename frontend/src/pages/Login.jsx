@@ -13,12 +13,21 @@ export const Login = () => {
   const [sobrenome, setSobrenome] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
+  const [registerError, setRegisterError] = useState('');
   
   const navigate = useNavigate();
   const { showToast } = useToast();
 
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setLoginError('');
+    setRegisterError('');
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoginError('');
     if (!email || !password) {
       showToast('Por favor, preencha todos os campos.', 'error');
       return;
@@ -30,7 +39,9 @@ export const Login = () => {
       showToast('Bem-vindo!', 'success');
       navigate('/');
     } catch (error) {
-      // O erro já é tratado no apiFetch, mas podemos disparar um toast aqui se precisarmos de msg customizada
+      const msg = error.message || 'E-mail ou senha incorretos.';
+      setLoginError(msg);
+      showToast(msg, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -38,8 +49,11 @@ export const Login = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setRegisterError('');
     if (password !== confirmPassword) {
-      showToast('As senhas não coincidem', 'error');
+      const msg = 'As senhas não coincidem';
+      setRegisterError(msg);
+      showToast(msg, 'error');
       return;
     }
 
@@ -51,9 +65,11 @@ export const Login = () => {
       // Limpa os campos da aba de registro e vai para o login
       setPassword('');
       setConfirmPassword('');
-      setActiveTab('login');
+      handleTabChange('login');
     } catch (error) {
-      // Erro tratado pela api.
+      const msg = error.message || 'Erro ao criar conta. Tente novamente.';
+      setRegisterError(msg);
+      showToast(msg, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +101,7 @@ export const Login = () => {
               className={`tab ${activeTab === 'login' ? 'active' : ''}`} 
               role="tab" 
               aria-selected={activeTab === 'login'} 
-              onClick={() => setActiveTab('login')}
+              onClick={() => handleTabChange('login')}
             >
               Entrar
             </button>
@@ -93,7 +109,7 @@ export const Login = () => {
               className={`tab ${activeTab === 'cadastro' ? 'active' : ''}`} 
               role="tab" 
               aria-selected={activeTab === 'cadastro'} 
-              onClick={() => setActiveTab('cadastro')}
+              onClick={() => handleTabChange('cadastro')}
             >
               Criar conta
             </button>
@@ -104,6 +120,29 @@ export const Login = () => {
             <h2 id="auth-heading" className="auth-title">Bem-vindo de volta</h2>
             <p className="auth-sub">Entre com sua conta para continuar</p>
 
+            {loginError && (
+              <div style={{
+                background: 'rgba(226, 75, 74, 0.1)',
+                border: '1px solid rgba(226, 75, 74, 0.3)',
+                color: '#E24B4A',
+                padding: '0.8rem 1rem',
+                borderRadius: '8px',
+                marginBottom: '1.2rem',
+                fontSize: '13.5px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontFamily: '"DM Sans", sans-serif'
+              }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>{loginError}</span>
+              </div>
+            )}
+
             <form onSubmit={handleLogin}>
               <Input 
                 id="email-login" 
@@ -111,7 +150,7 @@ export const Login = () => {
                 label="E-mail" 
                 placeholder="seu@email.com" 
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); setLoginError(''); }}
                 required 
               />
               
@@ -121,7 +160,7 @@ export const Login = () => {
                 label="Senha" 
                 placeholder="••••••••" 
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => { setPassword(e.target.value); setLoginError(''); }}
                 required 
               />
 
@@ -132,13 +171,36 @@ export const Login = () => {
               </Button>
             </form>
 
-            <p className="switch-msg">Não tem conta? <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('cadastro'); }} aria-label="Mudar para aba de criar conta">Criar agora</a></p>
+            <p className="switch-msg">Não tem conta? <a href="#" onClick={(e) => { e.preventDefault(); handleTabChange('cadastro'); }} aria-label="Mudar para aba de criar conta">Criar agora</a></p>
           </div>
 
           {/* CADASTRO */}
           <div id="cadastro" className={`form-section ${activeTab !== 'cadastro' ? 'hidden' : ''}`} role="tabpanel">
             <h2 className="auth-title">Criar sua conta</h2>
             <p className="auth-sub">Preencha os dados para começar</p>
+
+            {registerError && (
+              <div style={{
+                background: 'rgba(226, 75, 74, 0.1)',
+                border: '1px solid rgba(226, 75, 74, 0.3)',
+                color: '#E24B4A',
+                padding: '0.8rem 1rem',
+                borderRadius: '8px',
+                marginBottom: '1.2rem',
+                fontSize: '13.5px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontFamily: '"DM Sans", sans-serif'
+              }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>{registerError}</span>
+              </div>
+            )}
 
             <form onSubmit={handleRegister}>
               <div className="row-two">
@@ -148,7 +210,7 @@ export const Login = () => {
                   label="Nome" 
                   placeholder="João" 
                   value={nome}
-                  onChange={(e) => setNome(e.target.value)}
+                  onChange={(e) => { setNome(e.target.value); setRegisterError(''); }}
                   required 
                 />
                 <Input 
@@ -157,7 +219,7 @@ export const Login = () => {
                   label="Sobrenome" 
                   placeholder="Silva" 
                   value={sobrenome}
-                  onChange={(e) => setSobrenome(e.target.value)}
+                  onChange={(e) => { setSobrenome(e.target.value); setRegisterError(''); }}
                   required 
                 />
               </div>
@@ -168,7 +230,7 @@ export const Login = () => {
                 label="E-mail" 
                 placeholder="seu@email.com" 
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); setRegisterError(''); }}
                 required 
               />
 
@@ -180,7 +242,7 @@ export const Login = () => {
                   placeholder="Mínimo 8 caracteres" 
                   required 
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => { setPassword(e.target.value); setRegisterError(''); }}
                   aria-describedby="password-hint" 
                 />
                 <div className="strength-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" aria-label="Força da senha">
@@ -195,7 +257,7 @@ export const Login = () => {
                 label="Confirmar senha" 
                 placeholder="Repita a senha" 
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => { setConfirmPassword(e.target.value); setRegisterError(''); }}
                 required 
               />
 
@@ -204,7 +266,7 @@ export const Login = () => {
               </Button>
             </form>
 
-            <p className="switch-msg">Já tem conta? <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('login'); }} aria-label="Mudar para aba de entrar na conta">Entrar agora</a></p>
+            <p className="switch-msg">Já tem conta? <a href="#" onClick={(e) => { e.preventDefault(); handleTabChange('login'); }} aria-label="Mudar para aba de entrar na conta">Entrar agora</a></p>
           </div>
 
         </div>

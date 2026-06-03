@@ -31,6 +31,9 @@ export const App = () => {
             <Route path="alertas" element={<Alertas />} />
             <Route path="insights" element={<Insights />} />
           </Route>
+          
+          {/* Rota de fallback para redirecionar qualquer URL não correspondida (como as antigas páginas .html) */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </ToastProvider>

@@ -22,7 +22,15 @@ export const Alertas = () => {
   }, []);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <>
+      <div className="topbar">
+        <div className="topbar-left">
+          <h1>Alertas</h1>
+          <p>Notificações importantes</p>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       <div className="alerts-card">
         <h3>Central de Alertas</h3>
         {loading ? (
@@ -50,5 +58,6 @@ export const Alertas = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
