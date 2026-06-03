@@ -46,4 +46,11 @@ public class ReportsController : ControllerBase
     {
         return Ok(await _service.GetTrendAsync(GetCurrentUserId(), start, end));
     }
+
+    [HttpGet("daily")]
+    public async Task<ActionResult<IEnumerable<DailyExpenseReportResponse>>> GetDaily([FromQuery] DateTime? start, [FromQuery] DateTime? end)
+    {
+        return Ok(await _service.GetDailyAsync(GetCurrentUserId(), start, end));
+    }
 }
+

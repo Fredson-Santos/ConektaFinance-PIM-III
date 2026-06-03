@@ -22,7 +22,7 @@ services:
     container_name: conektafinance-frontend
     restart: always
     ports:
-      - "8888:80" # Expõe na porta 8888 para compatibilidade com Nginx Proxy Manager
+      - "9999:80" # Expõe na porta 9999 para compatibilidade com Nginx Proxy Manager
     depends_on:
       - backend
 

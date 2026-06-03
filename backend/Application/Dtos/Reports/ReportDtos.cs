@@ -7,7 +7,9 @@ public record ReportSummaryResponse(
     decimal TotalSpent,
     decimal RemainingBudget,
     double OverallPercentage,
-    LargestExpenseDto? LargestExpense
+    LargestExpenseDto? LargestExpense,
+    decimal RecurrentSpent,
+    int RecurrentCount
 );
 
 public record CategoryReportResponse(
@@ -19,6 +21,11 @@ public record CategoryReportResponse(
 );
 
 public record TrendReportResponse(
-    string Period, // Ex: "Jan/2026"
+    string Period, // Ex: "01/2026"
+    decimal Value
+);
+
+public record DailyExpenseReportResponse(
+    string Day,   // Ex: "01", "02", ..., "31"
     decimal Value
 );

@@ -69,3 +69,10 @@ obj/
 *.db
 *.db-shm
 *.db-wal
+
+# Playwright / E2E Tests
+**/test-results/
+**/playwright-report/
+**/blob-report/
+**/.playwright/
+

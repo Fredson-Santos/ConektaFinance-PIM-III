@@ -19,3 +19,10 @@ public interface IExpenseRepository
     Task UpdateAsync(Expense expense);
     Task DeleteAsync(int id);
 }
+
+public interface IChatRepository
+{
+    Task<IEnumerable<ChatMessage>> GetByUserIdAsync(int userId);
+    Task AddAsync(ChatMessage message);
+    Task ClearHistoryAsync(int userId);
+}

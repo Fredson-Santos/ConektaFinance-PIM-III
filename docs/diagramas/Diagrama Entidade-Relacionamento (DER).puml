@@ -1,0 +1,150 @@
+@startuml DER_Conekta
+title Diagrama Entidade-Relacionamento (DER) - Conekta (PIM-III)
+
+skinparam entity {
+  BackgroundColor #E8F5E9
+  BorderColor #2E7D32
+  FontSize 12
+}
+skinparam note {
+  BackgroundColor #FFF3E0
+  BorderColor #E65100
+}
+
+' =========================================================
+' ENTIDADES
+' =========================================================
+
+entity USUARIO {
+  * usuario_id : INT <<PK>>
+  --
+  * email : VARCHAR(255) <<UNIQUE>>
+  * senha_hash : VARCHAR(255)
+  * nome_completo : VARCHAR(255)
+  tipo_conta : VARCHAR(50)
+  data_criacao : TIMESTAMP
+  data_atualizacao : TIMESTAMP
+}
+
+entity CATEGORIA {
+  * categoria_id : INT <<PK>>
+  --
+  * nome : VARCHAR(100)
+  descricao : TEXT
+  codigo_cor : VARCHAR(7)
+  icone : VARCHAR(50)
+  data_criacao : TIMESTAMP
+}
+
+entity DESPESA {
+  * despesa_id : INT <<PK>>
+  --
+  * usuario_id : INT <<FK>>
+  * categoria_id : INT <<FK>>
+  * descricao : VARCHAR(255)
+  * valor : DECIMAL(10,2)
+  * data_transacao : DATE
+  observacao : TEXT
+  eh_recorrente : BOOLEAN
+  status : VARCHAR(20)
+  data_criacao : TIMESTAMP
+  data_atualizacao : TIMESTAMP
+}
+
+entity RECEITA {
+  * receita_id : INT <<PK>>
+  --
+  * usuario_id : INT <<FK>>
+  * descricao : VARCHAR(255)
+  * valor : DECIMAL(10,2)
+  * data_transacao : DATE
+  data_criacao : TIMESTAMP
+}
+
+entity ORCAMENTO {
+  * orcamento_id : INT <<PK>>
+  --
+  * usuario_id : INT <<FK>>
+  * categoria_id : INT <<FK>>
+  * valor_limite : DECIMAL(10,2)
+  mes_periodo : INT
+  ano_periodo : INT
+  data_criacao : TIMESTAMP
+  data_atualizacao : TIMESTAMP
+}
+
+entity ALERTA {
+  * alerta_id : INT <<PK>>
+  --
+  * usuario_id : INT <<FK>>
+  * tipo : VARCHAR(50)
+  * titulo : VARCHAR(255)
+  * mensagem : TEXT
+  categoria_id : INT <<FK>>
+  foi_lido : BOOLEAN
+  data_criacao : TIMESTAMP
+  data_atualizacao : TIMESTAMP
+}
+
+entity MENSAGEM_CHAT {
+  * mensagem_id : INT <<PK>>
+  --
+  * usuario_id : INT <<FK>>
+  * papel : VARCHAR(20)
+  * conteudo : TEXT
+  data_criacao : TIMESTAMP
+}
+
+' =========================================================
+' RELACIONAMENTOS
+' =========================================================
+
+USUARIO ||--o{ DESPESA : "cria"
+USUARIO ||--o{ RECEITA : "registra"
+USUARIO ||--o{ ORCAMENTO : "define"
+USUARIO ||--o{ ALERTA : "recebe"
+USUARIO ||--o{ MENSAGEM_CHAT : "conversa"
+
+CATEGORIA ||--o{ DESPESA : "classifica"
+CATEGORIA ||--o{ ORCAMENTO : "limita"
+CATEGORIA |o--o{ ALERTA : "referencia"
+
+' =========================================================
+' NOTAS
+' =========================================================
+
+note right of USUARIO
+  Cada usuário possui múltiplas
+  despesas, receitas, orçamentos,
+  alertas e mensagens de chat.
+end note
+
+note right of DESPESA
+  Registro de cada gasto realizado.
+  Status: Active | Cancelled.
+  Verificada contra ORCAMENTO.
+end note
+
+note right of RECEITA
+  Registro de entradas financeiras
+  do usuário. Sem categoria.
+end note
+
+note right of ORCAMENTO
+  Limite mensal de gastos
+  por categoria. Dispara alertas
+  quando excedido.
+end note
+
+note right of ALERTA
+  Tipos: BudgetExceeded,
+  HighExpense, CategoryLimit.
+  categoria_id é opcional.
+end note
+
+note right of MENSAGEM_CHAT
+  Histórico de conversa com IA.
+  papel: "user" | "assistant".
+end note
+
+@enduml

@@ -1,0 +1,160 @@
+@startuml Modelo_Relacional_Conekta
+title Modelo Relacional - Conekta (PIM-III)
+
+skinparam class {
+  BackgroundColor #EDE7F6
+  BorderColor #4527A0
+  ArrowColor #283593
+  FontSize 12
+  HeaderBackgroundColor #5C35B6
+  HeaderFontColor #FFFFFF
+}
+
+' =========================================================
+' TABELAS (Modelo Relacional)
+' =========================================================
+
+class USUARIO <<table>> {
+  --Chaves--
+  PK usuario_id : INT AUTOINCREMENT
+  --Dados--
+  email : VARCHAR(255) UNIQUE NOT NULL
+  senha_hash : VARCHAR(255) NOT NULL
+  nome_completo : VARCHAR(255) NOT NULL
+  tipo_conta : VARCHAR(50) DEFAULT 'Standard'
+  data_criacao : TIMESTAMP DEFAULT NOW()
+  data_atualizacao : TIMESTAMP DEFAULT NOW()
+}
+
+class CATEGORIA <<table>> {
+  --Chaves--
+  PK categoria_id : INT AUTOINCREMENT
+  --Dados--
+  nome : VARCHAR(100) NOT NULL
+  descricao : TEXT
+  codigo_cor : VARCHAR(7) DEFAULT '#000000'
+  icone : VARCHAR(50) DEFAULT 'folder'
+  data_criacao : TIMESTAMP DEFAULT NOW()
+}
+
+class DESPESA <<table>> {
+  --Chaves--
+  PK despesa_id : INT AUTOINCREMENT
+  FK usuario_id : INT NOT NULL
+  FK categoria_id : INT NOT NULL
+  --Dados--
+  descricao : VARCHAR(255) NOT NULL
+  valor : DECIMAL(10,2) NOT NULL
+  data_transacao : DATE NOT NULL
+  observacao : TEXT
+  eh_recorrente : BOOLEAN DEFAULT 0
+  status : VARCHAR(20) DEFAULT 'Active'
+  data_criacao : TIMESTAMP DEFAULT NOW()
+  data_atualizacao : TIMESTAMP DEFAULT NOW()
+}
+
+class RECEITA <<table>> {
+  --Chaves--
+  PK receita_id : INT AUTOINCREMENT
+  FK usuario_id : INT NOT NULL
+  --Dados--
+  descricao : VARCHAR(255) NOT NULL
+  valor : DECIMAL(10,2) NOT NULL
+  data_transacao : DATE NOT NULL
+  data_criacao : TIMESTAMP DEFAULT NOW()
+}
+
+class ORCAMENTO <<table>> {
+  --Chaves--
+  PK orcamento_id : INT AUTOINCREMENT
+  FK usuario_id : INT NOT NULL
+  FK categoria_id : INT NOT NULL
+  --Dados--
+  valor_limite : DECIMAL(10,2) NOT NULL
+  mes_periodo : INT NOT NULL
+  ano_periodo : INT NOT NULL
+  data_criacao : TIMESTAMP DEFAULT NOW()
+  data_atualizacao : TIMESTAMP DEFAULT NOW()
+}
+
+class ALERTA <<table>> {
+  --Chaves--
+  PK alerta_id : INT AUTOINCREMENT
+  FK usuario_id : INT NOT NULL
+  FK categoria_id : INT (NULLABLE)
+  --Dados--
+  tipo : VARCHAR(50) NOT NULL
+  titulo : VARCHAR(255) NOT NULL
+  mensagem : TEXT NOT NULL
+  foi_lido : BOOLEAN DEFAULT 0
+  data_criacao : TIMESTAMP DEFAULT NOW()
+  data_atualizacao : TIMESTAMP DEFAULT NOW()
+}
+
+class MENSAGEM_CHAT <<table>> {
+  --Chaves--
+  PK mensagem_id : INT AUTOINCREMENT
+  FK usuario_id : INT NOT NULL
+  --Dados--
+  papel : VARCHAR(20) NOT NULL
+  conteudo : TEXT NOT NULL
+  data_criacao : TIMESTAMP DEFAULT NOW()
+}
+
+' =========================================================
+' RELACIONAMENTOS (com cardinalidade)
+' =========================================================
+
+USUARIO "1" --o{ "N" DESPESA : "usuario_id"
+USUARIO "1" --o{ "N" RECEITA : "usuario_id"
+USUARIO "1" --o{ "N" ORCAMENTO : "usuario_id"
+USUARIO "1" --o{ "N" ALERTA : "usuario_id"
+USUARIO "1" --o{ "N" MENSAGEM_CHAT : "usuario_id"
+
+CATEGORIA "1" --o{ "N" DESPESA : "categoria_id"
+CATEGORIA "1" --o{ "N" ORCAMENTO : "categoria_id"
+CATEGORIA "1" --o{ "0..N" ALERTA : "categoria_id (opt)"
+
+' =========================================================
+' NOTAS TÉCNICAS
+' =========================================================
+
+note bottom of USUARIO
+  Centro do sistema.
+  Tipo: Standard (padrão).
+  Autenticação: BCrypt + JWT.
+end note
+
+note bottom of DESPESA
+  status: 'Active' | 'Cancelled'
+  Verifica ORCAMENTO ao criar.
+  Dispara ALERTA se exceder limite.
+end note
+
+note bottom of RECEITA
+  Entrada financeira simples.
+  Usada no cálculo de saldo:
+  Saldo = Σ(receitas) - Σ(despesas)
+end note
+
+note bottom of ORCAMENTO
+  Escopo: mês + ano + categoria.
+  Regra: 1 orçamento por
+  (usuario, categoria, mês, ano).
+end note
+
+note bottom of ALERTA
+  tipo: BudgetExceeded |
+        HighExpense |
+        CategoryLimit
+  categoria_id pode ser NULL
+  para alertas globais.
+end note
+
+note bottom of MENSAGEM_CHAT
+  papel: 'user' | 'assistant'
+  Histórico persistente por usuário.
+  Enviado como contexto para a IA.
+end note
+
+@enduml

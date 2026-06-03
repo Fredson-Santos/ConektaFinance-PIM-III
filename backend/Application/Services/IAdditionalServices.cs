@@ -10,6 +10,7 @@ public interface IReportService
     Task<ReportSummaryResponse> GetSummaryAsync(int userId, DateTime? start = null, DateTime? end = null);
     Task<IEnumerable<CategoryReportResponse>> GetByCategoryAsync(int userId, DateTime? start = null, DateTime? end = null);
     Task<IEnumerable<TrendReportResponse>> GetTrendAsync(int userId, DateTime? start = null, DateTime? end = null);
+    Task<IEnumerable<DailyExpenseReportResponse>> GetDailyAsync(int userId, DateTime? start = null, DateTime? end = null);
 }
 
 public interface IAlertService

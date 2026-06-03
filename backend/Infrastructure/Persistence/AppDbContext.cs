@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<Budget> Budgets { get; set; } = null!;
     public DbSet<Alert> Alerts { get; set; } = null!;
     public DbSet<Income> Incomes { get; set; } = null!;
+    public DbSet<ChatMessage> ChatMessages { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

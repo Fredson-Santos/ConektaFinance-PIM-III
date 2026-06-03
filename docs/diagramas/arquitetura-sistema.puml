@@ -1,88 +1,221 @@
-@startuml Arquitetura_Sistema
-title Arquitetura em Camadas - Conekta
+@startuml Arquitetura_Sistema_Conekta
+title Arquitetura em Camadas - Conekta (PIM-III)
 
-package "Frontend (58D1 - Web Responsivo)" #87CEEB {
-  component [tela-login.html] as login
-  component [tela-dashboard.html] as dashboard
-  component [tela-gastos.html] as gastos
-  component [tela-relatorios.html] as relatorios
-  component [JavaScript/DOM] as js
+skinparam component {
+  BackgroundColor #ECEFF1
+  BorderColor #546E7A
+  FontSize 12
+}
+skinparam database {
+  BackgroundColor #FCE4EC
+  BorderColor #C62828
+}
+skinparam note {
+  BackgroundColor #F3E5F5
+  BorderColor #6A1B9A
 }
 
-package "Backend (57D9 - OOP C#)" #98FB98 {
-  component [AuthController] as auth
-  component [TransacaoController] as transacao
-  component [OrcamentoController] as orcamento
-  component [RelatorioController] as relatorio
-  component [AlertaService] as alertas
-  component [AuthService] as authsvc
+' =========================================================
+' FRONTEND
+' =========================================================
+
+package "Frontend (React 19 + Vite 5)" #87CEEB {
+  package "Pages (src/pages/)" {
+    component [Login.jsx] as login
+    component [Dashboard.jsx] as dashboard
+    component [Gastos.jsx] as gastos
+    component [Categorias.jsx] as categorias
+    component [Relatorios.jsx] as relatorios
+    component [Alertas.jsx] as alertas
+    component [Insights.jsx] as insights
+  }
+  component [React Router DOM 7\n+ Fetch API (api.js)\n+ Recharts 3] as js
+  component [Nginx (Produção)] as nginx
 }
 
-package "Banco de Dados (57D8 - Modelagem)" #FFB6C6 {
-  database "MySQL/PostgreSQL" {
-    entity usuarios
-    entity categorias
-    entity transacoes
-    entity orcamentos
-    entity alertas
+' =========================================================
+' BACKEND
+' =========================================================
+
+package "Backend (ASP.NET Core C# - OOP)" #98FB98 {
+  package "Controllers (Camada de Apresentação)" {
+    component [AuthController] as authCtrl
+    component [ExpensesController] as expCtrl
+    component [IncomesController] as incCtrl
+    component [CategoriesController] as catCtrl
+    component [AlertsController] as alertCtrl
+    component [ReportsController] as repCtrl
+    component [InsightsController] as insCtrl
+    component [ChatController] as chatCtrl
+    component [IntegrationController] as intCtrl
+  }
+
+  package "Services (Camada de Aplicação)" {
+    component [AuthService] as authSvc
+    component [ExpenseService] as expSvc
+    component [IncomeService] as incSvc
+    component [AlertService] as alertSvc
+    component [ReportService] as repSvc
+    component [InsightService] as insSvc
+    component [ChatService] as chatSvc
+  }
+
+  package "Domain (Entidades e Regras)" {
+    component [User] as userEnt
+    component [Expense] as expEnt
+    component [Income] as incEnt
+    component [Budget] as budEnt
+    component [Alert] as alertEnt
+    component [Category] as catEnt
+    component [ChatMessage] as chatEnt
+  }
+
+  component [JWT Middleware] as jwt
+}
+
+' =========================================================
+' INFRAESTRUTURA
+' =========================================================
+
+package "Infrastructure (Persistência - EF Core)" #DDA0DD {
+  component [AppDbContext] as dbCtx
+  component [UserRepository] as userRepo
+  component [ExpenseRepository] as expRepo
+  component [IncomeRepository] as incRepo
+  component [BudgetRepository] as budRepo
+  component [AlertRepository] as alertRepo
+  component [ChatRepository] as chatRepo
+}
+
+' =========================================================
+' BANCO DE DADOS
+' =========================================================
+
+package "Banco de Dados (SQLite)" #FFB6C6 {
+  database "financeiro.db" {
+    entity Usuarios
+    entity Despesas
+    entity Receitas
+    entity Orcamentos
+    entity Alertas
+    entity Categorias
+    entity MensagensChat
   }
 }
 
-package "Camada de Dados" #DDA0DD {
-  component [UserRepository] as userrepo
-  component [TransacaoRepository] as tranrepo
-  component [OrcamentoRepository] as orcrepo
-  component [AlertaRepository] as alertrepo
+' =========================================================
+' SERVIÇOS EXTERNOS
+' =========================================================
+
+package "Serviços Externos" #FFFDE7 {
+  component [Google Gemini API\n(IA Financeira)] as gemini
+  component [ExchangeRate API\n(Cotações)] as exchange
 }
+
+' =========================================================
+' CONEXÕES - Frontend
+' =========================================================
 
 login --> js
 dashboard --> js
 gastos --> js
 relatorios --> js
+categorias --> js
+alertas --> js
+insights --> js
 
-js --> auth: POST /auth/login
-js --> transacao: CRUD /transacoes
-js --> orcamento: GET /orcamentos
-js --> relatorio: GET /relatorios
+js --> nginx
+nginx --> jwt : HTTP Requests
 
-auth --> authsvc: Valida credenciais
-authsvc --> userrepo: Busca usuário
+' =========================================================
+' CONEXÕES - Frontend → Backend (via JWT)
+' =========================================================
 
-transacao --> tranrepo: CRUD transações
-tranrepo --> transacoes
+jwt --> authCtrl : POST /api/auth/login\nPOST /api/auth/register
+jwt --> expCtrl  : GET/POST/PUT/DELETE /api/expenses
+jwt --> incCtrl  : GET/POST/DELETE /api/incomes
+jwt --> catCtrl  : GET/POST/PUT/DELETE /api/categories
+jwt --> alertCtrl : GET /api/alerts\nPATCH /api/alerts/{id}/read
+jwt --> repCtrl  : GET /api/reports
+jwt --> insCtrl  : GET /api/insights
+jwt --> chatCtrl : POST /api/chat\nGET /api/chat/history
+jwt --> intCtrl  : GET /api/integration/exchange-rates
 
-orcamento --> orcrepo: Lê orçamentos
-orcrepo --> orcamentos
+' =========================================================
+' CONEXÕES - Controllers → Services
+' =========================================================
 
-relatorio --> tranrepo: Agregações
-relatorio --> orcrepo: Comparações
-relatorio --> alertrepo: Alertas
+authCtrl --> authSvc
+expCtrl --> expSvc
+incCtrl --> incSvc
+catCtrl --> expSvc
+alertCtrl --> alertSvc
+repCtrl --> repSvc
+insCtrl --> insSvc
+chatCtrl --> chatSvc
+intCtrl --> exchange
 
-alertas --> alertrepo: Cria alertas
-alertrepo --> alertas
+' =========================================================
+' CONEXÕES - Services → Repositories
+' =========================================================
 
-userrepo --> usuarios
-orcrepo --> orcamentos
-tranrepo --> transacoes
-alertrepo --> alertas
+authSvc --> userRepo
+expSvc --> expRepo
+expSvc --> alertSvc
+incSvc --> incRepo
+alertSvc --> alertRepo
+repSvc --> expRepo
+repSvc --> budRepo
+insSvc --> expRepo
+chatSvc --> chatRepo
+chatSvc --> gemini
 
-note right of login
-  Autenticação com JWT
+' =========================================================
+' CONEXÕES - Repositories → DbContext → DB
+' =========================================================
+
+userRepo --> dbCtx
+expRepo --> dbCtx
+incRepo --> dbCtx
+budRepo --> dbCtx
+alertRepo --> dbCtx
+chatRepo --> dbCtx
+
+dbCtx --> Usuarios
+dbCtx --> Despesas
+dbCtx --> Receitas
+dbCtx --> Orcamentos
+dbCtx --> Alertas
+dbCtx --> Categorias
+dbCtx --> MensagensChat
+
+' =========================================================
+' NOTAS
+' =========================================================
+
+note right of jwt
+  Autenticação stateless via JWT.
+  Token incluído em toda requisição
+  autenticada (Bearer Token).
 end note
 
-note right of dashboard
-  KPIs: Saldo, Total Gasto,
-  Gastos Registrados, Maior Gasto
+note right of chatCtrl
+  Chat com IA financeira (Gemini).
+  Histórico persistido no banco.
 end note
 
-note right of transacao
-  CRUD completo:
-  Create, Read, Update, Delete
+note right of alertSvc
+  Dispara alertas automáticos
+  quando despesa excede orçamento
+  ou gasto é anormalmente alto.
 end note
 
-note right of alertas
-  Detecta orçamento excedido
-  e gastos altos
+note right of repSvc
+  Gera relatórios com:
+  - Total gasto por categoria
+  - % utilizado do orçamento
+  - Evolução mensal
+  - Saldo (receitas - despesas)
 end note
 
 @enduml
