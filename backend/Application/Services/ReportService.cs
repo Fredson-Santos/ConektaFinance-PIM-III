@@ -47,12 +47,18 @@ public class ReportService : IReportService
         var remainingBudget = totalBudget - totalSpent;
         var overallPercentage = totalBudget > 0 ? (double)(totalSpent / totalBudget * 100) : 0;
 
+        var recurrentExpenses = expenses.Where(x => x.IsRecurrent).ToList();
+        var recurrentSpent = recurrentExpenses.Sum(x => x.Value);
+        var recurrentCount = recurrentExpenses.Count;
+
         return new ReportSummaryResponse(
             totalBudget,
             totalSpent,
             remainingBudget,
             overallPercentage,
-            highestExpense != null ? new LargestExpenseDto(highestExpense.Value, highestExpense.Description) : null
+            highestExpense != null ? new LargestExpenseDto(highestExpense.Value, highestExpense.Description) : null,
+            recurrentSpent,
+            recurrentCount
         );
     }
 

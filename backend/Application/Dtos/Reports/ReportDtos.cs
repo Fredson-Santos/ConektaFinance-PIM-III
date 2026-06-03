@@ -7,7 +7,9 @@ public record ReportSummaryResponse(
     decimal TotalSpent,
     decimal RemainingBudget,
     double OverallPercentage,
-    LargestExpenseDto? LargestExpense
+    LargestExpenseDto? LargestExpense,
+    decimal RecurrentSpent,
+    int RecurrentCount
 );
 
 public record CategoryReportResponse(

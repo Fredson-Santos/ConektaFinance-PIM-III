@@ -11,13 +11,15 @@ public class ReportServiceTests
 {
     private readonly Mock<IExpenseRepository> _expenseRepoMock;
     private readonly Mock<IBudgetRepository> _budgetRepoMock;
+    private readonly Mock<IIncomeRepository> _incomeRepoMock;
     private readonly ReportService _service;
 
     public ReportServiceTests()
     {
         _expenseRepoMock = new Mock<IExpenseRepository>();
         _budgetRepoMock = new Mock<IBudgetRepository>();
-        _service = new ReportService(_expenseRepoMock.Object, _budgetRepoMock.Object);
+        _incomeRepoMock = new Mock<IIncomeRepository>();
+        _service = new ReportService(_expenseRepoMock.Object, _budgetRepoMock.Object, _incomeRepoMock.Object);
     }
 
     [Fact]
@@ -31,8 +33,13 @@ public class ReportServiceTests
             new Expense { Value = 250, Description = "Gasto 2" },
             new Expense { Value = 50, Description = "Gasto 3" }
         };
-        _expenseRepoMock.Setup(x => x.GetByUserIdAsync(userId, null, null, null)).ReturnsAsync(expenses);
+        _expenseRepoMock
+            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<DateTime?>(), It.IsAny<DateTime?>(), null))
+            .ReturnsAsync(expenses);
         _budgetRepoMock.Setup(x => x.GetByUserIdAsync(userId)).ReturnsAsync(new List<Budget>());
+        _incomeRepoMock
+            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<DateTime?>(), It.IsAny<DateTime?>()))
+            .ReturnsAsync(new List<Income>());
 
         // Act
         var result = await _service.GetSummaryAsync(userId);
@@ -54,8 +61,13 @@ public class ReportServiceTests
             new Expense { Value = 100, CategoryId = 1, Category = new Category { Name = "Alimentação" } },
             new Expense { Value = 300, CategoryId = 2, Category = new Category { Name = "Transporte" } }
         };
-        _expenseRepoMock.Setup(x => x.GetByUserIdAsync(userId, null, null, null)).ReturnsAsync(expenses);
+        _expenseRepoMock
+            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<DateTime?>(), It.IsAny<DateTime?>(), null))
+            .ReturnsAsync(expenses);
         _budgetRepoMock.Setup(x => x.GetByUserIdAsync(userId)).ReturnsAsync(new List<Budget>());
+        _incomeRepoMock
+            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<DateTime?>(), It.IsAny<DateTime?>()))
+            .ReturnsAsync(new List<Income>());
 
         // Act
         var result = await _service.GetByCategoryAsync(userId);
