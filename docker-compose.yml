@@ -6,11 +6,8 @@ services:
       dockerfile: Dockerfile
     container_name: conektafinance-backend
     restart: always
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__DefaultConnection=Data Source=/app/data/financeiro.db
-      - Cors__AllowedOrigins__0=http://localhost
-      - Cors__AllowedOrigins__1=http://127.0.0.1
+    env_file:
+      - .env
     volumes:
       - sqlite_data:/app/data
 
@@ -22,10 +19,17 @@ services:
     container_name: conektafinance-frontend
     restart: always
     ports:
-      - "9999:80" # Expõe na porta 9999 para compatibilidade com Nginx Proxy Manager
+      - "9001:80"
+    networks:
+      - default
+      - dokploy-network
     depends_on:
       - backend
 
 volumes:
   sqlite_data:
     driver: local
+
+networks:
+  dokploy-network:
+    external: true
