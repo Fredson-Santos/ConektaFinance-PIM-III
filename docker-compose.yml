@@ -20,6 +20,8 @@ services:
     restart: always
     ports:
       - "9001:80"
+    labels:
+      - "traefik.docker.network=dokploy-network"
     networks:
       - default
       - dokploy-network
