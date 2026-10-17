@@ -3,12 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ConektaFinance — Gestão Financeira Inteligente</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/pwa-192x192.svg">
+<link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="apple-touch-icon" href="/pwa-192x192.svg">
-<title>ConektaFinance — Gestão Financeira Inteligente</title>
+<meta name="description" content="ConektaFinance — Plataforma de Gestão Financeira Inteligente">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2461,14 +2463,25 @@ tbody tr:hover td {
   .topbar-brand { display: flex; }
   .topbar {
     padding-top: max(16px, env(safe-area-inset-top, 16px));
-    padding-bottom: 14px;
     padding-left: max(18px, env(safe-area-inset-left, 18px));
     padding-right: max(18px, env(safe-area-inset-right, 18px));
+    padding-bottom: 12px;
+    height: auto;
+    min-height: calc(56px + max(16px, env(safe-area-inset-top, 16px)));
+    align-items: flex-end;
   }
   .page-sub { display: none; }
   .btn.desktop-only, .search-trigger .desktop-only { display: none; }
-  .view-container { padding: 20px 16px calc(100px + env(safe-area-inset-bottom, 16px)); }
-  .stat-grid { grid-template-columns: 1fr; }
+  .view-container {
+    padding: 20px 16px calc(96px + env(safe-area-inset-bottom, 16px));
+  }
+  .stat-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .stat-grid > .card:first-child {
+    grid-column: 1 / -1;
+  }
   .grid-2 { grid-template-columns: 1fr; }
   .cat-grid { grid-template-columns: 1fr; }
   .donut-row { flex-direction: column; align-items: flex-start; }
@@ -2481,11 +2494,13 @@ tbody tr:hover td {
     bottom: 0;
     justify-content: space-around;
     align-items: center;
-    padding: 8px 8px max(18px, env(safe-area-inset-bottom, 18px));
-    background: color-mix(in srgb, var(--ds-background-100) 90%, transparent);
-    backdrop-filter: blur(12px);
+    height: calc(56px + max(16px, env(safe-area-inset-bottom, 16px)));
+    padding: 6px 8px max(16px, env(safe-area-inset-bottom, 16px));
+    background: color-mix(in srgb, var(--ds-background-100) 92%, transparent);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid var(--ds-border);
-    z-index: 20;
+    z-index: 999;
   }
 
   .bnav-item {
@@ -4435,13 +4450,13 @@ document.querySelectorAll('.chart-6m-group').forEach(group => {
     group.classList.add('active');
   });
 });
-
-// Registro de Service Worker para PWA e suporte offline
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
-}
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  }
 </script>
 </body>
 </html>
