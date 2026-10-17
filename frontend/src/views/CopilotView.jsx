@@ -27,7 +27,7 @@ export const CopilotView = () => {
     {
       id: 1,
       sender: 'ai',
-      text: 'Olá! Sou o Conekta Copilot, seu assistente financeiro inteligente integrado ao PIM IV. Eu analiso seus dados em tempo real usando Function Calling para otimizar seus orçamentos e evitar dívidas.',
+      text: 'Olá! Sou o Conekta Copilot, seu assistente financeiro inteligente. Eu analiso seus dados em tempo real utilizando inteligência preditiva e Function Calling para otimizar seus orçamentos e maximizar suas reservas.',
       functionCalled: null
     },
     {
@@ -49,7 +49,7 @@ export const CopilotView = () => {
     { label: "Quanto posso gastar por dia?", prompt: "Qual meu limite de gasto diário até o fim do mês?" },
     { label: "Qual categoria está em risco?", prompt: "Qual categoria está mais próxima de estourar o limite?" },
     { label: "Simular corte de 20%", prompt: "Simule uma economia de 20% em alimentação e lazer." },
-    { label: "Resumo para o PIM IV", prompt: "Gere um resumo executivo das finanças para a documentação acadêmica." }
+    { label: "Relatório Executivo", prompt: "Gere um resumo executivo consolidado das minhas finanças." }
   ];
 
   const handleSend = (textToSend) => {
@@ -84,8 +84,8 @@ export const CopilotView = () => {
         funcCalled = 'simulateExpenseReduction({ categories: ["Alimentação", "Lazer"], rate: 0.2 })';
         aiResponseText = `Cortando 20% em Alimentação e Lazer, você economizaria ${formatCurrency(economiaProjetada)} todo mês! Isso elevaria sua taxa de poupança para ${(Math.round(((saldoAtual + economiaProjetada) / totalReceitas) * 100))}% da sua renda.`;
       } else {
-        funcCalled = 'generateExecutiveReport({ scope: "PIM-IV" })';
-        aiResponseText = `Resumo executivo do ConektaFinance: Receitas consolidadas de ${formatCurrency(totalReceitas)}, despesas de ${formatCurrency(totalDespesas)} e saldo superavitário de ${formatCurrency(saldoAtual)}. O sistema opera com regras orientadas a objeto e persistência segura.`;
+        funcCalled = 'generateExecutiveReport({ period: "current-month" })';
+        aiResponseText = `Resumo executivo do ConektaFinance: Receitas consolidadas de ${formatCurrency(totalReceitas)}, despesas de ${formatCurrency(totalDespesas)} e saldo superavitário de ${formatCurrency(saldoAtual)}. Operações e limites sob controle.`;
       }
 
       setMessages(prev => [
@@ -174,7 +174,7 @@ export const CopilotView = () => {
                 {msg.text}
               </div>
 
-              {/* Tag evidenciando Function Calling para validação do PIM IV */}
+              {/* Tag de execução de Function Calling */}
               {msg.functionCalled && (
                 <div style={{
                   display: 'inline-flex',

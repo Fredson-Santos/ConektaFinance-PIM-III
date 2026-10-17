@@ -32,7 +32,7 @@ export const SettingsView = () => {
   const handleExportJSON = () => {
     const backup = {
       exportadoEm: new Date().toISOString(),
-      versaoPIM: 'IV',
+      versaoApp: '2.4.0',
       transacoes,
       categorias
     };
@@ -45,7 +45,7 @@ export const SettingsView = () => {
   };
 
   const handleResetData = () => {
-    if (confirm("Deseja realmente restaurar os dados originais de demonstração do PIM IV?")) {
+    if (confirm("Deseja realmente restaurar os dados de demonstração padrão do sistema?")) {
       localStorage.removeItem('conekta_transacoes');
       localStorage.removeItem('conekta_categorias');
       window.location.reload();
@@ -99,25 +99,25 @@ export const SettingsView = () => {
           </div>
         </div>
 
-        {/* Card Arquitetura Acadêmica UNIP */}
+        {/* Card Arquitetura & Cloud */}
         <div className="ds-card" style={{ padding: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
             <Layers size={20} color="var(--ds-green-700)" />
-            <h3 style={{ fontSize: '15px', fontWeight: '600' }}>Dados do PIM IV</h3>
+            <h3 style={{ fontSize: '15px', fontWeight: '600' }}>Plataforma & Infraestrutura</h3>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--ds-foreground-muted)' }}>Curso:</span>
-              <span style={{ fontWeight: '500' }}>CST ADS (4º Semestre)</span>
+              <span style={{ color: 'var(--ds-foreground-muted)' }}>Versão da Plataforma:</span>
+              <span style={{ fontWeight: '500' }}>v2.4.0 (Enterprise)</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--ds-foreground-muted)' }}>Instituição:</span>
-              <span style={{ fontWeight: '500' }}>Universidade Paulista (UNIP)</span>
+              <span style={{ color: 'var(--ds-foreground-muted)' }}>Engine de Dados:</span>
+              <span style={{ fontWeight: '500' }}>ASP.NET Core REST API</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--ds-foreground-muted)' }}>Disciplina Mobile:</span>
-              <span style={{ fontWeight: '500' }}>PWA Cross-Platform (2,0 pts)</span>
+              <span style={{ color: 'var(--ds-foreground-muted)' }}>Arquitetura Mobile:</span>
+              <span style={{ fontWeight: '500' }}>PWA Cross-Platform</span>
             </div>
           </div>
         </div>

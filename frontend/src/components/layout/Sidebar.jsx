@@ -43,7 +43,7 @@ export const Sidebar = () => {
           </div>
           <div>
             <div style={{ fontSize: '15px', fontWeight: '700', letterSpacing: '-0.02em' }}>ConektaFinance</div>
-            <div style={{ fontSize: '11px', color: 'var(--ds-foreground-muted)' }}>PIM IV — ADS UNIP</div>
+            <div style={{ fontSize: '11px', color: 'var(--ds-foreground-muted)' }}>Gestão Inteligente</div>
           </div>
         </div>
       </div>
