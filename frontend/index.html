@@ -1603,18 +1603,22 @@ th {
   font-size: 11px;
   font-weight: 600;
   color: var(--ds-foreground-muted);
-  padding: 0 0 14px;
+  padding: 0 12px 14px;
   border-bottom: 1px solid var(--ds-border);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
+th:first-child { padding-left: 0; }
+th:last-child { padding-right: 0; }
 
 td {
-  padding: 13px 0;
+  padding: 13px 12px;
   border-bottom: 1px solid var(--ds-border);
   font-size: 13px;
   color: var(--ds-foreground);
 }
+td:first-child { padding-left: 0; }
+td:last-child { padding-right: 0; }
 
 tr:last-child td {
   border-bottom: none;
@@ -1904,7 +1908,7 @@ tbody tr:hover td {
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--ds-duration-normal);
-  z-index: 80;
+  z-index: 1000;
 }
 
 .backdrop.open {
@@ -1923,7 +1927,7 @@ tbody tr:hover td {
   border: 1px solid var(--ds-border-strong);
   border-radius: var(--ds-radius-2xl);
   padding: 24px;
-  z-index: 90;
+  z-index: 1050;
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--ds-duration-normal), transform var(--ds-duration-normal) var(--ds-ease);
@@ -2458,13 +2462,380 @@ tbody tr:hover td {
   display: none;
 }
 
+/* ==========================================================================
+   TRANSAÇÃO: DESPESA VS ENTRADA / RECEITA
+   ========================================================================== */
+.tx-type-selector {
+  display: flex;
+  background: var(--ds-background-200);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+  padding: 3px;
+  gap: 4px;
+  margin-bottom: 18px;
+}
+.tx-type-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: var(--ds-radius-md);
+  background: transparent;
+  color: var(--ds-foreground-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--ds-duration-fast);
+}
+.tx-type-tab:hover {
+  color: var(--ds-foreground);
+}
+.tx-type-tab.active.expense {
+  background: var(--ds-background-surface);
+  color: var(--ds-foreground);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  border: 1px solid var(--ds-border-strong);
+  font-weight: 600;
+}
+.tx-type-tab.active.income {
+  background: var(--ds-green-alpha-200);
+  color: var(--ds-green-700);
+  border: 1px solid rgba(0, 204, 136, 0.4);
+  font-weight: 600;
+}
+.field-amount.income {
+  border-color: rgba(0, 204, 136, 0.45);
+}
+.field-amount.income span {
+  color: var(--ds-green-700);
+}
+.sheet-submit.income {
+  background: var(--ds-green-600);
+  color: #000000;
+  font-weight: 600;
+}
+.sheet-submit.income:hover {
+  background: var(--ds-green-700);
+}
+.tx-icon-income {
+  background: var(--ds-green-alpha-200) !important;
+  color: var(--ds-green-700) !important;
+  border: 1px solid rgba(0, 204, 136, 0.3) !important;
+}
+
+/* ==========================================================================
+   TABLE RESPONSIVENESS & CELL OVERFLOW
+   ========================================================================== */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table-wrap table {
+  min-width: 520px;
+}
+.amount-cell {
+  white-space: nowrap !important;
+  font-variant-numeric: tabular-nums;
+}
+.badge {
+  white-space: nowrap !important;
+}
+
+/* ==========================================================================
+   TOAST NOTIFICATIONS
+   ========================================================================== */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--ds-background-surface);
+  color: var(--ds-foreground);
+  border: 1px solid var(--ds-border-strong);
+  box-shadow: 0 10px 32px rgba(0,0,0,0.55);
+  padding: 10px 16px;
+  border-radius: var(--ds-radius-lg);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: all 0.25s var(--ds-ease);
+  pointer-events: auto;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.toast-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--ds-green-700);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   AUTH SCREEN (LOGIN WHATSAPP OTP & E-MAIL)
+   ========================================================================== */
+.auth-view {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: var(--ds-background-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px max(28px, env(safe-area-inset-bottom, 24px));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transition: opacity 0.32s var(--ds-ease), transform 0.32s var(--ds-ease), visibility 0.32s;
+}
+.auth-view.hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transform: scale(0.98);
+}
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--ds-background-surface);
+  border: 1px solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-2xl);
+  padding: 32px 28px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+  position: relative;
+}
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 24px 18px;
+  }
+}
+.auth-brand-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 22px;
+}
+.auth-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ds-foreground-muted);
+  background: var(--ds-background-200);
+  border: 1px solid var(--ds-border);
+  padding: 3px 10px;
+  border-radius: var(--ds-radius-full);
+  margin-bottom: 12px;
+}
+.auth-title {
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ds-foreground);
+  margin: 0 0 6px;
+}
+.auth-sub {
+  font-size: 12.5px;
+  color: var(--ds-foreground-muted);
+  margin: 0;
+  line-height: 1.45;
+}
+.auth-tabs {
+  display: flex;
+  background: var(--ds-background-200);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+  padding: 3px;
+  gap: 4px;
+  margin-bottom: 18px;
+}
+.auth-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-foreground-muted);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--ds-duration-fast);
+}
+.auth-tab:hover {
+  color: var(--ds-foreground);
+}
+.auth-tab.active {
+  background: var(--ds-background-surface);
+  color: var(--ds-foreground);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  border: 1px solid var(--ds-border-strong);
+  font-weight: 600;
+}
+.auth-tab.active.whatsapp {
+  color: var(--ds-green-700);
+}
+.auth-pane {
+  display: none;
+}
+.auth-pane.active {
+  display: block;
+}
+.phone-input-wrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-background-200);
+  transition: border-color var(--ds-duration-fast);
+}
+.phone-input-wrap:focus-within {
+  border-color: var(--ds-green-700);
+  box-shadow: 0 0 0 1px var(--ds-green-700);
+}
+.phone-country {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  font-size: 13px;
+  color: var(--ds-foreground);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  border-right: 1px solid var(--ds-border);
+  white-space: nowrap;
+}
+.phone-input-wrap input {
+  border: none;
+  background: transparent;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: var(--font-mono);
+  color: var(--ds-foreground);
+  width: 100%;
+  outline: none;
+}
+.otp-grid {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  margin: 16px 0;
+}
+.otp-box {
+  width: 44px;
+  height: 52px;
+  border: 1px solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-background-200);
+  color: var(--ds-foreground);
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  transition: all var(--ds-duration-fast);
+}
+.otp-box:focus {
+  border-color: var(--ds-green-700);
+  background: var(--ds-background-surface);
+  box-shadow: 0 0 0 1px var(--ds-green-700);
+}
+.btn-whatsapp {
+  background: var(--ds-green-600);
+  color: #000000;
+  border: none;
+  width: 100%;
+  height: 42px;
+  border-radius: var(--ds-radius-md);
+  font-size: 13.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background var(--ds-duration-fast);
+  margin-top: 14px;
+}
+.btn-whatsapp:hover {
+  background: var(--ds-green-700);
+}
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0 12px;
+  color: var(--ds-foreground-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.auth-divider::before, .auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--ds-border);
+}
+.btn-demo-quick {
+  width: 100%;
+  height: 38px;
+  border: 1px solid var(--ds-border);
+  background: var(--ds-background-200);
+  color: var(--ds-foreground);
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: var(--ds-radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all var(--ds-duration-fast);
+}
+.btn-demo-quick:hover {
+  border-color: var(--ds-foreground-muted);
+  background: var(--ds-gray-alpha-200);
+}
+.auth-footer-note {
+  font-size: 11px;
+  color: var(--ds-foreground-muted);
+  text-align: center;
+  margin-top: 16px;
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVENESS (< 880px)
+   ========================================================================== */
+.bottom-nav {
+  display: none;
+}
+
 @media (max-width: 880px) {
   .sidebar { display: none; }
   .topbar-brand { display: flex; }
   .topbar {
     padding-top: max(16px, env(safe-area-inset-top, 16px));
-    padding-left: max(18px, env(safe-area-inset-left, 18px));
-    padding-right: max(18px, env(safe-area-inset-right, 18px));
+    padding-left: max(16px, env(safe-area-inset-left, 16px));
+    padding-right: max(16px, env(safe-area-inset-right, 16px));
     padding-bottom: 12px;
     height: auto;
     min-height: calc(56px + max(16px, env(safe-area-inset-top, 16px)));
@@ -2473,19 +2844,87 @@ tbody tr:hover td {
   .page-sub { display: none; }
   .btn.desktop-only, .search-trigger .desktop-only { display: none; }
   .view-container {
-    padding: 20px 16px calc(96px + env(safe-area-inset-bottom, 16px));
+    padding: 16px 14px calc(96px + env(safe-area-inset-bottom, 16px));
+  }
+  
+  /* Cards & Stats */
+  .card {
+    padding: 18px 16px;
+  }
+  .card-head {
+    flex-wrap: wrap;
+    gap: 8px;
   }
   .stat-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 12px;
   }
-  .stat-grid > .card:first-child {
-    grid-column: 1 / -1;
+  @media (min-width: 601px) and (max-width: 880px) {
+    .stat-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .stat-grid > .card:first-child {
+      grid-column: 1 / -1;
+    }
   }
+  .stat-value {
+    font-size: 24px;
+  }
+
   .grid-2 { grid-template-columns: 1fr; }
   .cat-grid { grid-template-columns: 1fr; }
   .donut-row { flex-direction: column; align-items: flex-start; }
 
+  /* Charts Responsiveness */
+  .spend-chart-container {
+    gap: 6px;
+    height: 160px;
+  }
+  .spend-day {
+    font-size: 10px;
+  }
+  .spend-bar-track {
+    max-width: 28px;
+  }
+
+  .chart-6m-line-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    padding-bottom: 8px;
+  }
+  .chart-6m-svg {
+    min-width: 580px;
+    height: 240px;
+  }
+  .chart-6m-legend {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+
+  /* Toolbars */
+  .toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  .toolbar > div {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* User Menu Popover no Mobile */
+  .user-popover {
+    position: fixed;
+    top: calc(58px + max(16px, env(safe-area-inset-top, 16px)));
+    right: 16px;
+    bottom: auto;
+    left: auto;
+    width: 230px;
+    z-index: 1070;
+  }
+
+  /* Bottom Navigation */
   .bottom-nav {
     display: flex;
     position: fixed;
@@ -2496,11 +2935,11 @@ tbody tr:hover td {
     align-items: center;
     height: calc(56px + max(16px, env(safe-area-inset-bottom, 16px)));
     padding: 6px 8px max(16px, env(safe-area-inset-bottom, 16px));
-    background: color-mix(in srgb, var(--ds-background-100) 92%, transparent);
+    background: color-mix(in srgb, var(--ds-background-100) 94%, transparent);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid var(--ds-border);
-    z-index: 999;
+    z-index: 900;
   }
 
   .bnav-item {
@@ -2513,6 +2952,7 @@ tbody tr:hover td {
     color: var(--ds-foreground-muted);
     font-size: 10px;
     padding: 6px 12px;
+    cursor: pointer;
   }
 
   .bnav-item .icon { width: 18px; height: 18px; }
@@ -2528,8 +2968,9 @@ tbody tr:hover td {
     align-items: center;
     justify-content: center;
     margin-top: -20px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
     color: var(--ds-foreground-contrast);
+    cursor: pointer;
   }
 
   .bnav-fab .icon {
@@ -2539,7 +2980,7 @@ tbody tr:hover td {
   }
 
   .ai-fab {
-    bottom: 74px;
+    bottom: calc(66px + max(16px, env(safe-area-inset-bottom, 16px)));
     right: 16px;
     padding: 0;
     width: 44px;
@@ -2547,6 +2988,7 @@ tbody tr:hover td {
     min-width: 44px;
     justify-content: center;
     gap: 0;
+    z-index: 920;
     transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), padding 0.35s cubic-bezier(0.16, 1, 0.3, 1), gap 0.35s ease, transform var(--ds-duration-fast), box-shadow var(--ds-duration-fast);
   }
 
@@ -2562,7 +3004,6 @@ tbody tr:hover td {
     display: none;
   }
 
-  /* Estado expandido no mobile: surge o texto "Assistente de IA" com movimento e depois recolhe */
   .ai-fab.expanded {
     width: auto;
     padding: 0 16px 0 14px;
@@ -2590,6 +3031,7 @@ tbody tr:hover td {
     border-radius: var(--ds-radius-2xl) var(--ds-radius-2xl) 0 0;
     transform: translateY(100%);
     transform-origin: bottom center;
+    z-index: 1060;
   }
   .ai-panel.open {
     transform: translateY(0);
@@ -2604,11 +3046,23 @@ tbody tr:hover td {
     max-width: 100%;
     transform: translateY(100%);
     border-radius: var(--ds-radius-2xl) var(--ds-radius-2xl) 0 0;
-    padding-bottom: max(24px, env(safe-area-inset-bottom, 0px));
+    padding: 22px 20px max(24px, env(safe-area-inset-bottom, 24px));
+    max-height: 85vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    z-index: 1050;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.65);
   }
 
   .sheet.open {
     transform: translateY(0);
+  }
+
+  .toast-container {
+    bottom: calc(76px + env(safe-area-inset-bottom, 16px));
+    right: 16px;
+    left: 16px;
+    align-items: center;
   }
 }
 
@@ -2657,8 +3111,136 @@ tbody tr:hover td {
 <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
 <symbol id="i-trend-up" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
 <symbol id="i-trend-down" viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></symbol>
+<symbol id="i-whatsapp" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19.01L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.81 13.47 3.81 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.53 7.34C9.33 7.34 9.01 7.42 8.74 7.71C8.47 8 7.71 8.72 7.71 10.18C7.71 11.64 8.77 13.05 8.92 13.25C9.07 13.45 11.16 16.68 14.36 18.06C15.12 18.39 15.71 18.59 16.17 18.73C16.94 18.98 17.64 18.94 18.2 18.86C18.82 18.77 20.12 18.07 20.39 17.3C20.66 16.53 20.66 15.87 20.58 15.73C20.5 15.6 20.28 15.52 19.96 15.36C19.63 15.2 18.01 14.4 17.71 14.29C17.41 14.18 17.19 14.12 16.97 14.45C16.76 14.77 16.14 15.52 15.95 15.73C15.76 15.95 15.57 15.97 15.24 15.81C14.92 15.65 13.88 15.31 12.65 14.21C11.69 13.35 11.04 12.29 10.85 11.97C10.66 11.64 10.83 11.47 10.99 11.31C11.14 11.16 11.32 10.92 11.48 10.73C11.64 10.54 11.7 10.4 11.81 10.18C11.92 9.97 11.86 9.77 11.78 9.61C11.7 9.45 11.08 7.92 10.82 7.31C10.57 6.72 10.31 6.8 10.12 6.79L9.53 7.34Z"/></symbol>
+<symbol id="i-arrow-down-left" viewBox="0 0 24 24"><line x1="17" y1="7" x2="7" y2="17"/><polyline points="17 17 7 17 7 7"/></symbol>
+<symbol id="i-arrow-up-right" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
 </defs>
 </svg>
+
+<!-- TELA DE AUTENTICAÇÃO (LOGIN WHATSAPP OTP & E-MAIL) -->
+<div class="auth-view" id="viewAuth">
+  <div class="auth-card">
+    <div class="auth-brand-head">
+      <div class="brand-mark" style="width:36px;height:36px;margin-bottom:12px;">
+        <svg class="icon" style="width:18px;height:18px;"><use href="#i-sparkle"/></svg>
+      </div>
+      <div class="auth-badge">
+        <span class="badge-dot" style="background:var(--ds-green-700);"></span>
+        Plataforma ConektaFinance SaaS
+      </div>
+      <h1 class="auth-title">Acesse sua conta</h1>
+      <p class="auth-sub">Entre rapidamente com o seu WhatsApp ou utilize suas credenciais.</p>
+    </div>
+
+    <!-- Abas de Método de Login: WhatsApp vs E-mail -->
+    <div class="auth-tabs">
+      <button type="button" class="auth-tab active whatsapp" id="authTabWa">
+        <svg class="icon" style="width:15px;height:15px;color:var(--ds-green-700);"><use href="#i-whatsapp"/></svg>
+        <span>WhatsApp (OTP)</span>
+      </button>
+      <button type="button" class="auth-tab" id="authTabEmail">
+        <svg class="icon" style="width:14px;height:14px;"><use href="#i-user"/></svg>
+        <span>E-mail</span>
+      </button>
+    </div>
+
+    <!-- PAINEL 1: WHATSAPP -->
+    <div class="auth-pane active" id="authPaneWa">
+      <!-- Etapa 1: Inserir Número de Telefone -->
+      <div id="waStepPhone">
+        <div class="field">
+          <label>Número do WhatsApp</label>
+          <div class="phone-input-wrap">
+            <div class="phone-country">
+              <span>🇧🇷 +55</span>
+            </div>
+            <input type="tel" id="waPhoneInput" placeholder="(11) 98765-4321" value="(11) 98765-4321" maxlength="15">
+          </div>
+          <p style="font-size:11.5px;color:var(--ds-foreground-muted);margin:6px 0 0;">
+            Enviaremos um código PIN de 6 dígitos direto no seu WhatsApp para acesso imediato.
+          </p>
+        </div>
+        <button type="button" class="btn-whatsapp" id="btnSendWaCode">
+          <svg class="icon" style="width:17px;height:17px;"><use href="#i-whatsapp"/></svg>
+          <span>Receber código no WhatsApp</span>
+        </button>
+      </div>
+
+      <!-- Etapa 2: Inserir Código OTP de 6 dígitos -->
+      <div id="waStepOtp" style="display:none;">
+        <div style="background:var(--ds-gray-alpha-100);border:1px solid var(--ds-border);border-radius:var(--ds-radius-md);padding:10px 12px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:12px;color:var(--ds-foreground);">
+            Enviado para <strong id="waSentPhone">(11) 98765-4321</strong>
+          </div>
+          <button type="button" id="btnChangeWaPhone" style="background:none;border:none;color:var(--ds-blue-600);font-size:11.5px;cursor:pointer;font-weight:500;">
+            Alterar
+          </button>
+        </div>
+
+        <label style="font-size:12px;color:var(--ds-foreground-muted);display:block;margin-bottom:6px;">
+          Digite o código de 6 dígitos recebido:
+        </label>
+        <div class="otp-grid" id="otpContainer">
+          <input type="text" class="otp-box" maxlength="1" inputmode="numeric" data-idx="0">
+          <input type="text" class="otp-box" maxlength="1" inputmode="numeric" data-idx="1">
+          <input type="text" class="otp-box" maxlength="1" inputmode="numeric" data-idx="2">
+          <input type="text" class="otp-box" maxlength="1" inputmode="numeric" data-idx="3">
+          <input type="text" class="otp-box" maxlength="1" inputmode="numeric" data-idx="4">
+          <input type="text" class="otp-box" maxlength="1" inputmode="numeric" data-idx="5">
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin:8px 0 16px;font-size:11.5px;">
+          <span style="color:var(--ds-foreground-muted);">Código de demonstração:</span>
+          <button type="button" id="btnAutoFillOtp" style="background:var(--ds-green-alpha-200);border:1px solid rgba(0,204,136,0.3);color:var(--ds-green-700);padding:2px 8px;border-radius:var(--ds-radius-sm);font-weight:600;font-family:var(--font-mono);cursor:pointer;">
+            849201 (preencher)
+          </button>
+        </div>
+
+        <button type="button" class="btn-whatsapp" id="btnVerifyWaOtp">
+          <svg class="icon" style="width:16px;height:16px;"><use href="#i-check"/></svg>
+          <span>Confirmar e Entrar</span>
+        </button>
+
+        <p style="text-align:center;font-size:11.5px;color:var(--ds-foreground-muted);margin:12px 0 0;">
+          Não recebeu? <span id="waResendTimer" style="color:var(--ds-foreground);font-family:var(--font-mono);">Aguarde 0:45</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- PAINEL 2: E-MAIL / SENHA -->
+    <div class="auth-pane" id="authPaneEmail">
+      <form id="formEmailLogin" onsubmit="return false;">
+        <div class="field">
+          <label>E-mail corporativo ou pessoal</label>
+          <input type="email" id="emailInput" placeholder="usuario@conektafinance.com" value="usuario@conektafinance.com">
+        </div>
+        <div class="field">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <label>Senha</label>
+            <a href="#" style="font-size:11.5px;color:var(--ds-foreground-muted);text-decoration:none;" onclick="alert('Instruções enviadas para seu e-mail.');return false;">Esqueceu?</a>
+          </div>
+          <input type="password" id="passwordInput" placeholder="••••••••" value="••••••••">
+        </div>
+        <button type="submit" class="btn primary" id="btnEmailLogin" style="width:100%;height:40px;margin-top:14px;font-size:13.5px;font-weight:600;">
+          Entrar com e-mail
+        </button>
+      </form>
+    </div>
+
+    <!-- Divisor e Acesso Rápido de Demonstração -->
+    <div class="auth-divider">ou acesso de demonstração</div>
+    <button type="button" class="btn-demo-quick" id="btnQuickDemo">
+      <svg class="icon" style="width:14px;height:14px;color:var(--ds-amber-700);"><use href="#i-sparkle"/></svg>
+      <span>Acesso Rápido para Demonstração (1 Clique)</span>
+    </button>
+
+    <div class="auth-footer-note">
+      Ao acessar, você concorda com nossos Termos de Uso e Política de Privacidade.<br>
+      <span style="color:var(--ds-foreground-muted);font-size:10.5px;">Criptografia ponta a ponta AES-256 · ConektaFinance</span>
+    </div>
+  </div>
+</div>
 
 <div class="app">
 
@@ -2676,7 +3258,7 @@ tbody tr:hover td {
       <button class="nav-item" data-go="relatorios"><svg class="icon"><use href="#i-chart"/></svg>Relatórios</button>
     </nav>
 
-    <button class="side-cta" data-open="expense"><svg class="icon"><use href="#i-plus"/></svg>Novo gasto</button>
+    <button class="side-cta" data-open="expense"><svg class="icon"><use href="#i-plus"/></svg>Novo lançamento</button>
 
     <div class="sidebar-footer">
       <div class="user-menu-wrap" id="userMenuWrap">
@@ -2747,7 +3329,10 @@ tbody tr:hover td {
           <svg class="icon"><use href="#i-upload"/></svg>Importar
         </button>
         <button class="btn primary desktop-only" data-open="expense">
-          <svg class="icon"><use href="#i-plus"/></svg>Novo gasto
+          <svg class="icon"><use href="#i-plus"/></svg>Novo lançamento
+        </button>
+        <button class="btn-icon mobile-only" id="mobileUserBtn" title="Menu da conta">
+          <div class="avatar" style="width:26px;height:26px;font-size:10px;">UT</div>
         </button>
       </div>
     </header>
@@ -2761,20 +3346,20 @@ tbody tr:hover td {
           <div class="card">
             <div class="card-head" style="margin-bottom:8px;">
               <span class="stat-label" style="margin:0;">Saldo em Conta</span>
-              <span class="badge"><span class="badge-dot" style="background:var(--ds-green-700);"></span>+14.2% mês</span>
+              <span class="badge" id="badgeSaldo"><span class="badge-dot" style="background:var(--ds-green-700);"></span>+14.2% mês</span>
             </div>
-            <p class="stat-value num">R$ 14.850,00</p>
-            <p class="stat-foot">Atualizado há 4 minutos</p>
+            <p class="stat-value num" id="valSaldo">R$ 14.850,00</p>
+            <p class="stat-foot" id="footSaldo">Atualizado agora</p>
           </div>
 
           <!-- Despesas em Setembro -->
           <div class="card">
             <div class="card-head" style="margin-bottom:8px;">
               <span class="stat-label" style="margin:0;">Despesas em Setembro</span>
-              <span class="badge"><span class="badge-dot" style="background:var(--ds-blue-600);"></span>68% do teto</span>
+              <span class="badge" id="badgeDespesas"><span class="badge-dot" style="background:var(--ds-blue-600);"></span>68% do teto</span>
             </div>
-            <p class="stat-value num">R$ 4.320,00</p>
-            <p class="stat-foot">Limite de R$ 6.350,00</p>
+            <p class="stat-value num" id="valDespesas">R$ 4.320,00</p>
+            <p class="stat-foot" id="footDespesas">Limite de R$ 6.350,00</p>
           </div>
 
           <!-- Reserva & Economia -->
@@ -2896,24 +3481,26 @@ tbody tr:hover td {
           </div>
         </div>
 
-        <!-- Gastos recentes (Tabela limpa e simplificada conforme imagem) -->
+        <!-- Lançamentos recentes (Tabela com scroll horizontal responsivo) -->
         <div class="card" style="margin-top: 16px;">
           <div class="card-head" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-            <p class="card-title" style="font-size: 14.5px; font-weight: 600; margin: 0;">Gastos recentes</p>
+            <p class="card-title" style="font-size: 14.5px; font-weight: 600; margin: 0;">Lançamentos recentes</p>
             <a href="#" class="card-link" style="font-size: 12.5px; color: var(--ds-foreground-muted); text-decoration: none;" onclick="goPage('gastos'); return false;">ver tudo</a>
           </div>
 
-          <table>
-            <thead>
-              <tr>
-                <th style="font-size: 11px; font-weight: 500; color: var(--ds-foreground-muted); text-transform: none; letter-spacing: normal;">Descrição</th>
-                <th style="font-size: 11px; font-weight: 500; color: var(--ds-foreground-muted); text-transform: none; letter-spacing: normal;">Categoria</th>
-                <th style="font-size: 11px; font-weight: 500; color: var(--ds-foreground-muted); text-transform: none; letter-spacing: normal;">Data</th>
-                <th style="font-size: 11px; font-weight: 500; color: var(--ds-foreground-muted); text-align: right; text-transform: none; letter-spacing: normal;">Valor</th>
-              </tr>
-            </thead>
-            <tbody id="tx-body-dash"></tbody>
-          </table>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="font-size: 11px; font-weight: 500; color: var(--ds-foreground-muted); text-transform: none; letter-spacing: normal;">Descrição</th>
+                  <th style="font-size: 11px; font-weight: 500; color: var(--ds-foreground-muted); text-transform: none; letter-spacing: normal;">Categoria</th>
+                  <th style="font-size: 11px; font-weight: 500; color: var(--ds-foreground-muted); text-transform: none; letter-spacing: normal;">Data</th>
+                  <th style="font-size: 11px; font-weight: 500; color: var(--ds-foreground-muted); text-align: right; text-transform: none; letter-spacing: normal;">Valor</th>
+                </tr>
+              </thead>
+              <tbody id="tx-body-dash"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -2933,22 +3520,24 @@ tbody tr:hover td {
               <svg class="icon"><use href="#i-upload"/></svg>Importar extrato / planilha
             </button>
             <button class="btn primary" data-open="expense">
-              <svg class="icon"><use href="#i-plus"/></svg>Novo gasto
+              <svg class="icon"><use href="#i-plus"/></svg>Novo lançamento
             </button>
           </div>
         </div>
         <div class="card">
-          <table>
-            <thead>
-              <tr>
-                <th>Descrição</th>
-                <th>Categoria</th>
-                <th>Data</th>
-                <th style="text-align:right;">Valor</th>
-              </tr>
-            </thead>
-            <tbody id="tx-body-full"></tbody>
-          </table>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Data</th>
+                  <th style="text-align:right;">Valor</th>
+                </tr>
+              </thead>
+              <tbody id="tx-body-full"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -3322,7 +3911,8 @@ tbody tr:hover td {
             </div>
           </div>
 
-          <table>
+          <div class="table-wrap">
+            <table>
             <thead>
               <tr>
                 <th>Categoria</th>
@@ -3491,6 +4081,7 @@ tbody tr:hover td {
               </tr>
             </tbody>
           </table>
+          </div>
         </div>
       </section>
 
@@ -3693,41 +4284,49 @@ tbody tr:hover td {
 <!-- Backdrop -->
 <div class="backdrop" id="backdrop"></div>
 
-<!-- Add Expense Sheet -->
+<!-- Add Transaction Sheet (Despesa e Entrada / Receita) -->
 <div class="sheet" id="sheetExpense">
   <div class="sheet-head">
-    <p class="sheet-title">Novo gasto</p>
+    <p class="sheet-title" id="sheetTxTitle">Novo lançamento</p>
     <button class="sheet-close" data-close="expense"><svg class="icon"><use href="#i-x"/></svg></button>
   </div>
+
+  <!-- Segmented Control: Despesa vs Entrada / Receita -->
+  <div class="tx-type-selector">
+    <button type="button" class="tx-type-tab active expense" id="tabTypeExpense">
+      <svg class="icon" style="width:14px;height:14px;"><use href="#i-arrow-down-left"/></svg>
+      <span>Despesa</span>
+    </button>
+    <button type="button" class="tx-type-tab income" id="tabTypeIncome">
+      <svg class="icon" style="width:14px;height:14px;"><use href="#i-arrow-up-right"/></svg>
+      <span>Entrada / Receita</span>
+    </button>
+  </div>
+
   <div class="field">
-    <label>Descrição</label>
-    <input type="text" placeholder="Ex: Supermercado Semanal">
+    <label id="lblTxDesc">Descrição</label>
+    <input type="text" id="txInputDesc" placeholder="Ex: Supermercado Semanal">
   </div>
   <div class="field">
     <label>Valor</label>
-    <div class="field-amount">
-      <span>R$</span>
-      <input type="text" class="num" placeholder="0,00">
+    <div class="field-amount" id="txAmountContainer">
+      <span id="txAmountPrefix" style="font-weight:600;font-family:var(--font-mono);">− R$</span>
+      <input type="text" class="num" id="txInputAmount" placeholder="0,00" inputmode="decimal">
     </div>
   </div>
   <div class="field">
-    <label>Categoria</label>
-    <div class="pill-group">
-      <span class="pill selected"><span class="dot" style="background:var(--cat-alimentacao);"></span>Alimentação</span>
-      <span class="pill"><span class="dot" style="background:var(--cat-transporte);"></span>Transporte</span>
-      <span class="pill"><span class="dot" style="background:var(--cat-lazer);"></span>Lazer</span>
-      <span class="pill"><span class="dot" style="background:var(--cat-moradia);"></span>Moradia</span>
-      <span class="pill"><span class="dot" style="background:var(--cat-saude);"></span>Saúde</span>
-      <span class="pill"><span class="dot" style="background:var(--cat-educacao);"></span>Educação</span>
-      <span class="pill"><span class="dot" style="background:var(--cat-outros);"></span>Outros</span>
-    </div>
+    <label id="lblTxCat">Categoria</label>
+    <div class="pill-group" id="txCategoryPills"></div>
   </div>
   <div class="field">
     <label>Data</label>
-    <input type="text" value="27/09/2026">
+    <input type="text" id="txInputDate" value="17/09/2026">
   </div>
-  <button class="sheet-submit">Salvar gasto</button>
+  <button class="sheet-submit" id="btnSubmitTx">Registrar despesa</button>
 </div>
+
+<!-- Container de Toasts Flutuantes -->
+<div class="toast-container" id="toastContainer"></div>
 
 <!-- Import Expenses Sheet -->
 <div class="sheet" id="sheetImport" style="width:520px;">
@@ -3918,13 +4517,49 @@ const categories = [
   {id:'moradia', name:'Moradia', desc:'Aluguel, contas de luz/água', icon:'i-home', color:'var(--cat-moradia)', limit:1500, spent:400},
 ];
 
-const txs = [
-  {name:'Mc Donalds', cat:'alimentacao', catName:'Alimentação', date:'17/09', value:120},
-  {name:'Conserto do ar condicionado', cat:'moradia', catName:'Moradia', date:'17/09', value:400},
-  {name:'Calça', cat:'outros', catName:'Outros', date:'17/09', value:80},
+const expenseCategories = [
+  {id:'alimentacao', name:'Alimentação', color:'var(--cat-alimentacao)'},
+  {id:'transporte', name:'Transporte', color:'var(--cat-transporte)'},
+  {id:'lazer', name:'Lazer', color:'var(--cat-lazer)'},
+  {id:'moradia', name:'Moradia', color:'var(--cat-moradia)'},
+  {id:'saude', name:'Saúde', color:'var(--cat-saude)'},
+  {id:'educacao', name:'Educação', color:'var(--cat-educacao)'},
+  {id:'outros', name:'Outros', color:'var(--cat-outros)'},
 ];
 
-const catIcon = {alimentacao:'i-utensils', transporte:'i-car', lazer:'i-film', saude:'i-heart', educacao:'i-book', moradia:'i-home', outros:'i-bag'};
+const incomeCategories = [
+  {id:'salario', name:'Salário', color:'var(--ds-green-700)'},
+  {id:'investimentos', name:'Investimentos', color:'var(--ds-blue-600)'},
+  {id:'freelance', name:'Freelance', color:'var(--ds-teal-700)'},
+  {id:'dividendos', name:'Dividendos', color:'#8e4ec6'},
+  {id:'reembolso', name:'Reembolso', color:'var(--ds-amber-700)'},
+  {id:'outras_entradas', name:'Outras Entradas', color:'var(--ds-gray-500)'},
+];
+
+const txs = [
+  {name:'Salário Mensal', cat:'salario', catName:'Salário', date:'05/09', value:6400, type:'income'},
+  {name:'Mc Donalds', cat:'alimentacao', catName:'Alimentação', date:'17/09', value:120, type:'expense'},
+  {name:'Conserto do ar condicionado', cat:'moradia', catName:'Moradia', date:'17/09', value:400, type:'expense'},
+  {name:'Freelance Frontend', cat:'freelance', catName:'Freelance', date:'15/09', value:1850, type:'income'},
+  {name:'Calça Jeans', cat:'outros', catName:'Outros', date:'17/09', value:80, type:'expense'},
+];
+
+const catIcon = {
+  alimentacao:'i-utensils',
+  transporte:'i-car',
+  lazer:'i-film',
+  saude:'i-heart',
+  educacao:'i-book',
+  moradia:'i-home',
+  outros:'i-bag',
+  salario:'i-trend-up',
+  investimentos:'i-chart',
+  freelance:'i-sparkle',
+  dividendos:'i-trend-up',
+  reembolso:'i-arrow-down-left',
+  outras_entradas:'i-plus'
+};
+
 const catColor = {
   alimentacao:'#ef4444',
   transporte:'#12b5cb',
@@ -3932,33 +4567,45 @@ const catColor = {
   saude:'var(--cat-saude)',
   educacao:'var(--cat-educacao)',
   moradia:'#f5a623',
-  outros:'#888888'
+  outros:'#888888',
+  salario:'#00cc88',
+  investimentos:'#0070f3',
+  freelance:'#12b5cb',
+  dividendos:'#8e4ec6',
+  reembolso:'#f5a623',
+  outras_entradas:'#888888'
 };
 
 function txRow(t){
-  const iconClass = t.cat === 'alimentacao' ? 'tx-icon-alimentacao' : (t.cat === 'moradia' ? 'tx-icon-moradia' : (t.cat === 'outros' ? 'tx-icon-outros' : ''));
+  const isIncome = t.type === 'income';
+  const iconClass = isIncome ? 'tx-icon-income' : (t.cat === 'alimentacao' ? 'tx-icon-alimentacao' : (t.cat === 'moradia' ? 'tx-icon-moradia' : (t.cat === 'outros' ? 'tx-icon-outros' : '')));
+  const amountStr = isIncome ? `+R$ ${t.value.toFixed(2).replace('.',',')}` : `−R$ ${t.value.toFixed(2).replace('.',',')}`;
+  const amountColor = isIncome ? 'var(--ds-green-700)' : '#f87171';
+  const dotColor = isIncome ? 'var(--ds-green-700)' : (catColor[t.cat] || '#888');
+  const icon = isIncome ? (catIcon[t.cat] || 'i-arrow-up-right') : (catIcon[t.cat] || 'i-bag');
+
   return `<tr>
     <td>
       <div class="tx-cell">
         <span class="tx-icon ${iconClass}">
-          <svg class="icon"><use href="#${catIcon[t.cat] || 'i-bag'}"/></svg>
+          <svg class="icon"><use href="#${icon}"/></svg>
         </span>
         <span style="font-weight:500;">${t.name}</span>
       </div>
     </td>
     <td>
       <span class="badge">
-        <span class="badge-dot" style="background:${catColor[t.cat] || '#888'};"></span>
+        <span class="badge-dot" style="background:${dotColor};"></span>
         ${t.catName}
       </span>
     </td>
     <td class="num" style="color:var(--ds-foreground);font-weight:500;">${t.date}</td>
-    <td class="amount-cell num" style="color:#f87171;text-align:right;">−R$ ${t.value.toFixed(2).replace('.',',')}</td>
+    <td class="amount-cell num" style="color:${amountColor};text-align:right;">${amountStr}</td>
   </tr>`;
 }
 
 const elDashTx = document.getElementById('tx-body-dash');
-if (elDashTx) elDashTx.innerHTML = txs.map(txRow).join('');
+if (elDashTx) elDashTx.innerHTML = txs.slice(0, 5).map(txRow).join('');
 const elFullTx = document.getElementById('tx-body-full');
 if (elFullTx) elFullTx.innerHTML = txs.map(txRow).join('');
 
@@ -4401,22 +5048,389 @@ if (userTrigger && userPopover) {
     goPage('configuracoes');
   });
 
+  const mobileUserBtn = document.getElementById('mobileUserBtn');
+  if (mobileUserBtn) {
+    mobileUserBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = userPopover.classList.contains('open');
+      userPopover.classList.toggle('open', !isOpen);
+    });
+  }
+
   document.getElementById('btnUserLogout').addEventListener('click', () => {
     userPopover.classList.remove('open');
     userTrigger.classList.remove('active');
     if (confirm('Deseja realmente sair da sua conta ConektaFinance?')) {
-      alert('Sessão encerrada com sucesso.');
-      location.reload();
+      localStorage.removeItem('conekta_auth');
+      checkAuth();
+      showToast('Sessão encerrada com sucesso.');
     }
   });
 
   document.addEventListener('click', (e) => {
-    if (userMenuWrap && !userMenuWrap.contains(e.target)) {
+    if (userMenuWrap && !userMenuWrap.contains(e.target) && (!mobileUserBtn || !mobileUserBtn.contains(e.target))) {
       userPopover.classList.remove('open');
       userTrigger.classList.remove('active');
     }
   });
 }
+
+/* ==========================================================================
+   GERENCIADOR DE TRANSAÇÕES (DESPESAS E ENTRADAS / RECEITAS)
+   ========================================================================== */
+let currentTxType = 'expense';
+let selectedCategory = expenseCategories[0];
+let currentBalance = 14850.00;
+let currentExpenses = 4320.00;
+
+const tabTypeExpense = document.getElementById('tabTypeExpense');
+const tabTypeIncome = document.getElementById('tabTypeIncome');
+const sheetTxTitle = document.getElementById('sheetTxTitle');
+const lblTxDesc = document.getElementById('lblTxDesc');
+const txInputDesc = document.getElementById('txInputDesc');
+const txAmountContainer = document.getElementById('txAmountContainer');
+const txAmountPrefix = document.getElementById('txAmountPrefix');
+const lblTxCat = document.getElementById('lblTxCat');
+const btnSubmitTx = document.getElementById('btnSubmitTx');
+
+function renderTxCategories() {
+  const list = currentTxType === 'expense' ? expenseCategories : incomeCategories;
+  selectedCategory = list[0];
+  const container = document.getElementById('txCategoryPills');
+  if (!container) return;
+  container.innerHTML = list.map((c, i) => `
+    <span class="pill ${i === 0 ? 'selected' : ''}" data-cat-id="${c.id}" data-cat-name="${c.name}">
+      <span class="dot" style="background:${c.color};"></span>${c.name}
+    </span>
+  `).join('');
+
+  container.querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      container.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
+      pill.classList.add('selected');
+      selectedCategory = list.find(c => c.id === pill.dataset.catId) || list[0];
+    });
+  });
+}
+renderTxCategories();
+
+function setTxType(type) {
+  currentTxType = type;
+  const isIncome = type === 'income';
+  if (tabTypeExpense) tabTypeExpense.classList.toggle('active', !isIncome);
+  if (tabTypeIncome) tabTypeIncome.classList.toggle('active', isIncome);
+
+  if (isIncome) {
+    if (sheetTxTitle) sheetTxTitle.textContent = 'Nova Entrada / Receita';
+    if (lblTxDesc) lblTxDesc.textContent = 'Origem / Descrição da receita';
+    if (txInputDesc) txInputDesc.placeholder = 'Ex: Salário mensal, Freelance, Dividendos';
+    if (txAmountContainer) txAmountContainer.classList.add('income');
+    if (txAmountPrefix) txAmountPrefix.textContent = '+ R$';
+    if (lblTxCat) lblTxCat.textContent = 'Categoria da receita';
+    if (btnSubmitTx) {
+      btnSubmitTx.textContent = 'Registrar entrada';
+      btnSubmitTx.classList.add('income');
+    }
+  } else {
+    if (sheetTxTitle) sheetTxTitle.textContent = 'Novo lançamento (Despesa)';
+    if (lblTxDesc) lblTxDesc.textContent = 'Descrição da despesa';
+    if (txInputDesc) txInputDesc.placeholder = 'Ex: Supermercado Semanal';
+    if (txAmountContainer) txAmountContainer.classList.remove('income');
+    if (txAmountPrefix) txAmountPrefix.textContent = '− R$';
+    if (lblTxCat) lblTxCat.textContent = 'Categoria da despesa';
+    if (btnSubmitTx) {
+      btnSubmitTx.textContent = 'Registrar despesa';
+      btnSubmitTx.classList.remove('income');
+    }
+  }
+  renderTxCategories();
+}
+
+if (tabTypeExpense) tabTypeExpense.addEventListener('click', () => setTxType('expense'));
+if (tabTypeIncome) tabTypeIncome.addEventListener('click', () => setTxType('income'));
+
+function updateDashboardKpis() {
+  const elSaldo = document.getElementById('valSaldo');
+  if (elSaldo) elSaldo.textContent = `R$ ${currentBalance.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+  const elDespesas = document.getElementById('valDespesas');
+  if (elDespesas) elDespesas.textContent = `R$ ${currentExpenses.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+  const elFootSaldo = document.getElementById('footSaldo');
+  if (elFootSaldo) elFootSaldo.textContent = 'Atualizado agora';
+}
+
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <svg class="toast-icon icon"><use href="#i-check"/></svg>
+    <span>${message}</span>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => toast.classList.add('show'), 20);
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
+if (btnSubmitTx) {
+  btnSubmitTx.addEventListener('click', () => {
+    const desc = txInputDesc ? txInputDesc.value.trim() : '';
+    const inputAmount = document.getElementById('txInputAmount');
+    let rawAmount = inputAmount ? inputAmount.value.trim() : '';
+    rawAmount = rawAmount.replace('R$', '').replace(/\s/g, '').replace('.', '').replace(',', '.');
+    const amount = parseFloat(rawAmount);
+
+    if (!desc) {
+      alert('Por favor, informe uma descrição para o lançamento.');
+      if (txInputDesc) txInputDesc.focus();
+      return;
+    }
+    if (isNaN(amount) || amount <= 0) {
+      alert('Por favor, digite um valor numérico válido maior que zero.');
+      if (inputAmount) inputAmount.focus();
+      return;
+    }
+
+    const inputDate = document.getElementById('txInputDate');
+    const dateVal = inputDate && inputDate.value.trim() ? inputDate.value.trim() : '17/09';
+    const shortDate = dateVal.length > 5 ? dateVal.slice(0, 5) : dateVal;
+
+    const newTx = {
+      name: desc,
+      cat: selectedCategory.id,
+      catName: selectedCategory.name,
+      date: shortDate,
+      value: amount,
+      type: currentTxType
+    };
+
+    txs.unshift(newTx);
+
+    if (currentTxType === 'income') {
+      currentBalance += amount;
+    } else {
+      currentBalance -= amount;
+      currentExpenses += amount;
+    }
+
+    updateDashboardKpis();
+
+    const elDash = document.getElementById('tx-body-dash');
+    if (elDash) elDash.innerHTML = txs.slice(0, 5).map(txRow).join('');
+    const elFull = document.getElementById('tx-body-full');
+    if (elFull) elFull.innerHTML = txs.map(txRow).join('');
+
+    if (txInputDesc) txInputDesc.value = '';
+    if (inputAmount) inputAmount.value = '';
+    closeAll();
+
+    const tipoLabel = currentTxType === 'income' ? 'Entrada' : 'Despesa';
+    showToast(`✓ ${tipoLabel} de R$ ${amount.toFixed(2).replace('.', ',')} registrada com sucesso!`);
+  });
+}
+
+/* ==========================================================================
+   AUTENTICAÇÃO: WHATSAPP OTP E E-MAIL COM PERSISTÊNCIA DE SESSÃO
+   ========================================================================== */
+const viewAuth = document.getElementById('viewAuth');
+const authTabWa = document.getElementById('authTabWa');
+const authTabEmail = document.getElementById('authTabEmail');
+const authPaneWa = document.getElementById('authPaneWa');
+const authPaneEmail = document.getElementById('authPaneEmail');
+const btnSendWaCode = document.getElementById('btnSendWaCode');
+const waStepPhone = document.getElementById('waStepPhone');
+const waStepOtp = document.getElementById('waStepOtp');
+const waPhoneInput = document.getElementById('waPhoneInput');
+const waSentPhone = document.getElementById('waSentPhone');
+const btnChangeWaPhone = document.getElementById('btnChangeWaPhone');
+const btnVerifyWaOtp = document.getElementById('btnVerifyWaOtp');
+const btnAutoFillOtp = document.getElementById('btnAutoFillOtp');
+const btnQuickDemo = document.getElementById('btnQuickDemo');
+const formEmailLogin = document.getElementById('formEmailLogin');
+const otpBoxes = document.querySelectorAll('.otp-box');
+
+function checkAuth() {
+  if (!viewAuth) return;
+  const isAuth = localStorage.getItem('conekta_auth') === 'true';
+  if (isAuth) {
+    viewAuth.classList.add('hidden');
+  } else {
+    viewAuth.classList.remove('hidden');
+  }
+}
+
+function completeLogin(userName = 'Usuário Teste') {
+  try {
+    localStorage.setItem('conekta_auth', 'true');
+  } catch(e){}
+  if (viewAuth) viewAuth.classList.add('hidden');
+  showToast(`Bem-vindo ao ConektaFinance, ${userName}!`);
+}
+
+// Alternar abas WhatsApp / E-mail
+if (authTabWa && authTabEmail) {
+  authTabWa.addEventListener('click', () => {
+    authTabWa.classList.add('active', 'whatsapp');
+    authTabEmail.classList.remove('active');
+    if (authPaneWa) authPaneWa.classList.add('active');
+    if (authPaneEmail) authPaneEmail.classList.remove('active');
+  });
+  authTabEmail.addEventListener('click', () => {
+    authTabEmail.classList.add('active');
+    authTabWa.classList.remove('active', 'whatsapp');
+    if (authPaneEmail) authPaneEmail.classList.add('active');
+    if (authPaneWa) authPaneWa.classList.remove('active');
+  });
+}
+
+// Máscara de telefone
+if (waPhoneInput) {
+  waPhoneInput.addEventListener('input', (e) => {
+    let val = e.target.value.replace(/\D/g, '');
+    if (val.length > 11) val = val.slice(0, 11);
+    if (val.length > 6) {
+      e.target.value = `(${val.slice(0, 2)}) ${val.slice(2, 7)}-${val.slice(7)}`;
+    } else if (val.length > 2) {
+      e.target.value = `(${val.slice(0, 2)}) ${val.slice(2)}`;
+    } else if (val.length > 0) {
+      e.target.value = `(${val}`;
+    }
+  });
+}
+
+// Disparo de código WhatsApp
+function startOtpCountdown() {
+  let seconds = 45;
+  const timerEl = document.getElementById('waResendTimer');
+  if (!timerEl) return;
+  clearInterval(window._otpInterval);
+  window._otpInterval = setInterval(() => {
+    seconds--;
+    if (seconds <= 0) {
+      clearInterval(window._otpInterval);
+      timerEl.innerHTML = '<a href="#" style="color:var(--ds-green-700);text-decoration:none;font-weight:600;" id="linkResendOtp">Reenviar agora</a>';
+      const linkResend = document.getElementById('linkResendOtp');
+      if (linkResend) {
+        linkResend.addEventListener('click', (e) => {
+          e.preventDefault();
+          startOtpCountdown();
+          showToast('✓ Novo código enviado ao seu WhatsApp!');
+        });
+      }
+    } else {
+      timerEl.textContent = `Aguarde 0:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+  }, 1000);
+}
+
+if (btnSendWaCode) {
+  btnSendWaCode.addEventListener('click', () => {
+    const phone = waPhoneInput ? waPhoneInput.value.trim() : '';
+    if (phone.length < 14) {
+      alert('Por favor, informe um número de WhatsApp válido com DDD (ex: (11) 98765-4321).');
+      if (waPhoneInput) waPhoneInput.focus();
+      return;
+    }
+    btnSendWaCode.innerHTML = 'Enviando código...';
+    setTimeout(() => {
+      btnSendWaCode.innerHTML = '<svg class="icon" style="width:17px;height:17px;"><use href="#i-whatsapp"/></svg><span>Receber código no WhatsApp</span>';
+      if (waSentPhone) waSentPhone.textContent = phone;
+      if (waStepPhone) waStepPhone.style.display = 'none';
+      if (waStepOtp) waStepOtp.style.display = 'block';
+      if (otpBoxes[0]) otpBoxes[0].focus();
+      startOtpCountdown();
+      showToast('✓ Código PIN enviado ao seu WhatsApp!');
+    }, 500);
+  });
+}
+
+if (btnChangeWaPhone) {
+  btnChangeWaPhone.addEventListener('click', () => {
+    if (waStepOtp) waStepOtp.style.display = 'none';
+    if (waStepPhone) waStepPhone.style.display = 'block';
+    if (waPhoneInput) waPhoneInput.focus();
+  });
+}
+
+// Navegação entre caixas de OTP
+otpBoxes.forEach((box, idx) => {
+  box.addEventListener('input', (e) => {
+    const val = e.target.value.replace(/\D/g, '');
+    box.value = val ? val[0] : '';
+    if (box.value && idx < otpBoxes.length - 1) {
+      otpBoxes[idx + 1].focus();
+    }
+    const fullCode = Array.from(otpBoxes).map(b => b.value).join('');
+    if (fullCode.length === 6) {
+      setTimeout(() => completeLogin(), 200);
+    }
+  });
+
+  box.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' && !box.value && idx > 0) {
+      otpBoxes[idx - 1].focus();
+    }
+  });
+
+  box.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const pasteData = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+    if (pasteData.length >= 6) {
+      for (let i = 0; i < 6; i++) {
+        otpBoxes[i].value = pasteData[i];
+      }
+      setTimeout(() => completeLogin(), 200);
+    }
+  });
+});
+
+if (btnAutoFillOtp) {
+  btnAutoFillOtp.addEventListener('click', () => {
+    const demoCode = '849201';
+    demoCode.split('').forEach((digit, i) => {
+      if (otpBoxes[i]) otpBoxes[i].value = digit;
+    });
+    setTimeout(() => completeLogin(), 300);
+  });
+}
+
+if (btnVerifyWaOtp) {
+  btnVerifyWaOtp.addEventListener('click', () => {
+    const code = Array.from(otpBoxes).map(b => b.value).join('');
+    if (code.length < 6) {
+      alert('Por favor, preencha os 6 dígitos do código de verificação recebido.');
+      return;
+    }
+    completeLogin();
+  });
+}
+
+// Formulário de E-mail
+if (formEmailLogin) {
+  formEmailLogin.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const emailInput = document.getElementById('emailInput');
+    const email = emailInput ? emailInput.value.trim() : '';
+    if (!email) {
+      alert('Por favor, informe seu e-mail cadastrado.');
+      return;
+    }
+    completeLogin(email.split('@')[0]);
+  });
+}
+
+// Botão de Demonstração Rápida
+if (btnQuickDemo) {
+  btnQuickDemo.addEventListener('click', () => {
+    completeLogin('Usuário Demonstração');
+  });
+}
+
+// Inicializar verificação de autenticação
+checkAuth();
 
 /* ==========================================================================
    THEME SWITCHER (MODO ESCURO / CLARO COM O DESIGN SYSTEM)
