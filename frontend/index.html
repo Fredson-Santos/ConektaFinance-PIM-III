@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>ConektaFinance — Gestão Financeira Inteligente</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" href="/pwa-192x192.svg">
@@ -196,6 +196,9 @@
 
 html, body {
   min-height: 100%;
+  touch-action: pan-x pan-y;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -219,6 +222,10 @@ body {
 button, input, select, textarea {
   font-family: inherit;
   color: inherit;
+}
+
+button, a, .btn, .bnav-item, .bnav-fab, .pill {
+  touch-action: manipulation;
 }
 
 button {
@@ -2830,6 +2837,11 @@ tbody tr:hover td {
 }
 
 @media (max-width: 880px) {
+  /* Previne zoom automático do iOS ao focar em inputs */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
   .sidebar { display: none; }
   .topbar-brand { display: flex; }
   .topbar {
@@ -5464,6 +5476,29 @@ document.querySelectorAll('.chart-6m-group').forEach(group => {
     group.classList.add('active');
   });
 });
+
+// Prevenir gestos de pinça (pinch-to-zoom) no iOS Safari e PWA
+document.addEventListener('gesturestart', function(e) {
+  e.preventDefault();
+});
+document.addEventListener('gesturechange', function(e) {
+  e.preventDefault();
+});
+document.addEventListener('gestureend', function(e) {
+  e.preventDefault();
+});
+
+// Prevenir duplo toque de zoom em elementos não-editáveis
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function(e) {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) {
+    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+    }
+  }
+  lastTouchEnd = now;
+}, { passive: false });
 </script>
 <script>
   if ('serviceWorker' in navigator) {
