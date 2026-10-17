@@ -1,0 +1,705 @@
+/* ==========================================================================
+   CONEKTAFINANCE — CORE DESIGN SYSTEM TOKENS & UTILITIES
+   Baseado 100% nas especificações de NewFrontend/design-system.html
+   ========================================================================== */
+
+:root {
+  /* Modern Typography: Inter & IBM Plex Mono */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', Menlo, Monaco, 'Courier New', monospace;
+
+  /* Spacing Scale (4px base) */
+  --ds-space-1: 4px;
+  --ds-space-2: 8px;
+  --ds-space-3: 12px;
+  --ds-space-4: 16px;
+  --ds-space-5: 20px;
+  --ds-space-6: 24px;
+  --ds-space-8: 32px;
+  --ds-space-10: 40px;
+  --ds-space-12: 48px;
+  --ds-space-16: 64px;
+
+  /* Radius Scale */
+  --ds-radius-sm: 4px;
+  --ds-radius-md: 6px;
+  --ds-radius-lg: 8px;
+  --ds-radius-xl: 12px;
+  --ds-radius-2xl: 16px;
+  --ds-radius-full: 9999px;
+
+  /* Easing & Durations */
+  --ds-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ds-duration-fast: 120ms;
+  --ds-duration-normal: 200ms;
+}
+
+/* ==========================================================================
+   DARK THEME (PADRÃO DO DESIGN SYSTEM)
+   ========================================================================== */
+:root, [data-theme="dark"] {
+  color-scheme: dark;
+
+  /* 1. Backgrounds */
+  --ds-background-100: #000000;
+  --ds-background-200: #0a0a0a;
+  --ds-background-surface: #121212;
+  --ds-background-card: #111111;
+
+  /* 2. Gray Scale */
+  --ds-gray-100: #111111;
+  --ds-gray-200: #191919;
+  --ds-gray-300: #222222;
+  --ds-gray-400: #2e2e2e;
+  --ds-gray-500: #444444;
+  --ds-gray-600: #666666;
+  --ds-gray-700: #888888;
+  --ds-gray-800: #999999;
+  --ds-gray-900: #cccccc;
+  --ds-gray-1000: #ededed;
+
+  /* 3. Gray Alpha Transparencies */
+  --ds-gray-alpha-100: rgba(255, 255, 255, 0.05);
+  --ds-gray-alpha-200: rgba(255, 255, 255, 0.08);
+  --ds-gray-alpha-300: rgba(255, 255, 255, 0.12);
+  --ds-gray-alpha-400: rgba(255, 255, 255, 0.16);
+  --ds-gray-alpha-500: rgba(255, 255, 255, 0.24);
+  --ds-gray-alpha-600: rgba(255, 255, 255, 0.38);
+  --ds-gray-alpha-700: rgba(255, 255, 255, 0.54);
+  --ds-gray-alpha-800: rgba(255, 255, 255, 0.70);
+  --ds-gray-alpha-900: rgba(255, 255, 255, 0.88);
+
+  /* 4. Blue Scale */
+  --ds-blue-600: #0068d6;
+  --ds-blue-700: #0070f3;
+  --ds-blue-800: #0050a4;
+  --ds-blue-900: #52a8ff;
+  --ds-blue-1000: #ebf5ff;
+  --ds-blue-alpha-200: rgba(0, 112, 243, 0.15);
+
+  /* 5. Red Scale */
+  --ds-red-600: #c92a2a;
+  --ds-red-700: #e5484d;
+  --ds-red-800: #ee0000;
+  --ds-red-alpha-200: rgba(238, 0, 0, 0.15);
+
+  /* 6. Amber Scale */
+  --ds-amber-600: #d97706;
+  --ds-amber-700: #f5a623;
+  --ds-amber-alpha-200: rgba(245, 166, 35, 0.15);
+
+  /* 7. Green Scale */
+  --ds-green-600: #008f5d;
+  --ds-green-700: #00cc88;
+  --ds-green-alpha-200: rgba(0, 229, 153, 0.15);
+
+  /* 8. Teal Scale */
+  --ds-teal-600: #0b9bb0;
+  --ds-teal-700: #12b5cb;
+  --ds-teal-alpha-200: rgba(18, 181, 203, 0.15);
+
+  /* 9. Purple Scale */
+  --ds-purple-600: #7928ca;
+  --ds-purple-700: #8e4ec6;
+  --ds-purple-alpha-200: rgba(121, 40, 202, 0.18);
+
+  /* Semantic Typography & Foreground */
+  --ds-foreground: #ededed;
+  --ds-foreground-muted: #888888;
+  --ds-foreground-faint: #555555;
+  --ds-foreground-contrast: #000000;
+
+  /* Borders & Shadows */
+  --ds-border: var(--ds-gray-alpha-300);
+  --ds-border-strong: var(--ds-gray-alpha-500);
+  --ds-border-subtle: var(--ds-gray-alpha-200);
+
+  --ds-shadow-small: 0 1px 2px rgba(0, 0, 0, 0.8);
+  --ds-shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.7);
+  --ds-shadow-large: 0 30px 60px rgba(0, 0, 0, 0.9);
+  --ds-focus-ring: 0 0 0 2px var(--ds-background-100), 0 0 0 4px #0070f3;
+
+  /* Blueprint Grid */
+  --ds-grid-line: rgba(255, 255, 255, 0.035);
+}
+
+/* ==========================================================================
+   LIGHT THEME
+   ========================================================================== */
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* 1. Backgrounds */
+  --ds-background-100: #ffffff;
+  --ds-background-200: #fafafa;
+  --ds-background-surface: #f5f5f5;
+  --ds-background-card: #ffffff;
+
+  /* 2. Gray Scale */
+  --ds-gray-100: #fafafa;
+  --ds-gray-200: #f0f0f0;
+  --ds-gray-300: #e6e6e6;
+  --ds-gray-400: #d6d6d6;
+  --ds-gray-500: #a3a3a3;
+  --ds-gray-600: #737373;
+  --ds-gray-700: #525252;
+  --ds-gray-800: #333333;
+  --ds-gray-900: #1c1c1c;
+  --ds-gray-1000: #111111;
+
+  /* 3. Gray Alpha Scales */
+  --ds-gray-alpha-100: rgba(0, 0, 0, 0.03);
+  --ds-gray-alpha-200: rgba(0, 0, 0, 0.06);
+  --ds-gray-alpha-300: rgba(0, 0, 0, 0.09);
+  --ds-gray-alpha-400: rgba(0, 0, 0, 0.13);
+  --ds-gray-alpha-500: rgba(0, 0, 0, 0.22);
+  --ds-gray-alpha-600: rgba(0, 0, 0, 0.40);
+  --ds-gray-alpha-700: rgba(0, 0, 0, 0.58);
+
+  /* 4. Blue Scale */
+  --ds-blue-600: #0070f3;
+  --ds-blue-700: #095ed5;
+  --ds-blue-alpha-200: rgba(0, 112, 243, 0.1);
+
+  /* 5. Red Scale */
+  --ds-red-600: #ee0000;
+  --ds-red-700: #c92a2a;
+  --ds-red-alpha-200: rgba(238, 0, 0, 0.1);
+
+  /* 6. Amber Scale */
+  --ds-amber-600: #f5a623;
+  --ds-amber-700: #b45309;
+  --ds-amber-alpha-200: rgba(245, 166, 35, 0.1);
+
+  /* 7. Green Scale */
+  --ds-green-600: #008f5d;
+  --ds-green-700: #15803d;
+  --ds-green-alpha-200: rgba(0, 143, 93, 0.1);
+
+  /* 8. Teal Scale */
+  --ds-teal-600: #0b9bb0;
+  --ds-teal-700: #12b5cb;
+  --ds-teal-alpha-200: rgba(18, 181, 203, 0.1);
+
+  /* 9. Purple Scale */
+  --ds-purple-600: #7928ca;
+  --ds-purple-700: #8e4ec6;
+  --ds-purple-alpha-200: rgba(121, 40, 202, 0.12);
+
+  /* Semantic Foregrounds */
+  --ds-foreground: #111111;
+  --ds-foreground-muted: #666666;
+  --ds-foreground-faint: #999999;
+  --ds-foreground-contrast: #ffffff;
+
+  /* Borders & Shadows */
+  --ds-border: var(--ds-gray-alpha-300);
+  --ds-border-strong: var(--ds-gray-alpha-500);
+  --ds-border-subtle: var(--ds-gray-alpha-200);
+
+  --ds-shadow-small: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --ds-shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.1);
+  --ds-shadow-large: 0 30px 60px rgba(0, 0, 0, 0.15);
+  --ds-focus-ring: 0 0 0 2px var(--ds-background-100), 0 0 0 4px #0070f3;
+
+  /* Blueprint Grid */
+  --ds-grid-line: rgba(0, 0, 0, 0.035);
+}
+
+/* ==========================================================================
+   RESET & FOUNDATIONS
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  min-height: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--ds-background-200);
+  color: var(--ds-foreground);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image: 
+    linear-gradient(var(--ds-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ds-grid-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-attachment: fixed;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+input, textarea, [contenteditable="true"], .selectable {
+  user-select: text;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ds-gray-300);
+  border-radius: var(--ds-radius-full);
+}
+
+/* ==========================================================================
+   CARDS & UI KIT (VERCEL / MINIMALIST PRECISION)
+   ========================================================================== */
+.ds-card {
+  background: var(--ds-background-card);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-xl);
+  box-shadow: var(--ds-shadow-small);
+  transition: border-color var(--ds-duration-normal) var(--ds-ease),
+              box-shadow var(--ds-duration-normal) var(--ds-ease),
+              transform var(--ds-duration-fast) var(--ds-ease);
+  position: relative;
+  overflow: hidden;
+}
+
+.ds-card:hover {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ds-shadow-medium);
+}
+
+/* Typography Helpers */
+.font-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-muted { color: var(--ds-foreground-muted); }
+.text-faint { color: var(--ds-foreground-faint); }
+.text-success { color: var(--ds-green-700); }
+.text-danger { color: var(--ds-red-700); }
+.text-primary { color: var(--ds-blue-700); }
+.text-warning { color: var(--ds-amber-700); }
+
+/* Badges */
+.ds-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--ds-radius-full);
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  border: 1px solid transparent;
+}
+
+.ds-badge-blue {
+  background: var(--ds-blue-alpha-200);
+  color: var(--ds-blue-700);
+  border-color: rgba(0, 112, 243, 0.25);
+}
+
+.ds-badge-green {
+  background: var(--ds-green-alpha-200);
+  color: var(--ds-green-700);
+  border-color: rgba(0, 229, 153, 0.25);
+}
+
+.ds-badge-red {
+  background: var(--ds-red-alpha-200);
+  color: var(--ds-red-700);
+  border-color: rgba(229, 72, 77, 0.25);
+}
+
+.ds-badge-amber {
+  background: var(--ds-amber-alpha-200);
+  color: var(--ds-amber-700);
+  border-color: rgba(245, 166, 35, 0.25);
+}
+
+.ds-badge-purple {
+  background: var(--ds-purple-alpha-200);
+  color: var(--ds-purple-700);
+  border-color: rgba(142, 78, 198, 0.25);
+}
+
+.ds-badge-gray {
+  background: var(--ds-gray-alpha-200);
+  color: var(--ds-gray-800);
+  border-color: var(--ds-border);
+}
+
+/* Buttons */
+.ds-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 13.5px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  border-radius: var(--ds-radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--ds-duration-fast) var(--ds-ease);
+  text-decoration: none;
+  min-height: 38px;
+  white-space: nowrap;
+}
+
+.ds-btn:active {
+  transform: scale(0.98);
+}
+
+.ds-btn-primary {
+  background: var(--ds-foreground);
+  color: var(--ds-foreground-contrast);
+  border-color: var(--ds-foreground);
+}
+
+.ds-btn-primary:hover {
+  opacity: 0.9;
+}
+
+.ds-btn-blue {
+  background: var(--ds-blue-700);
+  color: #ffffff;
+  border-color: var(--ds-blue-600);
+}
+
+.ds-btn-blue:hover {
+  background: var(--ds-blue-600);
+}
+
+.ds-btn-secondary {
+  background: var(--ds-background-100);
+  color: var(--ds-foreground);
+  border: 1px solid var(--ds-border);
+}
+
+.ds-btn-secondary:hover {
+  background: var(--ds-gray-alpha-200);
+  border-color: var(--ds-foreground-muted);
+}
+
+.ds-btn-ghost {
+  background: transparent;
+  color: var(--ds-foreground-muted);
+  border-color: transparent;
+}
+
+.ds-btn-ghost:hover {
+  background: var(--ds-gray-alpha-100);
+  color: var(--ds-foreground);
+}
+
+.ds-btn-icon {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: var(--ds-radius-md);
+}
+
+/* Inputs */
+.ds-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  background: var(--ds-background-100);
+  color: var(--ds-foreground);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  outline: none;
+  transition: border-color var(--ds-duration-fast) var(--ds-ease),
+              box-shadow var(--ds-duration-fast) var(--ds-ease);
+}
+
+.ds-input:focus {
+  border-color: var(--ds-blue-700);
+  box-shadow: 0 0 0 3px var(--ds-blue-alpha-200);
+}
+
+.ds-input::placeholder {
+  color: var(--ds-foreground-faint);
+}
+
+.ds-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ds-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ds-foreground-muted);
+}
+
+/* ==========================================================================
+   MODAL OVERLAY & BOTTOM SHEET (SAFE AREAS)
+   ========================================================================== */
+.ds-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.ds-modal-content {
+  background: var(--ds-background-100);
+  border: 1px solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-2xl);
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--ds-shadow-large);
+}
+
+@media (max-width: 768px) {
+  .ds-modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .ds-modal-content {
+    max-width: 100%;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+    max-height: 85vh;
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
+  }
+}
+
+/* ==========================================================================
+   LAYOUT STRUCTURE (DESKTOP + IPHONE NOTCH & HOME BAR SAFE AREAS)
+   ========================================================================== */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+}
+
+/* Desktop Sidebar */
+.app-sidebar {
+  width: 250px;
+  background: var(--ds-background-100);
+  border-right: 1px solid var(--ds-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  padding-top: max(20px, env(safe-area-inset-top, 0px));
+}
+
+.sidebar-header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--ds-border);
+}
+
+.sidebar-nav {
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-foreground-muted);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--ds-duration-fast) var(--ds-ease);
+  border: 1px solid transparent;
+}
+
+.nav-item:hover {
+  color: var(--ds-foreground);
+  background: var(--ds-gray-alpha-100);
+}
+
+.nav-item.active {
+  color: var(--ds-foreground);
+  background: var(--ds-gray-alpha-200);
+  border-color: var(--ds-border);
+  font-weight: 600;
+}
+
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid var(--ds-border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Main Content Area */
+.app-main {
+  flex: 1;
+  margin-left: 250px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 32px;
+}
+
+/* Top Navigation Bar with Dynamic Island / Notch Safe Area */
+.app-topbar {
+  background: color-mix(in srgb, var(--ds-background-100) 85%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--ds-border);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 64px;
+}
+
+.content-container {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.mobile-bottom-nav {
+  display: none;
+}
+
+/* Desktop-only action button in topbar */
+.btn-desktop-only {
+  display: inline-flex;
+}
+
+/* ==========================================================================
+   MOBILE VIEWPORTS (< 768px) & IPHONE NOTCH / STATUS BAR CLEARANCE
+   ========================================================================== */
+@media (max-width: 768px) {
+  .app-sidebar {
+    display: none;
+  }
+
+  .app-main {
+    margin-left: 0;
+    /* Espaço para não cobrir conteúdo com o Bottom Nav e a Home Indicator bar */
+    padding-bottom: calc(84px + env(safe-area-inset-bottom, 20px));
+  }
+
+  /* TOPBAR: Dá espaçamento total para Notch / Dynamic Island do iPhone */
+  .app-topbar {
+    padding-top: max(16px, env(safe-area-inset-top, 16px));
+    height: calc(56px + max(16px, env(safe-area-inset-top, 16px)));
+    padding-left: max(16px, env(safe-area-inset-left, 16px));
+    padding-right: max(16px, env(safe-area-inset-right, 16px));
+    padding-bottom: 10px;
+    align-items: flex-end; /* Alinha o conteúdo abaixo do notch */
+  }
+
+  /* Oculta botão duplicado de adicionar no topo no celular (já existe na barra inferior) */
+  .btn-desktop-only {
+    display: none !important;
+  }
+
+  .content-container {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  /* Grid de métricas do celular: 2 colunas proporcionais, sem esticar */
+  .mobile-metrics-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+
+  .metric-card-hero {
+    grid-column: 1 / -1 !important;
+  }
+
+  /* BOTTOM NAVIGATION BAR: Elevação da Home Indicator Bar do iPhone */
+  .mobile-bottom-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(56px + max(16px, env(safe-area-inset-bottom, 16px)));
+    padding-bottom: max(14px, env(safe-area-inset-bottom, 14px));
+    padding-top: 6px;
+    background: color-mix(in srgb, var(--ds-background-100) 90%, transparent);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--ds-border);
+    z-index: 1000;
+  }
+
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    flex: 1;
+    height: 100%;
+    color: var(--ds-foreground-muted);
+    font-size: 10.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color var(--ds-duration-fast) var(--ds-ease);
+  }
+
+  .bottom-nav-item.active {
+    color: var(--ds-foreground);
+    font-weight: 600;
+  }
+
+  .bottom-nav-item.active svg {
+    color: var(--ds-blue-700);
+  }
+}

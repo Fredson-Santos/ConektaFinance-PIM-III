@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a0a"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </linearGradient>
+    <linearGradient id="primary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#52a8ff"/>
+      <stop offset="100%" stop-color="#0068d6"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00cc88"/>
+      <stop offset="100%" stop-color="#008f5d"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  
+  <!-- Rounded Base Icon -->
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <rect width="510" height="510" x="1" y="1" rx="127" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+  
+  <!-- Ambient Glow Behind Logo -->
+  <circle cx="256" cy="256" r="140" fill="#0070f3" opacity="0.18" filter="url(#glow)"/>
+
+  <!-- Conekta Dynamic Nodes / Finance Chart -->
+  <!-- Outer C Arc -->
+  <path d="M 340 160 C 310 130 260 120 210 140 C 150 165 125 235 145 295 C 165 355 235 385 295 365 C 335 350 360 320 372 285" 
+        fill="none" 
+        stroke="url(#primary)" 
+        stroke-width="36" 
+        stroke-linecap="round"/>
+        
+  <!-- Ascending Growth Bar 1 -->
+  <rect x="220" y="270" width="28" height="60" rx="14" fill="rgba(255,255,255,0.2)"/>
+  <!-- Ascending Growth Bar 2 -->
+  <rect x="264" y="230" width="28" height="100" rx="14" fill="url(#primary)"/>
+  <!-- Ascending Growth Bar 3 -->
+  <rect x="308" y="180" width="28" height="150" rx="14" fill="url(#accent)"/>
+
+  <!-- Glowing Accent Node -->
+  <circle cx="372" cy="172" r="20" fill="#00cc88" filter="url(#glow)"/>
+  <circle cx="372" cy="172" r="10" fill="#ffffff"/>
+</svg>
