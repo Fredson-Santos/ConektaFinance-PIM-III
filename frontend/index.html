@@ -999,9 +999,40 @@ a {
 .stat-label {
   font-size: 12.5px;
   color: var(--ds-foreground-muted);
-  margin-bottom: 8px;
   font-weight: 500;
   letter-spacing: -0.01em;
+}
+
+.stat-head-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--ds-radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-style: normal;
+  flex-shrink: 0;
+}
+
+.stat-icon.in {
+  background: var(--ds-green-alpha-200);
+  color: var(--ds-green-700);
+}
+
+.stat-icon.out {
+  background: var(--ds-red-alpha-200);
+  color: var(--ds-red-700);
+}
+
+.stat-icon.saldo {
+  background: var(--ds-blue-alpha-200);
+  color: var(--ds-blue-600);
 }
 
 .stat-value {
@@ -4180,33 +4211,42 @@ tbody tr:hover td {
         <div class="desktop-dash-content desktop-only">
           <div class="stat-grid">
             <!-- Saldo em Conta -->
-            <div class="card">
+            <div class="card stat-card">
               <div class="card-head" style="margin-bottom:8px;">
-                <span class="stat-label" style="margin:0;">Saldo em Conta</span>
+                <div class="stat-head-left">
+                  <i class="stat-icon saldo"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></i>
+                  <span class="stat-label" style="margin:0;">Saldo em Conta</span>
+                </div>
                 <span class="badge" id="badgeSaldo"><span class="badge-dot" style="background:var(--ds-green-700);"></span>+14.2% mês</span>
               </div>
               <p class="stat-value num" id="valSaldo">R$ 4.286,50</p>
               <p class="stat-foot" id="footSaldo">Atualizado agora</p>
             </div>
 
-            <!-- Despesas em Setembro -->
-            <div class="card">
+            <!-- Entradas -->
+            <div class="card stat-card in">
               <div class="card-head" style="margin-bottom:8px;">
-                <span class="stat-label" style="margin:0;">Despesas do Mês</span>
-                <span class="badge" id="badgeDespesas"><span class="badge-dot" style="background:var(--ds-blue-600);"></span>68% do teto</span>
+                <div class="stat-head-left">
+                  <i class="stat-icon in"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></i>
+                  <span class="stat-label" style="margin:0;">Entradas</span>
+                </div>
+                <span class="badge badge-success"><span class="badge-dot" style="background:var(--ds-green-700);"></span>+8.4% mês</span>
+              </div>
+              <p class="stat-value num" id="valEntradas">R$ 7.850,00</p>
+              <p class="stat-foot" id="footEntradas">Receitas consolidadas do mês</p>
+            </div>
+
+            <!-- Saídas -->
+            <div class="card stat-card out">
+              <div class="card-head" style="margin-bottom:8px;">
+                <div class="stat-head-left">
+                  <i class="stat-icon out"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7L7 17M16 17H7V8"/></svg></i>
+                  <span class="stat-label" style="margin:0;">Saídas</span>
+                </div>
+                <span class="badge" id="badgeDespesas"><span class="badge-dot" style="background:var(--ds-red-700, #ef4444);"></span>68% do teto</span>
               </div>
               <p class="stat-value num" id="valDespesas">R$ 3.563,00</p>
               <p class="stat-foot" id="footDespesas">Limite de R$ 6.350,00</p>
-            </div>
-
-            <!-- Reserva & Economia -->
-            <div class="card">
-              <div class="card-head" style="margin-bottom:8px;">
-                <span class="stat-label" style="margin:0;">Reserva & Economia</span>
-                <span class="badge"><span class="badge-dot" style="background:var(--ds-amber-600);"></span>Meta Ativa</span>
-              </div>
-              <p class="stat-value num">R$ 2.450,00</p>
-              <p class="stat-foot">Projeção de R$ 3.100 no fim do mês</p>
             </div>
           </div>
 
@@ -6262,6 +6302,8 @@ function updateDashboardKpis() {
 
   const elSaldo = document.getElementById('valSaldo');
   if (elSaldo) elSaldo.textContent = saldoFmt;
+  const elEntradas = document.getElementById('valEntradas');
+  if (elEntradas) elEntradas.textContent = `R$ ${totalIncomes.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
   const elDespesas = document.getElementById('valDespesas');
   if (elDespesas) elDespesas.textContent = despesasFmt;
   const elFootSaldo = document.getElementById('footSaldo');
