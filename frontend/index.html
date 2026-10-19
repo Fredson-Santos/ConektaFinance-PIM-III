@@ -3078,8 +3078,406 @@ tbody tr:hover td {
   }
 }
 
+/* ==========================================================================
+   MOBILE DASHBOARD — DESIGN OFICIAL (conektafinance-mockup-mobile-dash.html)
+   ========================================================================== */
+.mobile-dash-content {
+  width: 100%;
+}
+
+.mobile-dash-content .hello {
+  padding: 8px 0 4px;
+  font-size: 13.5px;
+  color: var(--ds-foreground-muted);
+  font-weight: 500;
+}
+
+.mobile-dash-content .balance {
+  padding: 4px 0 0;
+}
+
+.mobile-dash-content .balance .label {
+  font-size: 13.5px;
+  color: var(--ds-foreground-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mobile-dash-content .balance .value {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 40px;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+  margin-top: 2px;
+}
+
+.mobile-dash-content .balance .value small {
+  font-size: 20px;
+  color: var(--ds-foreground-muted);
+  margin-right: 4px;
+  letter-spacing: -0.02em;
+}
+
+.mobile-dash-content .delta {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--ds-foreground-muted);
+}
+
+.mobile-dash-content .flow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.mobile-dash-content .flow .card {
+  background: var(--ds-background-100);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-xl);
+  padding: 16px;
+}
+
+.mobile-dash-content .flow .card .k {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--ds-foreground-muted);
+}
+
+.mobile-dash-content .flow .card .k i {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--ds-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-dash-content .flow .in i {
+  background: var(--ds-green-alpha-200);
+  color: var(--ds-green-700);
+}
+
+.mobile-dash-content .flow .out i {
+  background: var(--ds-red-alpha-200);
+  color: var(--ds-red-700);
+}
+
+.mobile-dash-content .flow .v {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.03em;
+  margin-top: 10px;
+}
+
+.mobile-dash-content .sec {
+  margin-top: 28px;
+}
+
+.mobile-dash-content .sec-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.mobile-dash-content .sec-head h2 {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.mobile-dash-content .link {
+  font-size: 12.5px;
+  color: var(--ds-foreground-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.mobile-dash-content .link:hover {
+  color: var(--ds-foreground);
+}
+
+.mobile-dash-content .seg {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  background: var(--ds-gray-alpha-200);
+  border-radius: var(--ds-radius-lg);
+}
+
+.mobile-dash-content .seg button {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-foreground-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all var(--ds-duration-fast);
+}
+
+.mobile-dash-content .seg button.on {
+  background: var(--ds-background-100);
+  color: var(--ds-foreground);
+  box-shadow: 0 0 0 1px var(--ds-border);
+}
+
+.mobile-dash-content .chart-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 14px;
+}
+
+.mobile-dash-content .chart-foot .big {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: -0.03em;
+}
+
+.mobile-dash-content .chart-foot .sub {
+  font-size: 12.5px;
+  color: var(--ds-foreground-muted);
+}
+
+.mobile-dash-content .chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 104px;
+  margin-top: 6px;
+}
+
+.mobile-dash-content .bar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.mobile-dash-content .bar span {
+  width: 100%;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-gray-alpha-400);
+  transition: height 0.3s var(--ds-ease);
+}
+
+.mobile-dash-content .bar.now span {
+  background: var(--ds-foreground);
+}
+
+.mobile-dash-content .bar em {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--ds-foreground-faint);
+}
+
+.mobile-dash-content .bar.now em {
+  color: var(--ds-foreground);
+  font-weight: 600;
+}
+
+.mobile-dash-content .cats {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mobile-dash-content .cat-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 12px;
+  align-items: center;
+}
+
+.mobile-dash-content .cat-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.mobile-dash-content .cat-name b {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.mobile-dash-content .cat-val {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.mobile-dash-content .track {
+  grid-column: 1 / -1;
+  height: 4px;
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-gray-alpha-200);
+  overflow: hidden;
+}
+
+.mobile-dash-content .track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.mobile-dash-content .cat-meta {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: var(--ds-foreground-muted);
+  margin-top: -2px;
+}
+
+.mobile-dash-content .ai {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border-color: var(--ds-border);
+}
+
+.mobile-dash-content .ai .ico {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-blue-alpha-200);
+  color: var(--ds-blue-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mobile-dash-content .ai p {
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.mobile-dash-content .ai p span {
+  color: var(--ds-foreground-muted);
+}
+
+.mobile-dash-content .chips {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.mobile-dash-content .chip {
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: var(--ds-radius-full);
+  border: 1px solid var(--ds-border);
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  transition: all var(--ds-duration-fast) var(--ds-ease);
+}
+
+.mobile-dash-content .chip:hover {
+  background: var(--ds-gray-alpha-200);
+}
+
+.mobile-dash-content .txs {
+  padding: 4px 16px;
+}
+
+.mobile-dash-content .tx {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  width: 100%;
+  text-align: left;
+  border-bottom: 1px solid var(--ds-gray-alpha-200);
+  border-radius: var(--ds-radius-md);
+  background: none;
+  border-left: none;
+  border-top: none;
+  border-right: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.mobile-dash-content .tx:last-child {
+  border-bottom: none;
+}
+
+.mobile-dash-content .tx .ic {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ds-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ds-border);
+  background: var(--ds-background-surface);
+}
+
+.mobile-dash-content .tx .t {
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.mobile-dash-content .tx .s {
+  font-size: 12px;
+  color: var(--ds-foreground-muted);
+}
+
+.mobile-dash-content .tx .a {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 500;
+  text-align: right;
+}
+
+.mobile-dash-content .tx .a.pos {
+  color: var(--ds-green-700);
+}
+
+.mobile-dash-content .tx .d {
+  font-size: 11.5px;
+  color: var(--ds-foreground-faint);
+  text-align: right;
+  font-family: var(--font-sans);
+}
+
+@media (max-width: 880px) {
+  .desktop-only { display: none !important; }
+  .mobile-only { display: block !important; }
+}
+
 @media (min-width: 881px) {
-  .mobile-only { display: none; }
+  .mobile-only { display: none !important; }
+  .desktop-only { display: block; }
 }
 </style>
 </head>
@@ -3353,165 +3751,263 @@ tbody tr:hover td {
 
       <!-- PÁGINA: DASHBOARD -->
       <section class="page active" id="page-dashboard">
-        <div class="stat-grid">
-          <!-- Saldo em Conta -->
-          <div class="card">
-            <div class="card-head" style="margin-bottom:8px;">
-              <span class="stat-label" style="margin:0;">Saldo em Conta</span>
-              <span class="badge" id="badgeSaldo"><span class="badge-dot" style="background:var(--ds-green-700);"></span>+14.2% mês</span>
-            </div>
-            <p class="stat-value num" id="valSaldo">R$ 14.850,00</p>
-            <p class="stat-foot" id="footSaldo">Atualizado agora</p>
-          </div>
 
-          <!-- Despesas em Setembro -->
-          <div class="card">
-            <div class="card-head" style="margin-bottom:8px;">
-              <span class="stat-label" style="margin:0;">Despesas em Setembro</span>
-              <span class="badge" id="badgeDespesas"><span class="badge-dot" style="background:var(--ds-blue-600);"></span>68% do teto</span>
-            </div>
-            <p class="stat-value num" id="valDespesas">R$ 4.320,00</p>
-            <p class="stat-foot" id="footDespesas">Limite de R$ 6.350,00</p>
-          </div>
+        <!-- CONTEÚDO ROLANTE MOBILE (IDÊNTICO AO MOCKUP MOBILE) -->
+        <div class="mobile-dash-content mobile-only">
+          <p class="hello" id="mobileGreeting">Olá, Fred</p>
 
-          <!-- Reserva & Economia -->
-          <div class="card">
-            <div class="card-head" style="margin-bottom:8px;">
-              <span class="stat-label" style="margin:0;">Reserva & Economia</span>
-              <span class="badge"><span class="badge-dot" style="background:var(--ds-amber-600);"></span>Meta Ativa</span>
+          <section class="balance">
+            <div class="label">Saldo em outubro</div>
+            <div class="value"><small>R$</small><span id="valSaldoMobile">4.286,50</span></div>
+            <div class="delta"><span class="badge badge-success"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg><span id="badgeDeltaVal">R$ 640</span></span> a mais que em setembro</div>
+          </section>
+
+          <section class="flow" aria-label="Entradas e saídas do mês">
+            <div class="card in">
+              <div class="k"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></i>Entradas</div>
+              <div class="v" id="valEntradasMobile">R$ 7.850</div>
             </div>
-            <p class="stat-value num">R$ 2.450,00</p>
-            <p class="stat-foot">Projeção de R$ 3.100 no fim do mês</p>
-          </div>
+            <div class="card out">
+              <div class="k"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7L7 17M16 17H7V8"/></svg></i>Saídas</div>
+              <div class="v" id="valDespesasMobile">R$ 3.563</div>
+            </div>
+          </section>
+
+          <!-- GRÁFICO: DISTRIBUIÇÃO DE GASTOS DA SEMANA (MANTIDO E ADAPTADO AO DESIGN SYSTEM) -->
+          <section class="sec">
+            <div class="card">
+              <div class="chart-foot">
+                <div>
+                  <div class="sub">Distribuição de Gastos da Semana</div>
+                  <div class="big" id="dashWeekTotalMobile">R$ 994,00</div>
+                </div>
+                <div class="seg" role="tablist" aria-label="Período">
+                  <button class="on" role="tab" aria-selected="true">Semana</button>
+                  <button role="tab" aria-selected="false">Mês</button>
+                </div>
+              </div>
+              <div class="chart" role="img" aria-label="Distribuição de Gastos da Semana: Total R$ 994,00">
+                <div class="bar"><span style="height:45%"></span><em>SEG</em></div>
+                <div class="bar"><span style="height:30%"></span><em>TER</em></div>
+                <div class="bar"><span style="height:65%"></span><em>QUA</em></div>
+                <div class="bar"><span style="height:40%"></span><em>QUI</em></div>
+                <div class="bar"><span style="height:90%"></span><em>SEX</em></div>
+                <div class="bar"><span style="height:75%"></span><em>SÁB</em></div>
+                <div class="bar now"><span style="height:32%"></span><em>DOM</em></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ASSISTENTE DE IA COPILOT -->
+          <section class="sec ai-sec">
+            <div class="card ai">
+              <div class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg></div>
+              <div>
+                <p>Você gastou 32% a mais com alimentação do que na média dos últimos 3 meses. <span>Quer ver onde foi?</span></p>
+                <div class="chips">
+                  <button class="chip" id="btnAiMobileDetails">Ver detalhes</button>
+                  <button class="chip" onclick="goPage('categorias'); return false;">Criar limite</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- CATEGORIAS -->
+          <section class="sec">
+            <div class="sec-head"><h2>Categorias</h2><button class="link" onclick="goPage('categorias'); return false;">Ver todas<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button></div>
+            <div class="card cats" id="mobileCatList">
+              <div class="cat-row">
+                <div class="cat-name"><b style="background:var(--ds-blue-700)"></b>Moradia</div><div class="cat-val num">R$ 1.450</div>
+                <div class="track"><i style="width:92%;background:var(--ds-blue-700)"></i></div>
+                <div class="cat-meta"><span>41% das saídas</span><span>Limite R$ 1.600</span></div>
+              </div>
+              <div class="cat-row">
+                <div class="cat-name"><b style="background:var(--ds-amber-700)"></b>Alimentação</div><div class="cat-val num">R$ 980</div>
+                <div class="track"><i style="width:98%;background:var(--ds-amber-700)"></i></div>
+                <div class="cat-meta"><span>28% das saídas</span><span style="color:var(--ds-amber-700)">Perto do limite · R$ 1.000</span></div>
+              </div>
+              <div class="cat-row">
+                <div class="cat-name"><b style="background:var(--ds-purple-700)"></b>Transporte</div><div class="cat-val num">R$ 412</div>
+                <div class="track"><i style="width:52%;background:var(--ds-purple-700)"></i></div>
+                <div class="cat-meta"><span>12% das saídas</span><span>Limite R$ 800</span></div>
+              </div>
+              <div class="cat-row">
+                <div class="cat-name"><b style="background:var(--ds-pink-700)"></b>Lazer</div><div class="cat-val num">R$ 276</div>
+                <div class="track"><i style="width:34%;background:var(--ds-pink-700)"></i></div>
+                <div class="cat-meta"><span>8% das saídas</span><span>Limite R$ 800</span></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ÚLTIMAS TRANSAÇÕES -->
+          <section class="sec">
+            <div class="sec-head"><h2>Últimas transações</h2><button class="link" onclick="goPage('gastos'); return false;">Ver todas<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button></div>
+            <div class="card txs" id="mobileTxList"></div>
+          </section>
         </div>
 
-        <div class="grid-2">
-          <!-- Gráfico de Gastos Diários da Semana -->
-          <div class="card">
-            <div class="card-head">
-              <div>
-                <p class="card-title">Distribuição de Gastos da Semana</p>
-                <span class="stat-foot">Média diária de R$ 142,00</span>
+        <!-- CONTEÚDO DESKTOP (MANTIDO NA RESOLUÇÃO DESKTOP) -->
+        <div class="desktop-dash-content desktop-only">
+          <div class="stat-grid">
+            <!-- Saldo em Conta -->
+            <div class="card">
+              <div class="card-head" style="margin-bottom:8px;">
+                <span class="stat-label" style="margin:0;">Saldo em Conta</span>
+                <span class="badge" id="badgeSaldo"><span class="badge-dot" style="background:var(--ds-green-700);"></span>+14.2% mês</span>
               </div>
-              <span class="num" style="font-size:12px; font-weight:600; color:var(--ds-foreground);">Total: R$ 994,00</span>
+              <p class="stat-value num" id="valSaldo">R$ 4.286,50</p>
+              <p class="stat-foot" id="footSaldo">Atualizado agora</p>
             </div>
 
-            <div class="spend-chart-container" id="spendChart">
-              <div class="spend-col">
-                <div class="spend-bar-track"><div class="spend-bar-fill" style="height: 45%;"></div></div>
-                <span class="spend-day">SEG</span>
+            <!-- Despesas em Setembro -->
+            <div class="card">
+              <div class="card-head" style="margin-bottom:8px;">
+                <span class="stat-label" style="margin:0;">Despesas do Mês</span>
+                <span class="badge" id="badgeDespesas"><span class="badge-dot" style="background:var(--ds-blue-600);"></span>68% do teto</span>
               </div>
-              <div class="spend-col">
-                <div class="spend-bar-track"><div class="spend-bar-fill" style="height: 30%;"></div></div>
-                <span class="spend-day">TER</span>
+              <p class="stat-value num" id="valDespesas">R$ 3.563,00</p>
+              <p class="stat-foot" id="footDespesas">Limite de R$ 6.350,00</p>
+            </div>
+
+            <!-- Reserva & Economia -->
+            <div class="card">
+              <div class="card-head" style="margin-bottom:8px;">
+                <span class="stat-label" style="margin:0;">Reserva & Economia</span>
+                <span class="badge"><span class="badge-dot" style="background:var(--ds-amber-600);"></span>Meta Ativa</span>
               </div>
-              <div class="spend-col">
-                <div class="spend-bar-track"><div class="spend-bar-fill" style="height: 65%;"></div></div>
-                <span class="spend-day">QUA</span>
+              <p class="stat-value num">R$ 2.450,00</p>
+              <p class="stat-foot">Projeção de R$ 3.100 no fim do mês</p>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <!-- Gráfico de Gastos Diários da Semana -->
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <p class="card-title">Distribuição de Gastos da Semana</p>
+                  <span class="stat-foot">Média diária de R$ 142,00</span>
+                </div>
+                <span class="num" style="font-size:12px; font-weight:600; color:var(--ds-foreground);">Total: R$ 994,00</span>
               </div>
-              <div class="spend-col">
-                <div class="spend-bar-track"><div class="spend-bar-fill" style="height: 40%;"></div></div>
-                <span class="spend-day">QUI</span>
+
+              <div class="spend-chart-container" id="spendChart">
+                <div class="spend-col">
+                  <div class="spend-bar-track"><div class="spend-bar-fill" style="height: 45%;"></div></div>
+                  <span class="spend-day">SEG</span>
+                </div>
+                <div class="spend-col">
+                  <div class="spend-bar-track"><div class="spend-bar-fill" style="height: 30%;"></div></div>
+                  <span class="spend-day">TER</span>
+                </div>
+                <div class="spend-col">
+                  <div class="spend-bar-track"><div class="spend-bar-fill" style="height: 65%;"></div></div>
+                  <span class="spend-day">QUA</span>
+                </div>
+                <div class="spend-col">
+                  <div class="spend-bar-track"><div class="spend-bar-fill" style="height: 40%;"></div></div>
+                  <span class="spend-day">QUI</span>
+                </div>
+                <div class="spend-col">
+                  <div class="spend-bar-track"><div class="spend-bar-fill" style="height: 90%;"></div></div>
+                  <span class="spend-day">SEX</span>
+                </div>
+                <div class="spend-col">
+                  <div class="spend-bar-track"><div class="spend-bar-fill" style="height: 75%;"></div></div>
+                  <span class="spend-day">SÁB</span>
+                </div>
+                <div class="spend-col active">
+                  <div class="spend-bar-track"><div class="spend-bar-fill" style="height: 32%;"></div></div>
+                  <span class="spend-day">DOM</span>
+                </div>
               </div>
-              <div class="spend-col">
-                <div class="spend-bar-track"><div class="spend-bar-fill" style="height: 90%;"></div></div>
-                <span class="spend-day">SEX</span>
+            </div>
+
+            <!-- Orçamento por Categoria (Barras Coloridas) -->
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <p class="card-title">Orçamento por Categoria</p>
+                  <span class="stat-foot">Acompanhamento de consumo</span>
+                </div>
               </div>
-              <div class="spend-col">
-                <div class="spend-bar-track"><div class="spend-bar-fill" style="height: 75%;"></div></div>
-                <span class="spend-day">SÁB</span>
-              </div>
-              <div class="spend-col active">
-                <div class="spend-bar-track"><div class="spend-bar-fill" style="height: 32%;"></div></div>
-                <span class="spend-day">DOM</span>
+
+              <div class="cat-meter-list">
+                <div class="cat-meter-item">
+                  <div class="cat-meter-head">
+                    <span class="cat-meter-label">
+                      <span class="cat-meter-dot" style="background:#0070f3;"></span>
+                      Moradia
+                    </span>
+                    <span class="cat-meter-val num">R$ 1.800 / 2.000</span>
+                  </div>
+                  <div class="cat-track">
+                    <div class="cat-fill" style="width:90%; background:#0070f3;"></div>
+                  </div>
+                </div>
+
+                <div class="cat-meter-item">
+                  <div class="cat-meter-head">
+                    <span class="cat-meter-label">
+                      <span class="cat-meter-dot" style="background:#f5a623;"></span>
+                      Alimentação
+                    </span>
+                    <span class="cat-meter-val num">R$ 980 / 1.500</span>
+                  </div>
+                  <div class="cat-track">
+                    <div class="cat-fill" style="width:65%; background:#f5a623;"></div>
+                  </div>
+                </div>
+
+                <div class="cat-meter-item">
+                  <div class="cat-meter-head">
+                    <span class="cat-meter-label">
+                      <span class="cat-meter-dot" style="background:#12b5cb;"></span>
+                      Transporte
+                    </span>
+                    <span class="cat-meter-val num">R$ 380 / 600</span>
+                  </div>
+                  <div class="cat-track">
+                    <div class="cat-fill" style="width:63%; background:#12b5cb;"></div>
+                  </div>
+                </div>
+
+                <div class="cat-meter-item">
+                  <div class="cat-meter-head">
+                    <span class="cat-meter-label">
+                      <span class="cat-meter-dot" style="background:#8e4ec6;"></span>
+                      Lazer & Lojas
+                    </span>
+                    <span class="cat-meter-val num">R$ 290 / 800</span>
+                  </div>
+                  <div class="cat-track">
+                    <div class="cat-fill" style="width:36%; background:#8e4ec6;"></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Orçamento por Categoria (Barras Coloridas) -->
-          <div class="card">
-            <div class="card-head">
-              <div>
-                <p class="card-title">Orçamento por Categoria</p>
-                <span class="stat-foot">Acompanhamento de consumo</span>
-              </div>
+          <!-- Lançamentos recentes (Tabela Desktop) -->
+          <div class="card" style="margin-top: 16px;">
+            <div class="card-head" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+              <p class="card-title" style="font-size: 14.5px; font-weight: 600; margin: 0;">Lançamentos recentes</p>
+              <a href="#" class="card-link" style="font-size: 12.5px; color: var(--ds-foreground-muted); text-decoration: none;" onclick="goPage('gastos'); return false;">ver tudo</a>
             </div>
 
-            <div class="cat-meter-list">
-              <div class="cat-meter-item">
-                <div class="cat-meter-head">
-                  <span class="cat-meter-label">
-                    <span class="cat-meter-dot" style="background:#0070f3;"></span>
-                    Moradia
-                  </span>
-                  <span class="cat-meter-val num">R$ 1.800 / 2.000</span>
-                </div>
-                <div class="cat-track">
-                  <div class="cat-fill" style="width:90%; background:#0070f3;"></div>
-                </div>
-              </div>
-
-              <div class="cat-meter-item">
-                <div class="cat-meter-head">
-                  <span class="cat-meter-label">
-                    <span class="cat-meter-dot" style="background:#f5a623;"></span>
-                    Alimentação
-                  </span>
-                  <span class="cat-meter-val num">R$ 980 / 1.500</span>
-                </div>
-                <div class="cat-track">
-                  <div class="cat-fill" style="width:65%; background:#f5a623;"></div>
-                </div>
-              </div>
-
-              <div class="cat-meter-item">
-                <div class="cat-meter-head">
-                  <span class="cat-meter-label">
-                    <span class="cat-meter-dot" style="background:#12b5cb;"></span>
-                    Transporte
-                  </span>
-                  <span class="cat-meter-val num">R$ 380 / 600</span>
-                </div>
-                <div class="cat-track">
-                  <div class="cat-fill" style="width:63%; background:#12b5cb;"></div>
-                </div>
-              </div>
-
-              <div class="cat-meter-item">
-                <div class="cat-meter-head">
-                  <span class="cat-meter-label">
-                    <span class="cat-meter-dot" style="background:#8e4ec6;"></span>
-                    Lazer & Lojas
-                  </span>
-                  <span class="cat-meter-val num">R$ 290 / 800</span>
-                </div>
-                <div class="cat-track">
-                  <div class="cat-fill" style="width:36%; background:#8e4ec6;"></div>
-                </div>
-              </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="font-size: 11px; font-weight: 500; color: var(--ds-foreground-muted); text-transform: none; letter-spacing: normal;">Descrição</th>
+                    <th style="font-size: 11px; font-weight: 500; color: var(--ds-foreground-muted); text-transform: none; letter-spacing: normal;">Categoria</th>
+                    <th style="font-size: 11px; font-weight: 500; color: var(--ds-foreground-muted); text-transform: none; letter-spacing: normal;">Data</th>
+                    <th style="font-size: 11px; font-weight: 500; color: var(--ds-foreground-muted); text-align: right; text-transform: none; letter-spacing: normal;">Valor</th>
+                  </tr>
+                </thead>
+                <tbody id="tx-body-dash"></tbody>
+              </table>
             </div>
-          </div>
-        </div>
-
-        <!-- Lançamentos recentes (Tabela com scroll horizontal responsivo) -->
-        <div class="card" style="margin-top: 16px;">
-          <div class="card-head" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-            <p class="card-title" style="font-size: 14.5px; font-weight: 600; margin: 0;">Lançamentos recentes</p>
-            <a href="#" class="card-link" style="font-size: 12.5px; color: var(--ds-foreground-muted); text-decoration: none;" onclick="goPage('gastos'); return false;">ver tudo</a>
-          </div>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th style="font-size: 11px; font-weight: 500; color: var(--ds-foreground-muted); text-transform: none; letter-spacing: normal;">Descrição</th>
-                  <th style="font-size: 11px; font-weight: 500; color: var(--ds-foreground-muted); text-transform: none; letter-spacing: normal;">Categoria</th>
-                  <th style="font-size: 11px; font-weight: 500; color: var(--ds-foreground-muted); text-transform: none; letter-spacing: normal;">Data</th>
-                  <th style="font-size: 11px; font-weight: 500; color: var(--ds-foreground-muted); text-align: right; text-transform: none; letter-spacing: normal;">Valor</th>
-                </tr>
-              </thead>
-              <tbody id="tx-body-dash"></tbody>
-            </table>
           </div>
         </div>
       </section>
@@ -4549,11 +5045,11 @@ const incomeCategories = [
 ];
 
 const txs = [
-  {name:'Salário Mensal', cat:'salario', catName:'Salário', date:'05/09', value:6400, type:'income'},
-  {name:'Mc Donalds', cat:'alimentacao', catName:'Alimentação', date:'17/09', value:120, type:'expense'},
-  {name:'Conserto do ar condicionado', cat:'moradia', catName:'Moradia', date:'17/09', value:400, type:'expense'},
-  {name:'Freelance Frontend', cat:'freelance', catName:'Freelance', date:'15/09', value:1850, type:'income'},
-  {name:'Calça Jeans', cat:'outros', catName:'Outros', date:'17/09', value:80, type:'expense'},
+  {name:'Mercado Pão de Açúcar', cat:'alimentacao', catName:'Alimentação', date:'Hoje', value:186.40, type:'expense'},
+  {name:'Salário', cat:'salario', catName:'Receita', date:'Ontem', value:5200.00, type:'income'},
+  {name:'Uber', cat:'transporte', catName:'Transporte', date:'17 out', value:32.90, type:'expense'},
+  {name:'Streaming', cat:'lazer', catName:'Lazer', date:'15 out', value:39.90, type:'expense'},
+  {name:'Conserto do ar condicionado', cat:'moradia', catName:'Moradia', date:'12 out', value:400.00, type:'expense'},
 ];
 
 const catIcon = {
@@ -4616,10 +5112,54 @@ function txRow(t){
   </tr>`;
 }
 
+function mobileTxRow(t) {
+  const isIncome = t.type === 'income';
+  let svgIcon = '';
+  let color = 'var(--ds-amber-700)';
+
+  if (isIncome) {
+    color = 'var(--ds-green-700)';
+    svgIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>';
+  } else if (t.cat === 'alimentacao') {
+    color = 'var(--ds-amber-700)';
+    svgIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v7a3 3 0 003 3v10M10 2v7M18 22V2c-2 2-3.5 4.5-3.5 8 0 2 1 3 3.5 3"/></svg>';
+  } else if (t.cat === 'transporte') {
+    color = 'var(--ds-purple-700)';
+    svgIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14" rx="2" transform="translate(2 2)"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg>';
+  } else if (t.cat === 'lazer') {
+    color = 'var(--ds-pink-700)';
+    svgIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg>';
+  } else if (t.cat === 'moradia') {
+    color = 'var(--ds-blue-700)';
+    svgIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg>';
+  } else {
+    color = 'var(--ds-gray-700)';
+    svgIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>';
+  }
+
+  const amountStr = isIncome ? `+ R$ ${t.value.toFixed(2).replace('.', ',')}` : `− R$ ${t.value.toFixed(2).replace('.', ',')}`;
+  const amountClass = isIncome ? 'a pos' : 'a';
+  const sub = isIncome ? `${t.catName} · Conta corrente` : `${t.catName} · Cartão`;
+
+  return `<button class="tx" onclick="goPage('gastos'); return false;">
+    <span class="ic" style="color:${color}">${svgIcon}</span>
+    <span>
+      <div class="t">${t.name}</div>
+      <div class="s">${sub}</div>
+    </span>
+    <span>
+      <div class="${amountClass}">${amountStr}</div>
+      <div class="d">${t.date}</div>
+    </span>
+  </button>`;
+}
+
 const elDashTx = document.getElementById('tx-body-dash');
 if (elDashTx) elDashTx.innerHTML = txs.slice(0, 5).map(txRow).join('');
 const elFullTx = document.getElementById('tx-body-full');
 if (elFullTx) elFullTx.innerHTML = txs.map(txRow).join('');
+const elMobileTx = document.getElementById('mobileTxList');
+if (elMobileTx) elMobileTx.innerHTML = txs.slice(0, 5).map(mobileTxRow).join('');
 
 document.getElementById('cat-grid').innerHTML = categories.map(c=>{
   const pct = c.limit ? Math.round(c.spent/c.limit*100) : null;
@@ -5092,8 +5632,8 @@ if (userTrigger && userPopover) {
    ========================================================================== */
 let currentTxType = 'expense';
 let selectedCategory = expenseCategories[0];
-let currentBalance = 14850.00;
-let currentExpenses = 4320.00;
+let currentBalance = 4286.50;
+let currentExpenses = 3563.00;
 
 const tabTypeExpense = document.getElementById('tabTypeExpense');
 const tabTypeIncome = document.getElementById('tabTypeIncome');
@@ -5162,12 +5702,52 @@ if (tabTypeExpense) tabTypeExpense.addEventListener('click', () => setTxType('ex
 if (tabTypeIncome) tabTypeIncome.addEventListener('click', () => setTxType('income'));
 
 function updateDashboardKpis() {
+  const saldoFmt = `R$ ${currentBalance.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+  const despesasFmt = `R$ ${currentExpenses.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+  const totalIncomes = 7850.00 + (currentBalance - 4286.50 > 0 ? (currentBalance - 4286.50) : 0);
+  const entradasFmt = `R$ ${Math.round(totalIncomes).toLocaleString('pt-BR')}`;
+
   const elSaldo = document.getElementById('valSaldo');
-  if (elSaldo) elSaldo.textContent = `R$ ${currentBalance.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+  if (elSaldo) elSaldo.textContent = saldoFmt;
   const elDespesas = document.getElementById('valDespesas');
-  if (elDespesas) elDespesas.textContent = `R$ ${currentExpenses.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+  if (elDespesas) elDespesas.textContent = despesasFmt;
   const elFootSaldo = document.getElementById('footSaldo');
   if (elFootSaldo) elFootSaldo.textContent = 'Atualizado agora';
+
+  // Sincronização de métricas na tela inicial Mobile
+  const elSaldoMobile = document.getElementById('valSaldoMobile');
+  if (elSaldoMobile) elSaldoMobile.textContent = currentBalance.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  const elDespesasMobile = document.getElementById('valDespesasMobile');
+  if (elDespesasMobile) elDespesasMobile.textContent = `R$ ${Math.round(currentExpenses).toLocaleString('pt-BR')}`;
+  const elEntradasMobile = document.getElementById('valEntradasMobile');
+  if (elEntradasMobile) elEntradasMobile.textContent = entradasFmt;
+
+  // Atualiza lista de transações mobile
+  const elMobileTx = document.getElementById('mobileTxList');
+  if (elMobileTx && typeof mobileTxRow === 'function') {
+    elMobileTx.innerHTML = txs.slice(0, 5).map(mobileTxRow).join('');
+  }
+}
+
+// Configura botões de período (Segmented controls) e botão do card de IA
+document.querySelectorAll('.seg').forEach(function(seg){
+  seg.querySelectorAll('button').forEach(function(b){
+    b.onclick = function(){
+      seg.querySelectorAll('button').forEach(function(x){
+        x.classList.remove('on');
+        x.setAttribute('aria-selected', 'false');
+      });
+      b.classList.add('on');
+      b.setAttribute('aria-selected', 'true');
+    };
+  });
+});
+
+const btnAiMobile = document.getElementById('btnAiMobileDetails');
+if (btnAiMobile) {
+  btnAiMobile.addEventListener('click', () => {
+    openOverlay('ai');
+  });
 }
 
 function showToast(message, type = 'success') {
