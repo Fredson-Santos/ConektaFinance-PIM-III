@@ -2936,21 +2936,20 @@ tbody tr:hover td {
     z-index: 1070;
   }
 
-  /* Bottom Navigation */
+  /* Bottom Navigation — Layout Grid com 5 Colunas e Squircle FAB */
   .bottom-nav {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr 64px 1fr 1fr;
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
-    justify-content: space-around;
     align-items: center;
-    height: calc(56px + max(16px, env(safe-area-inset-bottom, 16px)));
-    padding: 6px 8px max(16px, env(safe-area-inset-bottom, 16px));
-    background: color-mix(in srgb, var(--ds-background-100) 94%, transparent);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid var(--ds-border);
+    padding: 8px 8px calc(env(safe-area-inset-bottom, 0px) + 12px);
+    background: color-mix(in srgb, var(--ds-background-100) 90%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--ds-gray-alpha-300);
     z-index: 900;
   }
 
@@ -2962,32 +2961,46 @@ tbody tr:hover td {
     background: none;
     border: none;
     color: var(--ds-foreground-muted);
-    font-size: 10px;
-    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 0;
     cursor: pointer;
+    transition: color var(--ds-duration-fast) var(--ds-ease);
   }
 
-  .bnav-item .icon { width: 18px; height: 18px; }
-  .bnav-item.active { color: var(--ds-foreground); font-weight: 600; }
+  .bnav-item svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .bnav-item.active {
+    color: var(--ds-foreground);
+    font-weight: 600;
+  }
 
   .bnav-fab {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--ds-radius-xl);
     background: var(--ds-foreground);
     border: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: -20px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    margin: -22px auto 0;
+    box-shadow: 0 0 0 4px var(--ds-background-100), 0 8px 24px rgba(0, 0, 0, 0.45);
     color: var(--ds-foreground-contrast);
     cursor: pointer;
+    transition: transform var(--ds-duration-fast) var(--ds-ease);
   }
 
-  .bnav-fab .icon {
-    width: 18px;
-    height: 18px;
+  .bnav-fab:active {
+    transform: scale(0.95);
+  }
+
+  .bnav-fab svg {
+    width: 22px;
+    height: 22px;
     stroke: var(--ds-foreground-contrast);
   }
 
@@ -3478,6 +3491,323 @@ tbody tr:hover td {
 @media (min-width: 881px) {
   .mobile-only { display: none !important; }
   .desktop-only { display: block; }
+}
+
+/* ==========================================================================
+   TELA DE GASTOS & CATEGORIAS UNIFICADAS (MOCKUP OFICIAL CONEKTAFINANCE)
+   ========================================================================== */
+.gastos-container {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding-bottom: 96px;
+}
+
+.gastos-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0 14px;
+  border-bottom: 1px solid var(--ds-gray-alpha-200);
+}
+
+.gastos-top h1 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ds-foreground);
+  margin: 0;
+}
+
+.gastos-top .month {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ds-foreground);
+}
+
+@media (max-width: 880px) {
+  .gastos-top h1 {
+    display: none;
+  }
+  .gastos-top {
+    justify-content: flex-end;
+    padding: 0 0 8px;
+    border-bottom: none;
+  }
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ds-radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ds-foreground-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all var(--ds-duration-fast) var(--ds-ease);
+}
+
+.btn-icon:hover {
+  background: var(--ds-gray-alpha-200);
+  color: var(--ds-foreground);
+}
+
+/* Segmented Control Unificado */
+.seg {
+  display: flex;
+  padding: 3px;
+  gap: 2px;
+  background: var(--ds-gray-alpha-200);
+  border-radius: var(--ds-radius-lg);
+}
+
+.seg button {
+  flex: 1;
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 7px 10px;
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-foreground-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all var(--ds-duration-fast) var(--ds-ease);
+}
+
+.seg button.on {
+  background: var(--ds-background-100);
+  color: var(--ds-foreground);
+  box-shadow: 0 0 0 1px var(--ds-gray-alpha-400);
+}
+
+/* Busca e Filtros */
+.gastos-container .search {
+  position: relative;
+  margin-top: 16px;
+}
+
+.gastos-container .search svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ds-foreground-muted);
+  pointer-events: none;
+}
+
+.ds-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 14px 0 36px;
+  font-size: 14px;
+  background: var(--ds-background-100);
+  border: 1px solid var(--ds-gray-alpha-400);
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-foreground);
+  outline: none;
+  transition: all var(--ds-duration-fast) var(--ds-ease);
+}
+
+.ds-input:focus {
+  border-color: var(--ds-blue-600);
+  box-shadow: 0 0 0 1px var(--ds-blue-600);
+}
+
+.ds-input::placeholder {
+  color: var(--ds-foreground-faint);
+}
+
+.gastos-container .chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 12px 0 4px;
+  scrollbar-width: none;
+}
+
+.gastos-container .chips::-webkit-scrollbar {
+  display: none;
+}
+
+.gastos-container .chip {
+  flex-shrink: 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: var(--ds-radius-full);
+  border: 1px solid var(--ds-gray-alpha-400);
+  color: var(--ds-foreground-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  cursor: pointer;
+  transition: all var(--ds-duration-fast) var(--ds-ease);
+}
+
+.gastos-container .chip:hover {
+  background: var(--ds-gray-alpha-200);
+  color: var(--ds-foreground);
+}
+
+.gastos-container .chip.on {
+  background: var(--ds-foreground);
+  color: var(--ds-foreground-contrast);
+  border-color: var(--ds-foreground);
+}
+
+.gastos-container .chip b {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Resumo do Mês */
+.gastos-container .summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 16px 0 6px;
+}
+
+.gastos-container .summary .big {
+  font-size: 22px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--ds-foreground);
+}
+
+.gastos-container .summary .sub {
+  font-size: 12.5px;
+  color: var(--ds-foreground-muted);
+}
+
+.badge.b-warn {
+  color: #f5a623;
+  background: rgba(245, 166, 35, 0.15);
+  border: 1px solid rgba(245, 166, 35, 0.25);
+  padding: 3px 9px;
+  border-radius: var(--ds-radius-full);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Grupos de Transações por Data */
+.gastos-container .group {
+  margin-top: 18px;
+}
+
+.gastos-container .gh {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: var(--ds-foreground-muted);
+  padding-bottom: 6px;
+  font-weight: 500;
+}
+
+.gastos-container .gh .mono {
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+.gastos-container .card.list {
+  padding: 2px 14px;
+  background: var(--ds-background-100);
+  border: 1px solid var(--ds-gray-alpha-300);
+  border-radius: var(--ds-radius-xl);
+}
+
+.gastos-container .tx {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  width: 100%;
+  text-align: left;
+  border-bottom: 1px solid var(--ds-gray-alpha-200);
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background var(--ds-duration-fast) var(--ds-ease);
+}
+
+.gastos-container .tx:last-child {
+  border-bottom: none;
+}
+
+.gastos-container .tx:hover {
+  background: var(--ds-gray-alpha-100);
+}
+
+.gastos-container .tx .ic {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ds-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ds-gray-alpha-400);
+  background: var(--ds-background-200);
+  flex-shrink: 0;
+}
+
+.gastos-container .tx .t {
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--ds-foreground);
+}
+
+.gastos-container .tx .s {
+  font-size: 12px;
+  color: var(--ds-foreground-muted);
+}
+
+.gastos-container .tx .a {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 500;
+  text-align: right;
+  color: var(--ds-foreground);
+  white-space: nowrap;
+}
+
+.gastos-container .tx .a.pos {
+  color: var(--ds-green-500, #00cc88);
+}
+
+.gastos-container .empty {
+  display: none;
+  text-align: center;
+  padding: 48px 16px;
+  color: var(--ds-foreground-muted);
+  font-size: 13.5px;
+}
+
+.gastos-container .empty strong {
+  display: block;
+  color: var(--ds-foreground);
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.gastos-container .cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
 }
 </style>
 </head>
@@ -4012,47 +4342,75 @@ tbody tr:hover td {
         </div>
       </section>
 
-      <!-- PÁGINA: GASTOS -->
+      <!-- PÁGINA: GASTOS E CATEGORIAS UNIFICADAS (OFICIAL MOCKUP) -->
       <section class="page" id="page-gastos">
-        <div class="toolbar" style="display:flex;justify-content:space-between;align-items:center;">
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-            <div class="select-pill">
-              <svg class="icon"><use href="#i-clock"/></svg>Setembro de 2026<svg class="icon"><use href="#i-chevron-down"/></svg>
+        <div class="gastos-container">
+          <!-- Header com Mês Oficial -->
+          <div class="gastos-top">
+            <h1>Gastos</h1>
+            <div class="month">
+              <button class="btn-icon" id="btnGastosPrevMonth" aria-label="Mês anterior">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+              </button>
+              <span id="gastosMonthText">Outubro</span>
+              <button class="btn-icon" id="btnGastosNextMonth" aria-label="Próximo mês">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+              </button>
             </div>
-            <div class="select-pill">
-              Todas as categorias<svg class="icon"><use href="#i-chevron-down"/></svg>
+          </div>
+
+
+            <div class="search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+              <input class="ds-input" id="q" type="search" placeholder="Buscar por descrição" aria-label="Buscar transações">
             </div>
-          </div>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <button class="btn" data-open="import">
-              <svg class="icon"><use href="#i-upload"/></svg>Importar extrato / planilha
-            </button>
-            <button class="btn primary" data-open="expense">
-              <svg class="icon"><use href="#i-plus"/></svg>Novo lançamento
-            </button>
-          </div>
-        </div>
-        <div class="card">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Descrição</th>
-                  <th>Categoria</th>
-                  <th>Data</th>
-                  <th style="text-align:right;">Valor</th>
-                </tr>
-              </thead>
-              <tbody id="tx-body-full"></tbody>
-            </table>
-          </div>
+
+            <div class="chips" id="chips">
+              <button class="chip on" data-f="all">Todas</button>
+              <button class="chip" data-f="alim"><b style="background:var(--ds-amber-500,#f5a623)"></b>Alimentação</button>
+              <button class="chip" data-f="mor"><b style="background:var(--ds-blue-600,#0070f3)"></b>Moradia</button>
+              <button class="chip" data-f="trans"><b style="background:var(--ds-purple-500,#8e4ec6)"></b>Transporte</button>
+              <button class="chip" data-f="lazer"><b style="background:var(--ds-pink-500,#e93d82)"></b>Lazer</button>
+              <button class="chip" data-f="saude"><b style="background:var(--ds-green-500,#00cc88)"></b>Saúde</button>
+              <button class="chip" data-f="outros"><b style="background:var(--ds-gray-500,#888)"></b>Outros</button>
+            </div>
+
+            <div class="summary">
+              <div>
+                <div class="sub" id="sum-label">Saídas no mês</div>
+                <div class="big" id="sum-val">R$ 3.563,00</div>
+              </div>
+              <span class="badge b-warn" id="sum-count">9 transações</span>
+            </div>
+
+            <!-- Grupos de Transações por Data -->
+            <div id="groups"></div>
+
+            <div class="empty" id="empty">
+              <strong>Nenhuma transação encontrada</strong>
+              Tente outro termo ou escolha outra categoria.
+            </div>
+
+            <!-- Ações rápidas desktop -->
+            <div class="desktop-only" style="margin-top:24px;display:flex;gap:10px;justify-content:flex-end;">
+              <button class="btn" data-open="import">
+                <svg class="icon"><use href="#i-upload"/></svg>Importar extrato / planilha
+              </button>
+              <button class="btn primary" data-open="expense">
+                <svg class="icon"><use href="#i-plus"/></svg>Novo lançamento
+              </button>
+            </div>
         </div>
       </section>
 
-      <!-- PÁGINA: CATEGORIAS -->
+      <!-- PÁGINA: CATEGORIAS (SEPARADA) -->
       <section class="page" id="page-categorias">
-        <div class="toolbar" style="justify-content:flex-end;">
-          <button class="btn primary"><svg class="icon"><use href="#i-plus"/></svg>Nova categoria</button>
+        <div class="toolbar" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-size:16px;font-weight:600;letter-spacing:-.02em;">Orçamentos e Limites</div>
+            <div class="sub">Acompanhe seu consumo mensal em cada categoria</div>
+          </div>
+          <button class="btn primary" onclick="openOverlay('expense');"><svg class="icon"><use href="#i-plus"/></svg>Nova categoria</button>
         </div>
         <div class="cat-grid" id="cat-grid"></div>
       </section>
@@ -4780,13 +5138,27 @@ tbody tr:hover td {
   </div>
 </div>
 
-<!-- Mobile Bottom Navigation -->
-<nav class="bottom-nav">
-  <button class="bnav-item active" data-go="dashboard"><svg class="icon"><use href="#i-grid"/></svg>Início</button>
-  <button class="bnav-item" data-go="gastos"><svg class="icon"><use href="#i-receipt"/></svg>Gastos</button>
-  <button class="bnav-fab" data-open="expense"><svg class="icon"><use href="#i-plus"/></svg></button>
-  <button class="bnav-item" data-go="categorias"><svg class="icon"><use href="#i-tag"/></svg>Categorias</button>
-  <button class="bnav-item" data-go="relatorios"><svg class="icon"><use href="#i-chart"/></svg>Relatórios</button>
+<!-- Mobile Bottom Navigation Oficial -->
+<nav class="bottom-nav" aria-label="Navegação principal">
+  <button class="bnav-item active" data-go="dashboard" id="bnav-inicio">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg>
+    <span>Início</span>
+  </button>
+  <button class="bnav-item" data-go="gastos" id="bnav-gastos">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+    <span>Gastos</span>
+  </button>
+  <button class="bnav-fab" data-open="expense" id="bnav-fab" aria-label="Nova transação">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+  <button class="bnav-item" data-go="categorias" id="bnav-categorias">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+    <span>Categorias</span>
+  </button>
+  <button class="bnav-item" data-go="relatorios" id="bnav-relatorios">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12A9 9 0 1112 3v9z"/><path d="M15 3.5A9 9 0 0120.5 9H15z"/></svg>
+    <span>Relatórios</span>
+  </button>
 </nav>
 
 <!-- Backdrop -->
@@ -5188,23 +5560,204 @@ document.getElementById('cat-grid').innerHTML = categories.map(c=>{
 }).join('');
 
 /* ==========================================================================
+   TELA DE GASTOS & CATEGORIAS UNIFICADAS (LÓGICA OFICIAL)
+   ========================================================================== */
+const gastosTxs = [
+  { id: 1, name: 'Mercado Pão de Açúcar', cat: 'alim', catName: 'Alimentação', subtitle: 'Alimentação · Cartão', dateGroup: 'Hoje', date: 'Hoje', value: 186.40, type: 'expense', color: 'var(--ds-amber-500, #f5a623)' },
+  { id: 2, name: 'Padaria Estrela', cat: 'alim', catName: 'Alimentação', subtitle: 'Alimentação · Pix', dateGroup: 'Ontem', date: 'Ontem', value: 24.50, type: 'expense', color: 'var(--ds-amber-500, #f5a623)' },
+  { id: 3, name: 'Uber', cat: 'trans', catName: 'Transporte', subtitle: 'Transporte · Pix', dateGroup: '17 out', date: '17 out', value: 32.90, type: 'expense', color: 'var(--ds-purple-500, #8e4ec6)' },
+  { id: 4, name: 'iFood', cat: 'alim', catName: 'Alimentação', subtitle: 'Alimentação · Cartão', dateGroup: '17 out', date: '17 out', value: 58.00, type: 'expense', color: 'var(--ds-amber-500, #f5a623)' },
+  { id: 5, name: 'Streaming', cat: 'lazer', catName: 'Lazer', subtitle: 'Lazer · Cartão · Recorrente', dateGroup: '15 out', date: '15 out', value: 39.90, type: 'expense', color: 'var(--ds-pink-500, #e93d82)' },
+  { id: 6, name: 'Aluguel', cat: 'mor', catName: 'Moradia', subtitle: 'Moradia · Boleto · Recorrente', dateGroup: '5 out', date: '5 out', value: 1450.00, type: 'expense', color: 'var(--ds-blue-600, #0070f3)' },
+  { id: 7, name: 'Farmácia Raia', cat: 'saude', catName: 'Saúde', subtitle: 'Saúde · Pix', dateGroup: '3 out', date: '3 out', value: 89.90, type: 'expense', color: 'var(--ds-green-500, #00cc88)' },
+  { id: 8, name: 'Metrô SP', cat: 'trans', catName: 'Transporte', subtitle: 'Transporte · Bilhete Único', dateGroup: '2 out', date: '2 out', value: 24.00, type: 'expense', color: 'var(--ds-purple-500, #8e4ec6)' },
+  { id: 9, name: 'Cinema Kinoplex', cat: 'lazer', catName: 'Lazer', subtitle: 'Lazer · Débito', dateGroup: '1 out', date: '1 out', value: 48.00, type: 'expense', color: 'var(--ds-pink-500, #e93d82)' },
+  { id: 10, name: 'Conta de Luz Enel', cat: 'mor', catName: 'Moradia', subtitle: 'Moradia · Débito automático', dateGroup: '1 out', date: '1 out', value: 215.30, type: 'expense', color: 'var(--ds-blue-600, #0070f3)' }
+];
+
+function getTxSvgIcon(cat) {
+  switch(cat) {
+    case 'alim':
+    case 'alimentacao':
+      return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v7a3 3 0 003 3v10M10 2v7M18 22V2c-2 2-3.5 4.5-3.5 8 0 2 1 3 3.5 3"/></svg>';
+    case 'mor':
+    case 'moradia':
+      return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg>';
+    case 'trans':
+    case 'transporte':
+      return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="12" rx="2"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg>';
+    case 'lazer':
+      return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg>';
+    case 'saude':
+      return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>';
+    default:
+      return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>';
+  }
+}
+
+function renderGastosGroups(items) {
+  const groupsEl = document.getElementById('groups');
+  if (!groupsEl) return;
+
+  const groupMap = new Map();
+  items.forEach(t => {
+    const grp = t.dateGroup || t.date || 'Recentes';
+    if (!groupMap.has(grp)) {
+      groupMap.set(grp, []);
+    }
+    groupMap.get(grp).push(t);
+  });
+
+  let html = '';
+  groupMap.forEach((txList, dateGroup) => {
+    const groupSum = txList.reduce((acc, cur) => acc + (cur.value || 0), 0);
+    html += `
+      <div class="group" data-date-group="${dateGroup}">
+        <div class="gh">
+          <span>${dateGroup}</span>
+          <span class="mono">− R$ ${groupSum.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+        </div>
+        <div class="card list">
+          ${txList.map(t => `
+            <button type="button" class="tx" data-cat="${t.cat}" data-v="${t.value}" onclick="showToast('Transação: ${t.name} (R$ ${t.value.toFixed(2).replace('.', ',')})'); return false;">
+              <span class="ic" style="color:${t.color || 'var(--ds-amber-500)'}">
+                ${getTxSvgIcon(t.cat)}
+              </span>
+              <span>
+                <div class="t">${t.name}</div>
+                <div class="s">${t.subtitle || (t.catName + ' · Cartão')}</div>
+              </span>
+              <span class="a mono">− R$ ${t.value.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  });
+
+  groupsEl.innerHTML = html;
+}
+
+let currentGastosFilter = 'all';
+const gastosCatNames = {
+  all: 'Saídas no mês',
+  alim: 'Alimentação',
+  mor: 'Moradia',
+  trans: 'Transporte',
+  lazer: 'Lazer',
+  saude: 'Saúde',
+  outros: 'Outros'
+};
+
+function applyGastosFilter() {
+  const qInput = document.getElementById('q');
+  const q = qInput ? qInput.value.trim().toLowerCase() : '';
+  let sum = 0, n = 0;
+
+  const txButtons = document.querySelectorAll('#groups .tx');
+  txButtons.forEach(t => {
+    const cat = t.dataset.cat;
+    const ok = (currentGastosFilter === 'all' || cat === currentGastosFilter) && (!q || t.textContent.toLowerCase().indexOf(q) > -1);
+    t.style.display = ok ? '' : 'none';
+    if (ok) {
+      sum += parseFloat(t.dataset.v || 0);
+      n++;
+    }
+  });
+
+  document.querySelectorAll('#groups .group').forEach(g => {
+    const hasVisible = Array.from(g.querySelectorAll('.tx')).some(t => t.style.display !== 'none');
+    g.style.display = hasVisible ? '' : 'none';
+  });
+
+  const sumLabel = document.getElementById('sum-label');
+  const sumVal = document.getElementById('sum-val');
+  const sumCount = document.getElementById('sum-count');
+  const emptyEl = document.getElementById('empty');
+
+  if (sumLabel) sumLabel.textContent = gastosCatNames[currentGastosFilter] || 'Saídas no mês';
+  if (sumVal) sumVal.textContent = 'R$ ' + sum.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  if (sumCount) sumCount.textContent = n + (n === 1 ? ' transação' : ' transações');
+  if (emptyEl) emptyEl.style.display = n ? 'none' : 'block';
+}
+
+function switchGastosTab(tab) {
+  const isLanc = tab === 'lancamentos';
+  const tabLanc = document.getElementById('gastos-tab-lancamentos');
+  const tabCats = document.getElementById('gastos-tab-categorias');
+  if (tabLanc) tabLanc.style.display = isLanc ? 'block' : 'none';
+  if (tabCats) tabCats.style.display = !isLanc ? 'block' : 'none';
+  document.querySelectorAll('#gastosTabs button').forEach(b => {
+    b.classList.toggle('on', b.dataset.gtab === tab);
+  });
+}
+
+// Inicializa renderização dos grupos de gastos
+renderGastosGroups(gastosTxs);
+applyGastosFilter();
+
+// Event listeners de chips e busca de gastos
+const chipsContainer = document.getElementById('chips');
+if (chipsContainer) {
+  chipsContainer.onclick = function(e) {
+    const c = e.target.closest('.chip');
+    if (!c) return;
+    currentGastosFilter = c.dataset.f;
+    chipsContainer.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c));
+    applyGastosFilter();
+  };
+}
+const searchInput = document.getElementById('q');
+if (searchInput) {
+  searchInput.oninput = applyGastosFilter;
+}
+
+// Navegação de mês
+const monthsList = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+let currentMonthIndex = 9; // Outubro (0-indexed)
+const monthTextEl = document.getElementById('gastosMonthText');
+const btnGastosPrev = document.getElementById('btnGastosPrevMonth');
+const btnGastosNext = document.getElementById('btnGastosNextMonth');
+
+if (btnGastosPrev && monthTextEl) {
+  btnGastosPrev.onclick = function() {
+    currentMonthIndex = (currentMonthIndex - 1 + 12) % 12;
+    monthTextEl.textContent = monthsList[currentMonthIndex];
+    applyGastosFilter();
+  };
+}
+if (btnGastosNext && monthTextEl) {
+  btnGastosNext.onclick = function() {
+    currentMonthIndex = (currentMonthIndex + 1) % 12;
+    monthTextEl.textContent = monthsList[currentMonthIndex];
+    applyGastosFilter();
+  };
+}
+
+/* ==========================================================================
    NAVEGAÇÃO ENTRE PÁGINAS
    ========================================================================== */
 const pageMeta = {
   dashboard: ['Dashboard', 'Visão geral · setembro de 2026'],
   gastos: ['Gastos', 'Gerencie todas as suas despesas'],
-  categorias: ['Categorias', 'Organize suas despesas por categoria'],
+  categorias: ['Categorias', 'Organize suas despesas e limites por categoria'],
   relatorios: ['Relatórios', 'Balanço semestral & inteligência preditiva · Abril a Setembro de 2026'],
-  configuracoes: ['Configurações', 'Preferências da conta e do sistema'],
+  configuracoes: ['Configurações', 'Preferências da conta e do perfil'],
 };
 
 function goPage(name){
   document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + name));
-  document.querySelectorAll('.nav-item[data-go], .bnav-item[data-go]').forEach(n => n.classList.toggle('active', n.dataset.go === name));
+  document.querySelectorAll('.nav-item[data-go], .bnav-item[data-go]').forEach(n => {
+    n.classList.toggle('active', n.dataset.go === name);
+  });
+
   if (pageMeta[name]) {
-    document.getElementById('pageTitle').textContent = pageMeta[name][0];
-    document.getElementById('pageSub').textContent = pageMeta[name][1];
+    const titleEl = document.getElementById('pageTitle');
+    const subEl = document.getElementById('pageSub');
+    if (titleEl) titleEl.textContent = pageMeta[name][0];
+    if (subEl) subEl.textContent = pageMeta[name][1];
   }
+  window.scrollTo({ top: 0, behavior: 'instant' });
 }
 document.querySelectorAll('[data-go]').forEach(el => el.addEventListener('click', () => goPage(el.dataset.go)));
 
@@ -5801,6 +6354,29 @@ if (btnSubmitTx) {
 
     txs.unshift(newTx);
 
+    const catMap = {
+      alimentacao: 'alim',
+      moradia: 'mor',
+      transporte: 'trans',
+      lazer: 'lazer',
+      saude: 'saude'
+    };
+    const mappedCat = catMap[selectedCategory.id] || 'outros';
+    const newGastosTx = {
+      name: desc,
+      cat: mappedCat,
+      catName: selectedCategory.name,
+      subtitle: `${selectedCategory.name} · ${currentTxType === 'income' ? 'Entrada' : 'Cartão'}`,
+      dateGroup: 'Hoje',
+      date: 'Hoje',
+      value: amount,
+      type: currentTxType,
+      color: catColor[selectedCategory.id] || 'var(--ds-amber-500)'
+    };
+    gastosTxs.unshift(newGastosTx);
+    renderGastosGroups(gastosTxs);
+    applyGastosFilter();
+
     if (currentTxType === 'income') {
       currentBalance += amount;
     } else {
@@ -5814,6 +6390,8 @@ if (btnSubmitTx) {
     if (elDash) elDash.innerHTML = txs.slice(0, 5).map(txRow).join('');
     const elFull = document.getElementById('tx-body-full');
     if (elFull) elFull.innerHTML = txs.map(txRow).join('');
+    const elMobile = document.getElementById('mobileTxList');
+    if (elMobile) elMobile.innerHTML = txs.slice(0, 5).map(mobileTxRow).join('');
 
     if (txInputDesc) txInputDesc.value = '';
     if (inputAmount) inputAmount.value = '';
