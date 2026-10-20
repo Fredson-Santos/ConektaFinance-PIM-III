@@ -7,6 +7,7 @@ import { AiFab } from '../ai/AiFab'
 import { AiPanel } from '../ai/AiPanel'
 import { ImportSheet } from '../import/ImportSheet'
 import { CommandPalette } from '../cmdk/CommandPalette'
+import { PwaInstallBanner } from './PwaInstallBanner'
 import { TransactionSheet } from '../transactions/TransactionSheet'
 
 export function AppLayout() {
@@ -14,6 +15,7 @@ export function AppLayout() {
     <div className="app-shell">
       <Sidebar />
       <main className="main-area">
+        <PwaInstallBanner />
         <Topbar />
         <div className="view-container">
           <Outlet />
