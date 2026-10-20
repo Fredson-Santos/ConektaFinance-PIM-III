@@ -29,15 +29,22 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("DedupKey")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsRead")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Message")
                         .IsRequired()
+                        .HasMaxLength(300)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(120)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Type")
@@ -53,9 +60,10 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "DedupKey")
+                        .IsUnique();
 
-                    b.ToTable("Alerts");
+                    b.ToTable("Alerts", (string)null);
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Budget", b =>
@@ -71,6 +79,7 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("LimitValue")
+                        .HasPrecision(18, 2)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("PeriodMonth")
@@ -89,9 +98,10 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "CategoryId", "PeriodMonth", "PeriodYear")
+                        .IsUnique();
 
-                    b.ToTable("Budgets");
+                    b.ToTable("Budgets", (string)null);
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Category", b =>
@@ -109,86 +119,42 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
-                        .IsRequired()
+                        .HasMaxLength(300)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Icon")
                         .IsRequired()
+                        .HasMaxLength(40)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsSystem")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("SortOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.HasIndex("UserId", "Name")
+                        .IsUnique();
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ColorCode = "#FF5733",
-                            CreatedAt = new DateTime(2026, 5, 9, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Restaurantes, supermercados, etc.",
-                            Icon = "restaurant",
-                            Name = "Alimentação"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ColorCode = "#33FF57",
-                            CreatedAt = new DateTime(2026, 5, 9, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Combustível, passagens, apps de transporte",
-                            Icon = "directions_car",
-                            Name = "Transporte"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ColorCode = "#3357FF",
-                            CreatedAt = new DateTime(2026, 5, 9, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Cinema, viagens, hobbies",
-                            Icon = "movie",
-                            Name = "Lazer"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ColorCode = "#FF33F1",
-                            CreatedAt = new DateTime(2026, 5, 9, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Farmácia, consultas, exames",
-                            Icon = "medical_services",
-                            Name = "Saúde"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            ColorCode = "#33FFF6",
-                            CreatedAt = new DateTime(2026, 5, 9, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Cursos, mensalidades, livros",
-                            Icon = "school",
-                            Name = "Educação"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            ColorCode = "#FFC300",
-                            CreatedAt = new DateTime(2026, 5, 9, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Aluguel, contas de luz/água, manutenção",
-                            Icon = "home",
-                            Name = "Moradia"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            ColorCode = "#900C3F",
-                            CreatedAt = new DateTime(2026, 5, 9, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Gastos diversos",
-                            Icon = "more_horiz",
-                            Name = "Outros"
-                        });
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.ChatMessage", b =>
@@ -197,16 +163,20 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ActionPayload")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Content")
                         .IsRequired()
+                        .HasMaxLength(4000)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Role")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
@@ -215,10 +185,94 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ChatMessages");
+                    b.ToTable("ChatMessages", (string)null);
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Expense", b =>
+            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.ImportBatch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("AutoCategorize")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("DetectedCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IgnoreDuplicates")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ImportedCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SkippedDuplicates")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ImportBatches", (string)null);
+                });
+
+            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.OtpCode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ConsumedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Purpose")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("Phone", "CreatedAt");
+
+                    b.ToTable("OtpCodes", (string)null);
+                });
+
+            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Transaction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -235,18 +289,34 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ExternalId")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("ImportBatchId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("IsRecurrent")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Observation")
-                        .IsRequired()
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
+
+                    b.Property<int?>("PaymentMethod")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Source")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("TEXT");
@@ -262,38 +332,14 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ImportBatchId");
 
-                    b.ToTable("Expenses");
-                });
+                    b.HasIndex("UserId", "ExternalId")
+                        .IsUnique();
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Income", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                    b.HasIndex("UserId", "TransactionDate");
 
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Incomes");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.User", b =>
@@ -304,9 +350,36 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("AccountType")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("Standard");
+
+                    b.Property<string>("AvatarUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Cpf")
+                        .HasMaxLength(14)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(3)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("BRL");
+
+                    b.Property<int>("CycleStartDay")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(120)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
@@ -319,8 +392,20 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal>("MonthlyCeiling")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Occupation")
+                        .HasMaxLength(120)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -331,14 +416,15 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Alert", b =>
                 {
                     b.HasOne("PIM_III_Backend.Domain.Entities.Category", "Category")
                         .WithMany()
-                        .HasForeignKey("CategoryId");
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("PIM_III_Backend.Domain.Entities.User", "User")
                         .WithMany("Alerts")
@@ -370,10 +456,10 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.ChatMessage", b =>
+            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Category", b =>
                 {
                     b.HasOne("PIM_III_Backend.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Categories")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -381,32 +467,57 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Expense", b =>
+            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.ChatMessage", b =>
+                {
+                    b.HasOne("PIM_III_Backend.Domain.Entities.User", "User")
+                        .WithMany("ChatMessages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.ImportBatch", b =>
+                {
+                    b.HasOne("PIM_III_Backend.Domain.Entities.User", "User")
+                        .WithMany("ImportBatches")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.OtpCode", b =>
+                {
+                    b.HasOne("PIM_III_Backend.Domain.Entities.User", null)
+                        .WithMany("OtpCodes")
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Transaction", b =>
                 {
                     b.HasOne("PIM_III_Backend.Domain.Entities.Category", "Category")
-                        .WithMany("Expenses")
+                        .WithMany("Transactions")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PIM_III_Backend.Domain.Entities.ImportBatch", "ImportBatch")
+                        .WithMany()
+                        .HasForeignKey("ImportBatchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("PIM_III_Backend.Domain.Entities.User", "User")
-                        .WithMany("Expenses")
+                        .WithMany("Transactions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Category");
 
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Income", b =>
-                {
-                    b.HasOne("PIM_III_Backend.Domain.Entities.User", "User")
-                        .WithMany("Incomes")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("ImportBatch");
 
                     b.Navigation("User");
                 });
@@ -415,7 +526,7 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                 {
                     b.Navigation("Budgets");
 
-                    b.Navigation("Expenses");
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.User", b =>
@@ -424,9 +535,15 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
 
                     b.Navigation("Budgets");
 
-                    b.Navigation("Expenses");
+                    b.Navigation("Categories");
 
-                    b.Navigation("Incomes");
+                    b.Navigation("ChatMessages");
+
+                    b.Navigation("ImportBatches");
+
+                    b.Navigation("OtpCodes");
+
+                    b.Navigation("Transactions");
                 });
 #pragma warning restore 612, 618
         }
