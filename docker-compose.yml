@@ -1,5 +1,4 @@
 services:
-  # Serviço do Backend (ASP.NET Core 10.0 Web API)
   backend:
     build:
       context: ./backend
@@ -8,10 +7,12 @@ services:
     restart: always
     env_file:
       - .env
+    environment:
+      ASPNETCORE_URLS: http://+:8080
     volumes:
       - sqlite_data:/app/data
+      - uploads_data:/app/wwwroot/uploads
 
-  # Serviço do Frontend (Nginx servindo arquivos estáticos e atuando como proxy reverso)
   frontend:
     build:
       context: ./frontend
@@ -30,6 +31,8 @@ services:
 
 volumes:
   sqlite_data:
+    driver: local
+  uploads_data:
     driver: local
 
 networks:
