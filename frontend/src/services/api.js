@@ -53,6 +53,26 @@ async function request(path, options = {}) {
   return response
 }
 
+export async function getWithMeta(path) {
+  const headers = {}
+  const token = getToken()
+  if (token) headers.Authorization = `Bearer ${token}`
+  let response
+  try {
+    response = await fetch(`${BASE_URL}${path}`, { headers })
+  } catch {
+    throw new ApiError(0, { title: 'Sem conexão', detail: 'Verifique sua internet e tente novamente.' })
+  }
+  if (response.status === 401 && onUnauthorized) onUnauthorized()
+  if (!response.ok) {
+    const contentType = response.headers.get('content-type') || ''
+    const problem = contentType.includes('json') ? await response.json().catch(() => ({})) : {}
+    throw new ApiError(response.status, problem)
+  }
+  const data = await response.json()
+  return { data, headers: response.headers }
+}
+
 export function get(path) {
   return request(path)
 }

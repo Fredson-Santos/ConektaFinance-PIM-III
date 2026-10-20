@@ -2,6 +2,8 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { AppLayout } from '../components/layout/AppLayout'
 import { AuthScreen } from '../views/auth/AuthScreen'
+import { BudgetsScreen } from '../views/budgets/BudgetsScreen'
+import { TransactionsScreen } from '../views/transactions/TransactionsScreen'
 import { Placeholder } from '../views/Placeholder'
 
 function RequireAuth({ children }) {
@@ -37,8 +39,8 @@ export function AppRoutes() {
       >
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<Placeholder title="Dashboard" />} />
-        <Route path="/transacoes" element={<Placeholder title="Gastos" />} />
-        <Route path="/categorias" element={<Placeholder title="Categorias & Orçamentos" />} />
+        <Route path="/transacoes" element={<TransactionsScreen />} />
+        <Route path="/categorias" element={<BudgetsScreen />} />
         <Route path="/relatorios" element={<Placeholder title="Relatórios" />} />
         <Route path="/configuracoes" element={<Placeholder title="Configurações" />} />
       </Route>

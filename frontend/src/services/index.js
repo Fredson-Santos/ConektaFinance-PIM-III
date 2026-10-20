@@ -1,4 +1,4 @@
-import { get, post, put, del, postForm, downloadFile } from './api'
+import { get, post, put, del, postForm, downloadFile, getWithMeta } from './api'
 
 export const authService = {
   login: (email, password) => post('/auth/login', { email, password }),
@@ -48,7 +48,7 @@ export const transactionService = {
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') query.set(key, value)
     })
-    return get(`/transactions${query.toString() ? `?${query}` : ''}`)
+    return getWithMeta(`/transactions${query.toString() ? `?${query}` : ''}`)
   },
   get: (id) => get(`/transactions/${id}`),
   create: (payload) => post('/transactions', payload),
