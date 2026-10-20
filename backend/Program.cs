@@ -9,7 +9,10 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PIM_III_Backend.Application.Middleware;
+using PIM_III_Backend.Application.Services;
+using PIM_III_Backend.Domain.Interfaces;
 using PIM_III_Backend.Infrastructure.Persistence;
+using PIM_III_Backend.Infrastructure.Persistence.Repositories;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -56,7 +59,10 @@ var jwtSecret = builder.Configuration["JWT_SECRET"];
 if (string.IsNullOrWhiteSpace(jwtSecret))
 {
     if (builder.Environment.IsDevelopment())
+    {
         jwtSecret = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?> { ["JWT_SECRET"] = jwtSecret });
+    }
     else
         throw new InvalidOperationException("JWT_SECRET nao configurado. Defina a variavel de ambiente.");
 }
@@ -128,6 +134,17 @@ builder.Services.AddRateLimiter(options =>
             $"otp:{context.Connection.RemoteIpAddress?.ToString() ?? "anonimo"}",
             _ => new FixedWindowRateLimiterOptions { PermitLimit = 3, Window = TimeSpan.FromSeconds(45) }));
 });
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<IAlertRepository, AlertRepository>();
+builder.Services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
+builder.Services.AddScoped<IOtpRepository, OtpRepository>();
+builder.Services.AddScoped<IImportBatchRepository, ImportBatchRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 

@@ -1,5 +1,6 @@
 using BCrypt.Net;
 using Microsoft.EntityFrameworkCore;
+using PIM_III_Backend.Domain.Constants;
 using PIM_III_Backend.Domain.Entities;
 using PIM_III_Backend.Domain.Enums;
 

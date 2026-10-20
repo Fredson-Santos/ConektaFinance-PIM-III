@@ -1,7 +1,7 @@
 using PIM_III_Backend.Domain.Entities;
 using PIM_III_Backend.Domain.Enums;
 
-namespace PIM_III_Backend.Infrastructure.Persistence;
+namespace PIM_III_Backend.Domain.Constants;
 
 public static class CategoryTemplates
 {
