@@ -2,6 +2,10 @@ import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
 import { BottomNav } from './BottomNav'
+import { NotificationsPopover } from './NotificationsPopover'
+import { AiFab } from '../ai/AiFab'
+import { AiPanel } from '../ai/AiPanel'
+import { TransactionSheet } from '../transactions/TransactionSheet'
 
 export function AppLayout() {
   return (
@@ -14,6 +18,10 @@ export function AppLayout() {
         </div>
       </main>
       <BottomNav />
+      <NotificationsPopover />
+      <AiFab />
+      <AiPanel />
+      <TransactionSheet />
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Search, Bell, Import, Plus } from 'lucide-react'
 import { useUi } from '../../context/UiContext'
 import { useAuth } from '../../context/AuthContext'
+import { useUnreadAlerts } from '../../hooks/useUnreadAlerts'
 import { Avatar } from '../common/Avatar'
 
 const PAGE_META = {
@@ -17,6 +18,7 @@ export function Topbar() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  const { count } = useUnreadAlerts()
   const [title, subtitle] = PAGE_META[pathname] || PAGE_META['/dashboard']
 
   return (
@@ -31,9 +33,9 @@ export function Topbar() {
           <span>Buscar páginas, ações…</span>
           <kbd className="kbd">/</kbd>
         </button>
-        <button type="button" className="icon-btn" aria-label="Alertas de orçamento" onClick={() => openOverlay('notif')}>
+        <button type="button" className="icon-btn" aria-label={`Alertas de orçamento (${count} não lidos)`} onClick={() => openOverlay('notif')}>
           <Bell size={19} />
-          {overlays.notif ? null : <Dot />}
+          {count > 0 ? <Dot /> : null}
         </button>
         <button type="button" className="icon-btn desktop-only" aria-label="Importar extrato" onClick={() => openOverlay('import')}>
           <Import size={19} />
