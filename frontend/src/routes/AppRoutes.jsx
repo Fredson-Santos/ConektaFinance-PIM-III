@@ -5,6 +5,7 @@ import { AuthScreen } from '../views/auth/AuthScreen'
 import { BudgetsScreen } from '../views/budgets/BudgetsScreen'
 import { TransactionsScreen } from '../views/transactions/TransactionsScreen'
 import { Placeholder } from '../views/Placeholder'
+import { DashboardScreen } from '../views/dashboard/DashboardScreen'
 
 function RequireAuth({ children }) {
   const { isAuthenticated, initialized } = useAuth()
@@ -38,7 +39,7 @@ export function AppRoutes() {
         )}
       >
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<Placeholder title="Dashboard" />} />
+        <Route path="/dashboard" element={<DashboardScreen />} />
         <Route path="/transacoes" element={<TransactionsScreen />} />
         <Route path="/categorias" element={<BudgetsScreen />} />
         <Route path="/relatorios" element={<Placeholder title="Relatórios" />} />
