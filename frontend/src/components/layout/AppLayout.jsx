@@ -5,6 +5,7 @@ import { BottomNav } from './BottomNav'
 import { NotificationsPopover } from './NotificationsPopover'
 import { AiFab } from '../ai/AiFab'
 import { AiPanel } from '../ai/AiPanel'
+import { ImportSheet } from '../import/ImportSheet'
 import { TransactionSheet } from '../transactions/TransactionSheet'
 
 export function AppLayout() {
@@ -21,6 +22,7 @@ export function AppLayout() {
       <NotificationsPopover />
       <AiFab />
       <AiPanel />
+      <ImportSheet />
       <TransactionSheet />
     </div>
   )

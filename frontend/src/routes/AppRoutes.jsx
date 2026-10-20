@@ -7,6 +7,7 @@ import { TransactionsScreen } from '../views/transactions/TransactionsScreen'
 import { Placeholder } from '../views/Placeholder'
 import { DashboardScreen } from '../views/dashboard/DashboardScreen'
 import { ReportsScreen } from '../views/reports/ReportsScreen'
+import { SettingsScreen } from '../views/settings/SettingsScreen'
 
 function RequireAuth({ children }) {
   const { isAuthenticated, initialized } = useAuth()
@@ -44,7 +45,7 @@ export function AppRoutes() {
         <Route path="/transacoes" element={<TransactionsScreen />} />
         <Route path="/categorias" element={<BudgetsScreen />} />
         <Route path="/relatorios" element={<ReportsScreen />} />
-        <Route path="/configuracoes" element={<Placeholder title="Configurações" />} />
+        <Route path="/configuracoes" element={<SettingsScreen />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

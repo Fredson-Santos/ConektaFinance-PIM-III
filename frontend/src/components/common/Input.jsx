@@ -1,11 +1,16 @@
-import { useId, useState } from 'react'
+import { cloneElement, isValidElement, useId, useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 
 export function Field({ label, error, hint, children }) {
+  const id = useId()
   return (
     <div className="ds-form-group">
-      {label ? <label className="ds-label">{label}</label> : null}
-      {children}
+      {label ? (
+        <label className="ds-label" htmlFor={id}>
+          {label}
+        </label>
+      ) : null}
+      {isValidElement(children) ? cloneElement(children, { id }) : children}
       {hint && !error ? <span className="ds-hint">{hint}</span> : null}
       {error ? <span className="ds-error">{error}</span> : null}
     </div>
@@ -17,12 +22,10 @@ export const Input = ({ hasError, className = '', ...props }) => (
 )
 
 export function PasswordInput({ hasError, ...props }) {
-  const id = useId()
   const [visible, setVisible] = useState(false)
   return (
     <div style={{ position: 'relative' }}>
       <input
-        id={id}
         type={visible ? 'text' : 'password'}
         className={`ds-input ${hasError ? 'ds-input-error' : ''}`}
         style={{ paddingRight: 44 }}
