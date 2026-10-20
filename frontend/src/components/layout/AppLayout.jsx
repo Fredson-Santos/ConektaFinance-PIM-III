@@ -6,6 +6,7 @@ import { NotificationsPopover } from './NotificationsPopover'
 import { AiFab } from '../ai/AiFab'
 import { AiPanel } from '../ai/AiPanel'
 import { ImportSheet } from '../import/ImportSheet'
+import { CommandPalette } from '../cmdk/CommandPalette'
 import { TransactionSheet } from '../transactions/TransactionSheet'
 
 export function AppLayout() {
@@ -20,6 +21,7 @@ export function AppLayout() {
       </main>
       <BottomNav />
       <NotificationsPopover />
+      <CommandPalette />
       <AiFab />
       <AiPanel />
       <ImportSheet />
