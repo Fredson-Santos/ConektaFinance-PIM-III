@@ -86,4 +86,45 @@ public class AuthFlowTests(CustomWebApplicationFactory factory) : IClassFixture<
         var response = await _client.GetAsync("/health");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
+
+    [Fact]
+    public async Task Otp_request_retorna_devcode_e_verify_autentica_por_telefone()
+    {
+        var phone = $"11{Random.Shared.Next(900000000, 999999999)}";
+
+        var requestResponse = await _client.PostAsJsonAsync("/api/v1/auth/otp/request", new { phone });
+        requestResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
+        var otp = await requestResponse.Content.ReadFromJsonAsync<OtpRequestResponse>();
+        otp!.DevCode.Should().NotBeNullOrWhiteSpace();
+
+        var verifyResponse = await _client.PostAsJsonAsync("/api/v1/auth/otp/verify",
+            new { phone, code = otp.DevCode });
+        verifyResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var auth = await verifyResponse.Content.ReadFromJsonAsync<AuthResponse>();
+        auth!.Token.Should().NotBeNullOrWhiteSpace();
+        auth.User.Phone.Should().Be(phone);
+    }
+
+    [Fact]
+    public async Task Otp_reenvio_dentro_da_janela_retorna_429()
+    {
+        var phone = $"11{Random.Shared.Next(900000000, 999999999)}";
+
+        var first = await _client.PostAsJsonAsync("/api/v1/auth/otp/request", new { phone });
+        first.StatusCode.Should().Be(HttpStatusCode.Accepted);
+
+        var second = await _client.PostAsJsonAsync("/api/v1/auth/otp/request", new { phone });
+        second.StatusCode.Should().Be(HttpStatusCode.TooManyRequests);
+    }
+
+    [Fact]
+    public async Task Otp_codigo_invalido_retorna_401()
+    {
+        var phone = $"11{Random.Shared.Next(900000000, 999999999)}";
+        await _client.PostAsJsonAsync("/api/v1/auth/otp/request", new { phone });
+
+        var response = await _client.PostAsJsonAsync("/api/v1/auth/otp/verify", new { phone, code = "000000" });
+
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
 }

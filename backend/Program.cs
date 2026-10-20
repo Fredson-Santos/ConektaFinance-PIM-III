@@ -13,6 +13,7 @@ using PIM_III_Backend.Application.Services;
 using PIM_III_Backend.Domain.Interfaces;
 using PIM_III_Backend.Infrastructure.Persistence;
 using PIM_III_Backend.Infrastructure.Persistence.Repositories;
+using PIM_III_Backend.Infrastructure.Messaging;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -145,6 +146,8 @@ builder.Services.AddScoped<IOtpRepository, OtpRepository>();
 builder.Services.AddScoped<IImportBatchRepository, ImportBatchRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddSingleton<IOtpSender, DevOtpSender>();
 
 var app = builder.Build();
 

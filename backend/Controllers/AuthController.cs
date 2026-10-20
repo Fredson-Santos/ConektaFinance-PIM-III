@@ -7,7 +7,7 @@ using PIM_III_Backend.Application.Services;
 namespace PIM_III_Backend.Controllers;
 
 [AllowAnonymous]
-public class AuthController(IAuthService authService) : BaseApiController
+public class AuthController(IAuthService authService, IOtpService otpService) : BaseApiController
 {
     [EnableRateLimiting("auth")]
     [HttpPost("register")]
@@ -22,6 +22,22 @@ public class AuthController(IAuthService authService) : BaseApiController
     public async Task<ActionResult<AuthResponse>> Login(LoginRequest request)
     {
         var response = await authService.LoginAsync(request);
+        return Ok(response);
+    }
+
+    [EnableRateLimiting("otp")]
+    [HttpPost("otp/request")]
+    public async Task<ActionResult<OtpRequestResponse>> RequestOtp(RequestOtpRequest request)
+    {
+        var response = await otpService.RequestOtpAsync(request.Phone);
+        return Accepted(response);
+    }
+
+    [EnableRateLimiting("auth")]
+    [HttpPost("otp/verify")]
+    public async Task<ActionResult<AuthResponse>> VerifyOtp(VerifyOtpRequest request)
+    {
+        var response = await otpService.VerifyOtpAsync(request);
         return Ok(response);
     }
 }
