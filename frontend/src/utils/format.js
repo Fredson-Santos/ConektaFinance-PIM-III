@@ -4,7 +4,9 @@ export function formatCurrency(value, options = {}) {
   const formatted = new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-  }).format(Math.abs(Number(value)))
+  })
+    .format(Math.abs(Number(value)))
+    .replace(/\u00A0/g, ' ')
   if (signed && Number(value) < 0) return `− ${formatted}`
   return formatted
 }
