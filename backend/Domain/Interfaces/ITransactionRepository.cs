@@ -6,6 +6,7 @@ namespace PIM_III_Backend.Domain.Interfaces;
 
 public interface ITransactionRepository
 {
+    Task<List<Transaction>> ListByPeriodAsync(int userId, DateTime start, DateTime end);
     Task<PagedResult<Transaction>> GetPagedAsync(TransactionFilter filter);
     Task<decimal> SumFilteredAsync(TransactionFilter filter);
     Task<Transaction?> GetByIdAsync(int id);

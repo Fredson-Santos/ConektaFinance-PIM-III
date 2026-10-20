@@ -12,10 +12,14 @@ public class UserServiceTests
 {
     private readonly Mock<IUserRepository> _userRepository = new();
     private readonly Mock<IAvatarStorage> _avatarStorage = new();
+    private readonly Mock<ITransactionRepository> _transactionRepository = new();
+    private readonly Mock<IBudgetRepository> _budgetRepository = new();
+    private readonly Mock<IAlertRepository> _alertRepository = new();
     private readonly UserService _service;
 
     public UserServiceTests() =>
-        _service = new UserService(_userRepository.Object, _avatarStorage.Object);
+        _service = new UserService(_userRepository.Object, _avatarStorage.Object,
+            _transactionRepository.Object, _budgetRepository.Object, _alertRepository.Object);
 
     private void SetupUser(User user) =>
         _userRepository.Setup(r => r.GetByIdAsync(user.Id)).ReturnsAsync(user);
@@ -118,5 +122,29 @@ public class UserServiceTests
         response.MonthlyCeiling.Should().Be(8380m);
         response.Currency.Should().Be("BRL");
         response.CycleStartDay.Should().Be(5);
+    }
+
+    [Fact]
+    public async Task Redefinir_registros_limpa_transacoes_orcamentos_e_alertas()
+    {
+        SetupUser(new User { Id = 1 });
+
+        await _service.ResetFinancialDataAsync(1);
+
+        _transactionRepository.Verify(r => r.DeleteAllForUserAsync(1), Times.Once);
+        _budgetRepository.Verify(r => r.DeleteAllForUserAsync(1), Times.Once);
+        _alertRepository.Verify(r => r.DeleteAllForUserAsync(1), Times.Once);
+    }
+
+    [Fact]
+    public async Task Excluir_conta_com_senha_certa_remove_usuario_e_avatar()
+    {
+        var user = new User { Id = 1, PasswordHash = BCrypt.Net.BCrypt.HashPassword("SenhaForte@123"), AvatarUrl = "/uploads/avatars/avatar_1_x.png" };
+        SetupUser(user);
+
+        await _service.DeleteAccountAsync(1, "SenhaForte@123");
+
+        _avatarStorage.Verify(s => s.DeleteAsync("/uploads/avatars/avatar_1_x.png"), Times.Once);
+        _userRepository.Verify(r => r.DeleteAsync(user), Times.Once);
     }
 }

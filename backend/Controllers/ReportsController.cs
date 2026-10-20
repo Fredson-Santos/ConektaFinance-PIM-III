@@ -33,4 +33,19 @@ public class ReportsController(IReportService reportService) : BaseApiController
     public async Task<ActionResult<List<DailyExpenseReportResponse>>> Daily(
         [FromQuery] DateTime? start, [FromQuery] DateTime? end) =>
         Ok(await reportService.GetDailyAsync(CurrentUserId, start, end));
+
+    [HttpGet("export.csv")]
+    public async Task<IActionResult> ExportCsv([FromQuery] DateTime? start, [FromQuery] DateTime? end)
+    {
+        var export = await reportService.GetExportAsync(CurrentUserId, start, end);
+        var csv = PIM_III_Backend.Application.Services.ReportService.BuildCsv(export);
+        var bytes = System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(csv)).ToArray();
+        return File(bytes, "text/csv; charset=utf-8",
+            $"transacoes_{export.Start:MM-yyyy}_{export.End:MM-yyyy}.csv");
+    }
+
+    [HttpGet("export.json")]
+    public async Task<ActionResult<PeriodExportResponse>> ExportJson(
+        [FromQuery] DateTime? start, [FromQuery] DateTime? end) =>
+        Ok(await reportService.GetExportAsync(CurrentUserId, start, end));
 }

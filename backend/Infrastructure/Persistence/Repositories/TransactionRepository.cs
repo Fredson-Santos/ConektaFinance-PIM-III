@@ -9,6 +9,14 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Repositories;
 
 public class TransactionRepository(AppDbContext context) : ITransactionRepository
 {
+    public Task<List<Transaction>> ListByPeriodAsync(int userId, DateTime start, DateTime end) =>
+        context.Transactions.AsNoTracking()
+            .Include(t => t.Category)
+            .Where(t => t.UserId == userId && t.TransactionDate >= start && t.TransactionDate < end)
+            .OrderByDescending(t => t.TransactionDate)
+            .ThenByDescending(t => t.Id)
+            .ToListAsync();
+
     public async Task<PagedResult<Transaction>> GetPagedAsync(TransactionFilter filter)
     {
         var query = BuildFilter(context.Transactions.AsNoTracking().Include(t => t.Category), filter);

@@ -36,4 +36,18 @@ public class UsersController(IUserService userService) : BaseApiController
     [HttpPut("me/preferences")]
     public async Task<ActionResult<PreferencesResponse>> UpdatePreferences(UpdatePreferencesRequest request) =>
         Ok(await userService.UpdatePreferencesAsync(CurrentUserId, request));
+
+    [HttpPost("me/reset-data")]
+    public async Task<ActionResult> ResetData()
+    {
+        await userService.ResetFinancialDataAsync(CurrentUserId);
+        return NoContent();
+    }
+
+    [HttpDelete("me")]
+    public async Task<ActionResult> DeleteAccount(DeleteAccountRequest request)
+    {
+        await userService.DeleteAccountAsync(CurrentUserId, request.Password);
+        return NoContent();
+    }
 }

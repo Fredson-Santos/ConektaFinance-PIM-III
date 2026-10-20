@@ -106,6 +106,40 @@ public class ReportService(
         return daily;
     }
 
+    public async Task<PeriodExportResponse> GetExportAsync(int userId, DateTime? start, DateTime? end)
+    {
+        var (periodStart, periodEnd) = NormalizePeriod(start, end);
+        var transactions = await transactionRepository.ListByPeriodAsync(userId, periodStart, periodEnd);
+        return new PeriodExportResponse(periodStart, periodEnd,
+            transactions.Select(TransactionService.MapResponse).ToList());
+    }
+
+    public static string BuildCsv(PeriodExportResponse export)
+    {
+        var builder = new System.Text.StringBuilder();
+        builder.AppendLine("Data;Descricao;Categoria;Tipo;Valor;Forma de pagamento;Observacao");
+        foreach (var transaction in export.Transactions)
+        {
+            builder.AppendJoin(';',
+                transaction.TransactionDate.ToString("dd/MM/yyyy"),
+                Escape(transaction.Description),
+                Escape(transaction.Category.Name),
+                transaction.Type == TransactionType.Expense ? "Despesa" : "Receita",
+                transaction.Value.ToString("F2", System.Globalization.CultureInfo.CreateSpecificCulture("pt-BR")),
+                transaction.PaymentMethod?.ToString() ?? string.Empty,
+                Escape(transaction.Observation ?? string.Empty));
+            builder.AppendLine();
+        }
+        return builder.ToString();
+    }
+
+    private static string Escape(string value)
+    {
+        var containsSeparator = value.Contains(';') || value.Contains('"') || value.Contains('\n');
+        var escaped = value.Replace("\"", "\"\"");
+        return containsSeparator ? $"\"{escaped}\"" : escaped;
+    }
+
     private static (DateTime Start, DateTime End) NormalizePeriod(DateTime? start, DateTime? end)
     {
         var now = DateTime.UtcNow;

@@ -10,6 +10,8 @@ public interface IUserService
     Task ChangePasswordAsync(int userId, ChangePasswordRequest request);
     Task<PreferencesResponse> GetPreferencesAsync(int userId);
     Task<PreferencesResponse> UpdatePreferencesAsync(int userId, UpdatePreferencesRequest request);
+    Task ResetFinancialDataAsync(int userId);
+    Task DeleteAccountAsync(int userId, string password);
 }
 
 public interface IAvatarStorage

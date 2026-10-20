@@ -9,4 +9,5 @@ public interface IReportService
     Task<List<CategoryReportResponse>> GetByCategoryAsync(int userId, DateTime? start, DateTime? end, TransactionType kind);
     Task<List<TrendReportResponse>> GetTrendAsync(int userId, int months);
     Task<List<DailyExpenseReportResponse>> GetDailyAsync(int userId, DateTime? start, DateTime? end);
+    Task<PeriodExportResponse> GetExportAsync(int userId, DateTime? start, DateTime? end);
 }

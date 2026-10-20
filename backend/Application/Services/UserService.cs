@@ -5,7 +5,12 @@ using PIM_III_Backend.Domain.Interfaces;
 
 namespace PIM_III_Backend.Application.Services;
 
-public class UserService(IUserRepository userRepository, IAvatarStorage avatarStorage) : IUserService
+public class UserService(
+    IUserRepository userRepository,
+    IAvatarStorage avatarStorage,
+    ITransactionRepository transactionRepository,
+    IBudgetRepository budgetRepository,
+    IAlertRepository alertRepository) : IUserService
 {
     private static readonly HashSet<string> AllowedAvatarTypes = ["image/jpeg", "image/png", "image/webp"];
     private const long MaxAvatarBytes = 2 * 1024 * 1024;
@@ -81,6 +86,24 @@ public class UserService(IUserRepository userRepository, IAvatarStorage avatarSt
         }
         await userRepository.UpdateAsync(user);
         return MapPreferences(user);
+    }
+
+    public async Task ResetFinancialDataAsync(int userId)
+    {
+        var user = await GetRequiredUserAsync(userId);
+        await transactionRepository.DeleteAllForUserAsync(userId);
+        await budgetRepository.DeleteAllForUserAsync(userId);
+        await alertRepository.DeleteAllForUserAsync(userId);
+        await userRepository.UpdateAsync(user);
+    }
+
+    public async Task DeleteAccountAsync(int userId, string password)
+    {
+        var user = await GetRequiredUserAsync(userId);
+        if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            throw AppException.BadRequest("Senha incorreta", "Confirme sua senha para excluir a conta.");
+        await avatarStorage.DeleteAsync(user.AvatarUrl);
+        await userRepository.DeleteAsync(user);
     }
 
     private async Task<Domain.Entities.User> GetRequiredUserAsync(int userId)

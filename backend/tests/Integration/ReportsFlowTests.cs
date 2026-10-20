@@ -67,7 +67,7 @@ public class ReportsFlowTests(CustomWebApplicationFactory factory) : IClassFixtu
         var categories = await (await client.GetAsync("/api/v1/categories?kind=expense")).Content
             .ReadFromJsonAsync<List<CategoryResponse>>(Json);
         var alimentacao = categories!.First(c => c.Name == "Alimentação").Id;
-        var transporte = categories.First(c => c.Name == "Transporte").Id;
+        var transporte = categories!.First(c => c.Name == "Transporte").Id;
         await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("expense", alimentacao, "Mercado", 300m, DateTime.UtcNow.AddDays(-1)));
         await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("expense", transporte, "Uber", 100m, DateTime.UtcNow.AddDays(-2)));
 
@@ -76,7 +76,7 @@ public class ReportsFlowTests(CustomWebApplicationFactory factory) : IClassFixtu
 
         byCategory!.First().Name.Should().Be("Alimentação");
         byCategory.First().Percentage.Should().Be(75);
-        byCategory.Should().ContainSingle(c => c.Name == "Transporte").Which.Percentage.Should().Be(25);
+        byCategory!.Should().ContainSingle(c => c.Name == "Transporte").Which.Percentage.Should().Be(25);
     }
 
     [Fact]
