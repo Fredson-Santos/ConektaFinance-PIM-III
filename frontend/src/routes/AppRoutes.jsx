@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { AppLayout } from '../components/layout/AppLayout'
+import { AuthScreen } from '../views/auth/AuthScreen'
 import { Placeholder } from '../views/Placeholder'
 
 function RequireAuth({ children }) {
@@ -25,7 +26,7 @@ export function AppRoutes() {
     <Routes>
       <Route
         path="/login"
-        element={<Placeholder title="Login" />}
+        element={<AuthScreen />}
       />
       <Route
         element={(
