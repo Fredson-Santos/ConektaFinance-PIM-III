@@ -69,6 +69,8 @@ obj/
 *.db
 *.db-shm
 *.db-wal
+*.db-journal
+appsettings.*.local.json
 
 # Playwright / E2E Tests
 **/test-results/
