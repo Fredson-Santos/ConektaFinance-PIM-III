@@ -15,6 +15,7 @@ using PIM_III_Backend.Infrastructure.Persistence;
 using PIM_III_Backend.Infrastructure.Persistence.Repositories;
 using PIM_III_Backend.Infrastructure.Messaging;
 using PIM_III_Backend.Infrastructure.Copilot;
+using PIM_III_Backend.Infrastructure.Files;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -174,6 +175,8 @@ else
 }
 builder.Services.AddScoped<ICopilotService, CopilotService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAvatarStorage, LocalAvatarStorage>();
 builder.Services.AddSingleton<IOtpSender, DevOtpSender>();
 
 var app = builder.Build();
@@ -195,6 +198,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseStaticFiles();
 app.UseCors();
 app.UseRateLimiter();
 app.UseAuthentication();

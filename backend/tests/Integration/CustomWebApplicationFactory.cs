@@ -14,6 +14,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");
+        builder.UseSetting("Storage:UploadsPath",
+            Path.Combine(Path.GetTempPath(), "conekta-test-uploads"));
         builder.ConfigureServices(services =>
         {
             _connection.Open();
