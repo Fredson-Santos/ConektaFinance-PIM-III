@@ -97,7 +97,7 @@ public class CategoriesFlowTests(CustomWebApplicationFactory factory) : IClassFi
         var categories = await response.Content.ReadFromJsonAsync<List<CategoryResponse>>(TestJson.Options);
         categories!.Where(c => c.Kind == Domain.Enums.CategoryKind.Expense)
             .Should().OnlyContain(c => c.Spent == 0m && c.Limit == 0m && c.Status == "noLimit");
-        categories.Where(c => c.Kind == Domain.Enums.CategoryKind.Income)
+        categories!.Where(c => c.Kind == Domain.Enums.CategoryKind.Income)
             .Should().OnlyContain(c => c.Spent == null && c.Limit == null && c.Status == null);
     }
 }

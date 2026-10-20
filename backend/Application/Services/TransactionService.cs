@@ -16,7 +16,7 @@ public class TransactionService(
     {
         Normalize(filter);
         var result = await transactionRepository.GetPagedAsync(filter);
-        var items = result.Items.Select(Map).ToList();
+        var items = result.Items.Select(MapResponse).ToList();
         var meta = new PaginationMeta(result.Page, result.PageSize, result.TotalItems, result.TotalPages);
         return new TransactionListResponse(items, meta);
     }
@@ -30,7 +30,7 @@ public class TransactionService(
     public async Task<TransactionResponse> GetByIdAsync(int userId, int id)
     {
         var transaction = await GetOwnedAsync(userId, id);
-        return Map(transaction);
+        return MapResponse(transaction);
     }
 
     public async Task<TransactionResponse> CreateAsync(int userId, CreateTransactionRequest request)
@@ -59,7 +59,7 @@ public class TransactionService(
             await alertService.CheckBudgetAlertsAsync(userId, category.Id,
                 transaction.TransactionDate.Year, transaction.TransactionDate.Month);
 
-        return Map(transaction);
+        return MapResponse(transaction);
     }
 
     public async Task<TransactionResponse> UpdateAsync(int userId, int id, UpdateTransactionRequest request)
@@ -85,7 +85,7 @@ public class TransactionService(
             await alertService.CheckBudgetAlertsAsync(userId, category.Id,
                 transaction.TransactionDate.Year, transaction.TransactionDate.Month);
 
-        return Map(transaction);
+        return MapResponse(transaction);
     }
 
     public async Task DeleteAsync(int userId, int id)
@@ -128,7 +128,7 @@ public class TransactionService(
             filter.Search = filter.Search.Trim().ToLowerInvariant();
     }
 
-    private static TransactionResponse Map(Transaction t) => new(
+    internal static TransactionResponse MapResponse(Transaction t) => new(
         t.Id, t.Type, t.Description, t.Value, t.TransactionDate, t.PaymentMethod, t.Observation,
         t.IsRecurrent, t.Status, t.Source,
         new CategoryBrief(t.Category.Id, t.Category.Name, t.Category.ColorCode, t.Category.Icon),
