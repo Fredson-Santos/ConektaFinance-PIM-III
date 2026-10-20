@@ -173,6 +173,7 @@ else
             sp.GetRequiredService<ILogger<CompositeCopilotClient>>()));
 }
 builder.Services.AddScoped<ICopilotService, CopilotService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddSingleton<IOtpSender, DevOtpSender>();
 
 var app = builder.Build();

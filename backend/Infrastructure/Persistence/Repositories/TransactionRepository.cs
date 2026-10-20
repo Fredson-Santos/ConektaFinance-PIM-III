@@ -40,8 +40,28 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
         return query.SumAsync(t => t.Value);
     }
 
-    public async Task<List<CategorySum>> SumByCategoryAsync(int userId, TransactionType type, DateTime start, DateTime end)
-    {
+    public Task<decimal> SumRecurrentAsync(int userId, TransactionType type, DateTime start, DateTime end) =>
+        context.Transactions
+            .Where(t => t.UserId == userId && t.Type == type && t.Status == TransactionStatus.Active &&
+                        t.IsRecurrent && t.TransactionDate >= start && t.TransactionDate < end)
+            .SumAsync(t => t.Value);
+
+    public Task<int> CountRecurrentAsync(int userId, TransactionType type, DateTime start, DateTime end) =>
+        context.Transactions
+            .Where(t => t.UserId == userId && t.Type == type && t.Status == TransactionStatus.Active &&
+                        t.IsRecurrent && t.TransactionDate >= start && t.TransactionDate < end)
+            .CountAsync();
+
+    public Task<Transaction?> GetLargestExpenseAsync(int userId, DateTime start, DateTime end) =>
+        context.Transactions
+            .Include(t => t.Category)
+            .Where(t => t.UserId == userId && t.Type == TransactionType.Expense &&
+                        t.Status == TransactionStatus.Active &&
+                        t.TransactionDate >= start && t.TransactionDate < end)
+            .OrderByDescending(t => t.Value)
+            .FirstOrDefaultAsync();
+
+    public async Task<List<CategorySum>> SumByCategoryAsync(int userId, TransactionType type, DateTime start, DateTime end)    {
         var rows = await context.Transactions
             .Where(t => t.UserId == userId && t.Type == type && t.Status == TransactionStatus.Active &&
                         t.TransactionDate >= start && t.TransactionDate < end)

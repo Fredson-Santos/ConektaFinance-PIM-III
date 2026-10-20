@@ -11,6 +11,9 @@ public interface ITransactionRepository
     Task<Transaction?> GetByIdAsync(int id);
     Task<bool> ExistsExternalAsync(int userId, string externalId);
     Task<decimal> SumAsync(int userId, TransactionType type, DateTime start, DateTime end, int? categoryId = null);
+    Task<decimal> SumRecurrentAsync(int userId, TransactionType type, DateTime start, DateTime end);
+    Task<int> CountRecurrentAsync(int userId, TransactionType type, DateTime start, DateTime end);
+    Task<Transaction?> GetLargestExpenseAsync(int userId, DateTime start, DateTime end);
     Task<List<CategorySum>> SumByCategoryAsync(int userId, TransactionType type, DateTime start, DateTime end);
     Task<List<DailySum>> SumByDayAsync(int userId, TransactionType type, DateTime start, DateTime end);
     Task AddAsync(Transaction transaction);
