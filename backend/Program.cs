@@ -14,6 +14,7 @@ using PIM_III_Backend.Domain.Interfaces;
 using PIM_III_Backend.Infrastructure.Persistence;
 using PIM_III_Backend.Infrastructure.Persistence.Repositories;
 using PIM_III_Backend.Infrastructure.Messaging;
+using PIM_III_Backend.Infrastructure.Copilot;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -152,6 +153,26 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IAlertService, AlertService>();
+builder.Services.AddScoped<RuleBasedCopilotClient>();
+if (!string.IsNullOrWhiteSpace(builder.Configuration["Copilot:BaseUrl"]) &&
+    !string.IsNullOrWhiteSpace(builder.Configuration["Copilot:ApiKey"]))
+{
+    builder.Services.AddHttpClient<LlmCopilotClient>();
+    builder.Services.AddScoped<ICopilotAiClient>(sp =>
+        new CompositeCopilotClient(
+            sp.GetRequiredService<LlmCopilotClient>(),
+            sp.GetRequiredService<RuleBasedCopilotClient>(),
+            sp.GetRequiredService<ILogger<CompositeCopilotClient>>()));
+}
+else
+{
+    builder.Services.AddScoped<ICopilotAiClient>(sp =>
+        new CompositeCopilotClient(
+            null,
+            sp.GetRequiredService<RuleBasedCopilotClient>(),
+            sp.GetRequiredService<ILogger<CompositeCopilotClient>>()));
+}
+builder.Services.AddScoped<ICopilotService, CopilotService>();
 builder.Services.AddSingleton<IOtpSender, DevOtpSender>();
 
 var app = builder.Build();
