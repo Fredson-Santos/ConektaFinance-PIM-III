@@ -1,4 +1,6 @@
 using PIM_III_Backend.Application.Services;
+using PIM_III_Backend.Application.Dtos;
+using PIM_III_Backend.Application.Exceptions;
 using PIM_III_Backend.Domain.Entities;
 using PIM_III_Backend.Domain.Enums;
 using PIM_III_Backend.Domain.Interfaces;
@@ -61,4 +63,47 @@ public class AlertService(
         existing.Message = message;
         await alertRepository.UpdateAsync(existing);
     }
+
+    public async Task<List<AlertResponse>> ListAsync(int userId, bool unreadOnly)
+    {
+        var alerts = await alertRepository.ListAsync(userId, unreadOnly);
+        return alerts.Select(Map).ToList();
+    }
+
+    public Task<int> CountUnreadAsync(int userId) =>
+        alertRepository.CountUnreadAsync(userId);
+
+    public async Task MarkAsReadAsync(int userId, int alertId)
+    {
+        var alert = await GetOwnedAsync(userId, alertId);
+        alert.IsRead = true;
+        await alertRepository.UpdateAsync(alert);
+    }
+
+    public async Task DismissAsync(int userId, int alertId)
+    {
+        var alert = await GetOwnedAsync(userId, alertId);
+        await alertRepository.DeleteAsync(alert);
+    }
+
+    private async Task<Alert> GetOwnedAsync(int userId, int alertId)
+    {
+        var alert = await alertRepository.GetByIdAndUserAsync(alertId, userId)
+            ?? throw AppException.NotFound("Alerta nao encontrado", "Verifique o identificador informado.");
+        return alert;
+    }
+
+    private static AlertResponse Map(Alert alert) => new(
+        alert.Id,
+        alert.Type switch
+        {
+            AlertType.BudgetExceeded => "budgetExceeded",
+            AlertType.CategoryLimit => "categoryLimit",
+            _ => "highExpense"
+        },
+        alert.Title,
+        alert.Message,
+        alert.Category is null ? null : new AlertCategoryBrief(alert.Category.Id, alert.Category.Name),
+        alert.IsRead,
+        alert.CreatedAt);
 }
