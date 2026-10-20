@@ -127,4 +127,15 @@ public class AuthFlowTests(CustomWebApplicationFactory factory) : IClassFixture<
 
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
+
+    [Fact]
+    public async Task Acesso_demo_retorna_token_da_conta_de_demonstracao()
+    {
+        var response = await _client.PostAsJsonAsync("/api/v1/auth/demo", new { });
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var auth = await response.Content.ReadFromJsonAsync<AuthResponse>();
+        auth!.Token.Should().NotBeNullOrWhiteSpace();
+        auth.User.Email.Should().Be("demo@conektafinance.com");
+    }
 }

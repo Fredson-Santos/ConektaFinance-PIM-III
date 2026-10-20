@@ -10,7 +10,8 @@ namespace PIM_III_Backend.Application.Services;
 public class AuthService(
     IUserRepository userRepository,
     ICategoryRepository categoryRepository,
-    ITokenService tokenService) : IAuthService
+    ITokenService tokenService,
+    IConfiguration configuration) : IAuthService
 {
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {
@@ -38,6 +39,15 @@ public class AuthService(
         if (user is null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             throw AppException.Unauthorized("Credenciais invalidas", "E-mail ou senha incorretos.");
 
+        return new AuthResponse(tokenService.GenerateToken(user), MapUser(user));
+    }
+
+    public async Task<AuthResponse> DemoLoginAsync()
+    {
+        var demoEmail = configuration["Demo:Email"] ?? "demo@conektafinance.com";
+        var user = await userRepository.GetByEmailAsync(demoEmail)
+            ?? throw AppException.NotFound("Demonstracao indisponivel",
+                "A conta de demonstracao nao esta configurada neste ambiente.");
         return new AuthResponse(tokenService.GenerateToken(user), MapUser(user));
     }
 

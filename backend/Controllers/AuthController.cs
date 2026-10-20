@@ -40,4 +40,12 @@ public class AuthController(IAuthService authService, IOtpService otpService) : 
         var response = await otpService.VerifyOtpAsync(request);
         return Ok(response);
     }
+
+    [EnableRateLimiting("auth")]
+    [HttpPost("demo")]
+    public async Task<ActionResult<AuthResponse>> DemoLogin()
+    {
+        var response = await authService.DemoLoginAsync();
+        return Ok(response);
+    }
 }
