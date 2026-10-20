@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using PIM_III_Backend.Application.Dtos;
 using PIM_III_Backend.Application.Exceptions;
@@ -18,7 +19,11 @@ public class AuthServiceTests
     public AuthServiceTests()
     {
         _tokenService.Setup(t => t.GenerateToken(It.IsAny<User>())).Returns("token-teste");
-        _service = new AuthService(_userRepository.Object, _categoryRepository.Object, _tokenService.Object);
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Demo:Email"] = "demo@conektafinance.com"
+        }).Build();
+        _service = new AuthService(_userRepository.Object, _categoryRepository.Object, _tokenService.Object, configuration);
     }
 
     [Fact]
@@ -75,5 +80,28 @@ public class AuthServiceTests
 
         response.Token.Should().Be("token-teste");
         response.User.Email.Should().Be("maria@teste.com");
+    }
+
+    [Fact]
+    public async Task Login_demo_retorna_token_da_conta_configurada()
+    {
+        _userRepository.Setup(r => r.GetByEmailAsync("demo@conektafinance.com"))
+            .ReturnsAsync(new User { Id = 3, Email = "demo@conektafinance.com", FullName = "Usuario Demo" });
+
+        var response = await _service.DemoLoginAsync();
+
+        response.Token.Should().Be("token-teste");
+        response.User.Email.Should().Be("demo@conektafinance.com");
+    }
+
+    [Fact]
+    public async Task Login_demo_sem_conta_configurada_lanca_nao_encontrado()
+    {
+        _userRepository.Setup(r => r.GetByEmailAsync(It.IsAny<string>())).ReturnsAsync((User?)null);
+
+        var act = () => _service.DemoLoginAsync();
+
+        var exception = await act.Should().ThrowAsync<AppException>();
+        exception.Which.StatusCode.Should().Be(404);
     }
 }
