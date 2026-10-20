@@ -1,0 +1,49 @@
+import { Navigate, Route, Routes } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { AppLayout } from '../components/layout/AppLayout'
+import { Placeholder } from '../views/Placeholder'
+
+function RequireAuth({ children }) {
+  const { isAuthenticated, initialized } = useAuth()
+  if (!initialized) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+        <span className="typing-dots" aria-label="Carregando">
+          <i />
+          <i />
+          <i />
+        </span>
+      </div>
+    )
+  }
+  if (!isAuthenticated) return <Navigate to="/login" replace />
+  return children
+}
+
+export function AppRoutes() {
+  return (
+    <Routes>
+      <Route
+        path="/login"
+        element={<Placeholder title="Login" />}
+      />
+      <Route
+        element={(
+          <RequireAuth>
+            <AppLayout />
+          </RequireAuth>
+        )}
+      >
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<Placeholder title="Dashboard" />} />
+        <Route path="/transacoes" element={<Placeholder title="Gastos" />} />
+        <Route path="/categorias" element={<Placeholder title="Categorias & Orçamentos" />} />
+        <Route path="/relatorios" element={<Placeholder title="Relatórios" />} />
+        <Route path="/configuracoes" element={<Placeholder title="Configurações" />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
+  )
+}
+
+export default AppRoutes

@@ -78,3 +78,5 @@ appsettings.*.local.json
 **/blob-report/
 **/.playwright/
 
+
+dev-dist/
