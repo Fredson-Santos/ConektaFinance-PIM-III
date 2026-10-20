@@ -4,7 +4,10 @@ using PIM_III_Backend.Application.Exceptions;
 
 namespace PIM_III_Backend.Application.Middleware;
 
-public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
+public class ErrorHandlingMiddleware(
+    RequestDelegate next,
+    ILogger<ErrorHandlingMiddleware> logger,
+    IWebHostEnvironment environment)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -24,8 +27,19 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
         catch (Exception ex)
         {
             logger.LogError(ex, "Erro nao tratado em {Path}", context.Request.Path);
-            await WriteProblemAsync(context, StatusCodes.Status500InternalServerError, "Erro interno",
-                "Ocorreu um erro inesperado. Tente novamente em instantes.");
+            string detail;
+            if (environment.IsDevelopment())
+            {
+                var chain = new List<string>();
+                for (var current = (Exception?)ex; current is not null; current = current.InnerException)
+                    chain.Add($"{current.GetType().Name}: {current.Message}");
+                detail = $"Detalhe de desenvolvimento: {string.Join(" | ", chain)}";
+            }
+            else
+            {
+                detail = "Ocorreu um erro inesperado. Tente novamente em instantes.";
+            }
+            await WriteProblemAsync(context, StatusCodes.Status500InternalServerError, "Erro interno", detail);
         }
     }
 

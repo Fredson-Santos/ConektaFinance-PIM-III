@@ -16,6 +16,7 @@ using PIM_III_Backend.Infrastructure.Persistence.Repositories;
 using PIM_III_Backend.Infrastructure.Messaging;
 using PIM_III_Backend.Infrastructure.Copilot;
 using PIM_III_Backend.Infrastructure.Files;
+using PIM_III_Backend.Infrastructure.Importing;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -177,6 +178,8 @@ builder.Services.AddScoped<ICopilotService, CopilotService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAvatarStorage, LocalAvatarStorage>();
+builder.Services.AddScoped<IStatementParser, StatementParser>();
+builder.Services.AddScoped<IImportService, ImportService>();
 builder.Services.AddSingleton<IOtpSender, DevOtpSender>();
 
 var app = builder.Build();

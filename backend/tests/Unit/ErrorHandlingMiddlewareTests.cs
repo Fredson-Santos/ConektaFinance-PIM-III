@@ -11,12 +11,16 @@ namespace PIM_III_Backend.Tests.Unit;
 
 public class ErrorHandlingMiddlewareTests
 {
-    private static async Task<(int status, ProblemDetails? body)> ExecuteAsync(Exception thrown)
+    private static async Task<(int status, ProblemDetails? body)> ExecuteAsync(Exception thrown, bool development = false)
     {
         var context = new DefaultHttpContext();
         context.Response.Body = new MemoryStream();
         context.Request.Path = "/api/v1/teste";
-        var middleware = new ErrorHandlingMiddleware(_ => throw thrown, Mock.Of<ILogger<ErrorHandlingMiddleware>>());
+        var environment = new Mock<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
+        environment.SetupGet(e => e.EnvironmentName).Returns(development
+            ? Microsoft.Extensions.Hosting.Environments.Development
+            : Microsoft.Extensions.Hosting.Environments.Production);
+        var middleware = new ErrorHandlingMiddleware(_ => throw thrown, Mock.Of<ILogger<ErrorHandlingMiddleware>>(), environment.Object);
         await middleware.InvokeAsync(context);
         var json = System.Text.Encoding.UTF8.GetString(((MemoryStream)context.Response.Body).ToArray());
         var body = JsonSerializer.Deserialize<ProblemDetails>(json,

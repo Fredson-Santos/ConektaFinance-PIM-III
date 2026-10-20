@@ -214,6 +214,10 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.Property<int>("ImportedCount")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ItemsJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("SkippedDuplicates")
                         .HasColumnType("INTEGER");
 

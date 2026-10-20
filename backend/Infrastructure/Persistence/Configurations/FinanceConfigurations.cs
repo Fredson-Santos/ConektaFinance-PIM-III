@@ -87,6 +87,7 @@ public class ImportBatchConfiguration : IEntityTypeConfiguration<ImportBatch>
         builder.ToTable("ImportBatches");
         builder.HasKey(b => b.Id);
         builder.Property(b => b.FileName).IsRequired().HasMaxLength(255);
+        builder.Property(b => b.ItemsJson).IsRequired();
         builder.HasOne(b => b.User)
             .WithMany(u => u.ImportBatches)
             .HasForeignKey(b => b.UserId)

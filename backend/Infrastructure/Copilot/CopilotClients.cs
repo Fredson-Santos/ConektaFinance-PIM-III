@@ -5,30 +5,12 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PIM_III_Backend.Application.Services;
+using PIM_III_Backend.Domain.Constants;
 
 namespace PIM_III_Backend.Infrastructure.Copilot;
 
 public partial class RuleBasedCopilotClient : ICopilotAiClient
 {
-    private static readonly Dictionary<string, string> KeywordCategories = new()
-    {
-        ["ifood"] = "Alimentação",
-        ["mercado"] = "Alimentação",
-        ["supermercado"] = "Alimentação",
-        ["restaurante"] = "Alimentação",
-        ["padaria"] = "Alimentação",
-        ["uber"] = "Transporte",
-        ["combustivel"] = "Transporte",
-        ["onibus"] = "Transporte",
-        ["aluguel"] = "Moradia",
-        ["energia"] = "Moradia",
-        ["condominio"] = "Moradia",
-        ["farmacia"] = "Saúde",
-        ["remedio"] = "Saúde",
-        ["netflix"] = "Lazer",
-        ["cinema"] = "Lazer",
-        ["streaming"] = "Lazer"
-    };
 
     public Task<CopilotReply> ReplyAsync(string userMessage, CopilotFinancialContext context)
     {
@@ -111,11 +93,9 @@ public partial class RuleBasedCopilotClient : ICopilotAiClient
 
     private static string? MatchCategory(string message, CopilotFinancialContext context)
     {
-        foreach (var (keyword, category) in KeywordCategories)
-        {
-            if (message.Contains(keyword))
-                return category;
-        }
+        var matched = CategoryKeywords.Match(message);
+        if (matched is not null)
+            return matched;
         return context.Categories.FirstOrDefault(c => message.Contains(c.Name.ToLowerInvariant()))?.Name;
     }
 

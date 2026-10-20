@@ -14,5 +14,6 @@ public class ImportBatch
     public bool AutoCategorize { get; set; }
     public bool IgnoreDuplicates { get; set; }
     public ImportStatus Status { get; set; } = ImportStatus.Pending;
+    public string ItemsJson { get; set; } = "[]";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
