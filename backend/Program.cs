@@ -165,7 +165,8 @@ builder.Services.AddScoped<RuleBasedCopilotClient>();
 if (!string.IsNullOrWhiteSpace(builder.Configuration["Copilot:BaseUrl"]) &&
     !string.IsNullOrWhiteSpace(builder.Configuration["Copilot:ApiKey"]))
 {
-    builder.Services.AddHttpClient<LlmCopilotClient>();
+    builder.Services.AddHttpClient();
+    builder.Services.AddScoped<LlmCopilotClient>();
     builder.Services.AddScoped<ICopilotAiClient>(sp =>
         new CompositeCopilotClient(
             sp.GetRequiredService<LlmCopilotClient>(),
