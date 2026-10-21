@@ -136,7 +136,7 @@ function ExportButtons({ period, range, summary, byCategory, label }) {
 
 function KpiCard({ label, value, badge, foot }) {
   return (
-    <div className="ds-card kpi-card">
+    <div className="card kpi-card">
       <div className="kpi-label">{label}</div>
       <div className="kpi-value num">{value}</div>
       {badge}
@@ -160,7 +160,7 @@ function MobileReports({ summary, byCategory, trend, insights }) {
         badge={<Badge variant={savedAverage >= 0 ? 'ok' : 'bad'}>{savedAverage >= 0 ? '+' : ''}{formatCurrency(Math.abs(savedAverage))} por mês</Badge>}
       />
 
-      <section className="ds-card" aria-label="Entradas e saídas por mês">
+      <section className="card" aria-label="Entradas e saídas por mês">
         <div className="card-head">
           <h3 className="card-title">Entradas e saídas</h3>
         </div>
@@ -169,7 +169,7 @@ function MobileReports({ summary, byCategory, trend, insights }) {
         </div>
       </section>
 
-      <section className="ds-card" aria-label="Composição dos gastos">
+      <section className="card" aria-label="Composição dos gastos">
         <div className="card-head">
           <h3 className="card-title">Para onde foi o dinheiro</h3>
         </div>
@@ -178,7 +178,7 @@ function MobileReports({ summary, byCategory, trend, insights }) {
         </div>
       </section>
 
-      <section className="ds-card" style={{ padding: 16, display: 'flex', gap: 10, alignItems: 'center' }}>
+      <section className="card" style={{ padding: 16, display: 'flex', gap: 10, alignItems: 'center' }}>
         <span className="ai-avatar" style={{ width: 28, height: 28 }}>
           <Sparkles size={14} />
         </span>
@@ -225,7 +225,7 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
         />
       </div>
 
-      <section className="ds-card" aria-label="Evolução de 6 meses">
+      <section className="card" aria-label="Evolução de 6 meses">
         <div className="card-head">
           <h3 className="card-title">Evolução dos últimos 6 meses</h3>
         </div>
@@ -255,7 +255,7 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
       </section>
 
       <div className="grid-2">
-        <section className="ds-card" aria-label="Composição dos gastos">
+        <section className="card" aria-label="Composição dos gastos">
           <div className="card-head">
             <h3 className="card-title">Composição dos gastos</h3>
           </div>
@@ -264,7 +264,7 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
           </div>
         </section>
 
-        <section className="ds-card" aria-label="Insights da IA">
+        <section className="card" aria-label="Insights da IA">
           <div className="card-head">
             <h3 className="card-title">Diagnóstico & insights da IA</h3>
           </div>
@@ -369,7 +369,7 @@ function CategoryTable({ byCategory, previousCategories }) {
   const max = Math.max(...items.map((item) => item.total), 1)
 
   return (
-    <section className="ds-card" aria-label="Desempenho por categoria">
+    <section className="card" aria-label="Desempenho por categoria">
       <div className="card-head">
         <h3 className="card-title">Desempenho por categoria</h3>
       </div>

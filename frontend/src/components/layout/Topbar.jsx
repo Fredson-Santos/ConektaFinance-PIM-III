@@ -30,18 +30,18 @@ export function Topbar() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <button type="button" className="search-trigger desktop-only" onClick={() => openOverlay('cmdk')}>
           <Search size={14} />
-          <span>Buscar páginas, ações…</span>
+          <span>Buscar ou executar</span>
           <kbd className="kbd">/</kbd>
         </button>
         <button type="button" className="icon-btn" aria-label={`Alertas de orçamento (${count} não lidos)`} onClick={() => openOverlay('notif')}>
-          <Bell size={19} />
+          <Bell size={18} />
           {count > 0 ? <Dot /> : null}
         </button>
-        <button type="button" className="icon-btn desktop-only" aria-label="Importar extrato" onClick={() => openOverlay('import')}>
-          <Import size={19} />
+        <button type="button" className="btn desktop-only" aria-label="Importar extrato" onClick={() => openOverlay('import')}>
+          <Import size={14} /> Importar
         </button>
-        <button type="button" className="ds-btn ds-btn-blue desktop-only" onClick={() => openOverlay('transaction')}>
-          <Plus size={15} /> Novo lançamento
+        <button type="button" className="btn primary desktop-only" onClick={() => openOverlay('transaction')}>
+          <Plus size={14} /> Novo lançamento
         </button>
         <button
           type="button"

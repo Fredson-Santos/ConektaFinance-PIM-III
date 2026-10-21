@@ -20,11 +20,6 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image:
-    linear-gradient(var(--ds-grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--ds-grid-line) 1px, transparent 1px);
-  background-size: 32px 32px;
-  background-attachment: fixed;
   overflow-x: hidden;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -92,20 +87,15 @@ a {
 }
 
 .ds-card {
-  background: var(--ds-background-card);
+  background: var(--ds-background-100);
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-xl);
-  box-shadow: var(--ds-shadow-small);
-  transition:
-    border-color var(--ds-duration-normal) var(--ds-ease),
-    box-shadow var(--ds-duration-normal) var(--ds-ease),
-    transform var(--ds-duration-fast) var(--ds-ease);
+  transition: border-color var(--ds-duration-fast) var(--ds-ease);
   position: relative;
-  overflow: hidden;
 }
 
 .ds-card:hover {
-  border-color: var(--ds-border-strong);
+  border-color: var(--ds-foreground-muted);
 }
 
 .ds-card-interactive:hover {

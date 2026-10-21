@@ -54,25 +54,35 @@ export function BudgetsScreen() {
 
   return (
     <>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-        <h2 className="card-title" style={{ fontSize: 17 }}>Categorias & Orçamentos</h2>
-        <Button icon={Plus} onClick={() => setFormModal({ mode: 'create' })}>
-          Nova categoria
-        </Button>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+        <div>
+          <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-.03em', color: 'var(--ds-foreground)' }}>Categorias & Orçamentos</div>
+          <div className="sub" style={{ fontSize: 13, color: 'var(--ds-foreground-muted)' }}>Acompanhe seus limites mensais e veja o total gasto em todas as categorias</div>
+        </div>
+        <button type="button" className="btn primary" onClick={() => setFormModal({ mode: 'create' })}>
+          <Plus size={14} /> Nova categoria
+        </button>
       </div>
 
-      <section className="ds-card overview-card" aria-label="Consolidado do mês">
-        <div className="overview-top">
+      <section className="card overview-card" aria-label="Consolidado do mês" style={{ padding: 20, marginBottom: 24 }}>
+        <div className="overview-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
           <div>
-            <div className="stat-label">Total do mês</div>
-            <div className="overview-big">
-              {formatCurrency(overview.totalSpent)} <span className="text-faint" style={{ fontSize: 14 }}>de {formatCurrency(overview.totalLimit)}</span>
+            <div className="stat-label" style={{ fontSize: 13, color: 'var(--ds-foreground-muted)' }}>Total do mês</div>
+            <div className="overview-big" style={{ fontSize: 28, fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+              {formatCurrency(overview.totalSpent)} <span className="text-faint" style={{ fontSize: 13, fontWeight: 400 }}>de {formatCurrency(overview.totalLimit)}</span>
             </div>
           </div>
           <Badge variant={STATUS_BADGES[overview.status].variant}>{overview.statusLabel}</Badge>
         </div>
-        <Meter value={overview.totalSpent} max={overview.totalLimit} tone={overview.status === 'ok' ? null : overview.status} height={10} />
-        <div className="stat-foot">
+        <div className="cat-track" style={{ height: 8, background: 'var(--ds-gray-alpha-200)', borderRadius: 99, overflow: 'hidden', margin: '10px 0' }}>
+          <div className="cat-fill" style={{
+            width: `${Math.min(100, overview.percentage)}%`,
+            height: '100%',
+            background: overview.status === 'ok' ? 'linear-gradient(90deg, #0070f3, #00cc88)' : overview.status === 'warn' ? '#f5a623' : '#e5484d',
+            borderRadius: 99
+          }} />
+        </div>
+        <div className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>
           {formatCurrency(overview.remaining)} livres restantes nos tetos do mês
         </div>
       </section>
@@ -141,7 +151,7 @@ function CategoryCard({ category, onOpenExtrato, onSetLimit, onEdit }) {
   const spent = category.spent || 0
   const limit = category.limit || 0
   return (
-    <article className="ds-card cat-card">
+    <article className="card cat-card">
       <div className="cat-card-top">
         <span className="cat-icon" style={{ background: `${category.colorCode}22`, color: category.colorCode, borderColor: `${category.colorCode}55` }}>
           <Icon name={category.icon} size={18} />

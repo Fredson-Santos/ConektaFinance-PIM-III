@@ -77,20 +77,21 @@ export function AiFab() {
     : undefined
 
   return (
-    <>
-      <button
-        type="button"
-        className={`ai-fab ${dragging ? 'dragging' : ''} ${wiggle ? 'wiggle' : ''}`}
-        aria-label="Abrir assistente de IA"
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        style={{ ...style, display: overlays.ai ? 'none' : undefined }}
-      >
-        <Sparkles size={22} />
-      </button>
-      {showLabel && !overlays.ai ? <span className="ai-fab-label" style={{ right: 84, bottom: 108 }}>Assistente de IA</span> : null}
-    </>
+    <button
+      type="button"
+      className={`ai-fab ${dragging ? 'is-dragging' : ''} ${wiggle ? 'has-movement' : ''}`}
+      aria-label="Abrir assistente de IA"
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      style={{ ...style, display: overlays.ai ? 'none' : undefined }}
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon">
+        <path d="M12 3L14 9L20 11L14 13L12 19L10 13L4 11L10 9L12 3Z" fill="currentColor" stroke="none" />
+      </svg>
+      <span className="ai-fab-text">Assistente de IA</span>
+      <span className="ai-fab-dot" />
+    </button>
   )
 }
 

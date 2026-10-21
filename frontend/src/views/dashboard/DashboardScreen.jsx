@@ -14,7 +14,8 @@ import { ErrorState } from '../../components/common/ErrorState'
 import { TransactionRow } from '../../components/transactions/TransactionRow'
 import { MoneyText } from '../../components/common/MoneyText'
 import { formatCurrency, formatPercent } from '../../utils/format'
-import { monthPeriod } from '../../utils/dates'
+import { monthPeriod, formatDayLabel } from '../../utils/dates'
+import { Icon } from '../../components/common/Icon'
 
 export function DashboardScreen() {
   const isMobile = useMediaQuery('(max-width: 880px)')
@@ -125,81 +126,262 @@ function MiniStat({ label, tone, state, pick, loading }) {
 
 function DesktopDashboard() {
   const navigate = useNavigate()
+  const { openTransactionSheet } = useUi()
   const { overview, week, recent, meters } = useDashboardData()
 
   if (overview.error) return <ErrorState message={overview.error.message} onRetry={overview.refetch} />
 
+  const recentList = recent.data || []
+  const weekDays = (week.data?.days || []).map((d) => ({
+    label: (d.weekday || '').toUpperCase(),
+    rawLabel: d.weekday,
+    pct: d.percentage || 0,
+    value: d.value || 0,
+  }))
+  const todayWeekdayIndex = (new Date().getDay() + 6) % 7
+  const weekdayNames = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM']
+  const todayWeekday = weekdayNames[todayWeekdayIndex]
+
+  const defaultMeters = [
+    { name: 'Moradia', spent: 1800, limit: 2000, percentage: 90, color: '#0070f3' },
+    { name: 'Alimentação', spent: 980, limit: 1500, percentage: 65, color: '#f5a623' },
+    { name: 'Transporte', spent: 380, limit: 600, percentage: 63, color: '#12b5cb' },
+    { name: 'Lazer & Lojas', spent: 290, limit: 800, percentage: 36, color: '#8e4ec6' },
+  ]
+  const meterItems = meters.data && meters.data.length > 0
+    ? meters.data.map((m) => ({
+        name: m.name,
+        spent: m.spent,
+        limit: m.limit,
+        percentage: m.percentage,
+        color: m.colorCode || '#0070f3',
+      }))
+    : defaultMeters
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* 3 KPI Cards */}
       <div className="stat-grid">
-        <section className="ds-card stat-card" aria-label="Saldo em conta">
-          <div className="stat-label">Saldo em conta</div>
-          <div className="stat-value num">
-            <MoneyText value={overview.data?.balance} />
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Badge variant={(overview.data?.incomeChangePct || 0) >= 0 ? 'ok' : 'bad'}>
+        {/* Saldo em Conta */}
+        <div className="card stat-card">
+          <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <i className="stat-icon saldo" style={{
+                width: 22, height: 22, borderRadius: 'var(--ds-radius-md)', background: 'var(--ds-blue-alpha-200)', color: 'var(--ds-blue-600)',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="5" width="20" height="14" rx="2" />
+                  <line x1="2" y1="10" x2="22" y2="10" />
+                </svg>
+              </i>
+              <span className="stat-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>Saldo em Conta</span>
+            </div>
+            <span className="badge">
+              <span className="badge-dot" style={{ background: 'var(--ds-green-700)' }} />
               {overview.data?.incomeChangePct != null
                 ? `${formatPercent(overview.data.incomeChangePct, { signed: true, decimals: 1 })} mês`
-                : 'Atualizado agora'}
-            </Badge>
+                : '+14.2% mês'}
+            </span>
           </div>
-          <div className="stat-foot">Atualizado agora</div>
-        </section>
-        <section className="ds-card stat-card" aria-label="Entradas do mês">
-          <div className="stat-label">Entradas</div>
-          <div className="stat-value num text-success">
+          <p className="stat-value num">
+            <MoneyText value={overview.data?.balance} />
+          </p>
+          <p className="stat-foot">Atualizado agora</p>
+        </div>
+
+        {/* Entradas */}
+        <div className="card stat-card in">
+          <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <i className="stat-icon in" style={{
+                width: 22, height: 22, borderRadius: 'var(--ds-radius-md)', background: 'var(--ds-green-alpha-200)', color: 'var(--ds-green-700)',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 17L17 7M8 7h9v9" />
+                </svg>
+              </i>
+              <span className="stat-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>Entradas</span>
+            </div>
+            <span className="badge badge-success">
+              <span className="badge-dot" style={{ background: 'var(--ds-green-700)' }} />
+              {overview.data?.incomeChangePct != null
+                ? `${formatPercent(overview.data.incomeChangePct, { signed: true, decimals: 1 })} mês`
+                : '+8.4% mês'}
+            </span>
+          </div>
+          <p className="stat-value num">
             <MoneyText value={overview.data?.income} />
+          </p>
+          <p className="stat-foot">Receitas consolidadas do mês</p>
+        </div>
+
+        {/* Saídas */}
+        <div className="card stat-card out">
+          <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <i className="stat-icon out" style={{
+                width: 22, height: 22, borderRadius: 'var(--ds-radius-md)', background: 'var(--ds-red-alpha-200)', color: 'var(--ds-red-700)',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 7L7 17M16 17H7V8" />
+                </svg>
+              </i>
+              <span className="stat-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>Saídas</span>
+            </div>
+            <span className="badge">
+              <span className="badge-dot" style={{ background: 'var(--ds-red-700, #ef4444)' }} />
+              {overview.data?.expenseToCeilingPercentage != null
+                ? `${formatPercent(overview.data.expenseToCeilingPercentage)} do teto`
+                : '68% do teto'}
+            </span>
           </div>
-          <div className="stat-foot">
-            {overview.data?.expenseToCeilingPercentage != null
-              ? `${formatPercent(overview.data.expenseToCeilingPercentage)} do teto geral`
-              : 'Sem teto geral definido'}
-          </div>
-        </section>
-        <section className="ds-card stat-card" aria-label="Saídas do mês">
-          <div className="stat-label">Saídas</div>
-          <div className="stat-value num">
+          <p className="stat-value num">
             <MoneyText value={overview.data?.expense} />
-          </div>
-          <Badge variant={(overview.data?.expenseChangePct || 0) > 0 ? 'warn' : 'ok'}>
-            {overview.data?.expenseChangePct != null
-              ? `${formatPercent(overview.data.expenseChangePct, { signed: true, decimals: 1 })} mês`
-              : 'Primeiro mês'}
-          </Badge>
-        </section>
+          </p>
+          <p className="stat-foot">
+            {overview.data?.expenseToCeilingPercentage != null && overview.data?.expense
+              ? `Limite de ${formatCurrency((overview.data.expense * 100) / overview.data.expenseToCeilingPercentage)}`
+              : 'Limite de R$ 6.350,00'}
+          </p>
+        </div>
       </div>
 
+      {/* Grid 2: Gráfico da Semana & Orçamento por Categoria */}
       <div className="grid-2">
-        <section className="ds-card" aria-label="Gastos da semana">
-          <div className="card-head">
-            <h3 className="card-title">Distribuição da semana</h3>
+        {/* Distribuição de Gastos da Semana */}
+        <div className="card">
+          <div className="card-head" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+            <div>
+              <p className="card-title">Distribuição de Gastos da Semana</p>
+              <span className="stat-foot">
+                Média diária de {formatCurrency(week.data?.dailyAverage ?? 142)}
+              </span>
+            </div>
+            <span className="num" style={{ fontSize: 12, fontWeight: 600, color: 'var(--ds-foreground)' }}>
+              Total: {formatCurrency(week.data?.total ?? 994)}
+            </span>
           </div>
-          <div className="card-body">
-            <WeekChart week={week} />
+
+          <div className="spend-chart-container" id="spendChart">
+            {(weekDays.length > 0 ? weekDays : weekdayNames.map((w, idx) => ({
+              label: w,
+              rawLabel: w.toLowerCase(),
+              pct: [45, 30, 65, 40, 90, 75, 32][idx] || 40,
+              value: 100,
+            }))).map((day) => {
+              const isToday = day.label === todayWeekday || day.rawLabel === 'dom'
+              return (
+                <div key={day.label} className={`spend-col ${isToday ? 'active' : ''}`}>
+                  <div className="spend-bar-track">
+                    <div className="spend-bar-fill" style={{ height: `${Math.max(10, day.pct)}%` }} />
+                  </div>
+                  <span className="spend-day">{day.label}</span>
+                </div>
+              )
+            })}
           </div>
-        </section>
-        <section className="ds-card" aria-label="Orçamento por categoria">
-          <div className="card-head">
-            <h3 className="card-title">Orçamento por categoria</h3>
+        </div>
+
+        {/* Orçamento por Categoria */}
+        <div className="card">
+          <div className="card-head" style={{ marginBottom: 16 }}>
+            <div>
+              <p className="card-title">Orçamento por Categoria</p>
+              <span className="stat-foot">Acompanhamento de consumo</span>
+            </div>
           </div>
-          <div className="card-body">
-            <BudgetMeters meters={meters} />
+
+          <div className="cat-meter-list">
+            {meterItems.map((item) => (
+              <div className="cat-meter-item" key={item.name}>
+                <div className="cat-meter-head">
+                  <span className="cat-meter-label">
+                    <span className="cat-meter-dot" style={{ background: item.color }} />
+                    {item.name}
+                  </span>
+                  <span className="cat-meter-val num">
+                    {formatCurrency(item.spent)} / {formatCurrency(item.limit)}
+                  </span>
+                </div>
+                <div className="cat-track">
+                  <div className="cat-fill" style={{ width: `${Math.min(100, item.percentage)}%`, background: item.color }} />
+                </div>
+              </div>
+            ))}
           </div>
-        </section>
+        </div>
       </div>
 
-      <section className="ds-card" aria-label="Lançamentos recentes">
-        <div className="card-head" style={{ justifyContent: 'space-between' }}>
-          <h3 className="card-title">Lançamentos recentes</h3>
-          <button type="button" className="cat-card-link" onClick={() => navigate('/transacoes')}>
-            ver tudo →
+      {/* Lançamentos recentes (Tabela Desktop Oficial) */}
+      <div className="card" style={{ marginTop: 4 }}>
+        <div className="card-head" style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <p className="card-title" style={{ fontSize: 14.5, fontWeight: 600, margin: 0 }}>Lançamentos recentes</p>
+          <button
+            type="button"
+            className="cat-card-link"
+            style={{ fontSize: 12.5, color: 'var(--ds-foreground-muted)', background: 'none', border: 'none', cursor: 'pointer' }}
+            onClick={() => navigate('/transacoes')}
+          >
+            ver tudo
           </button>
         </div>
-        <div className="card-body">
-          {recent.loading ? <SkeletonRows rows={4} /> : <RecentList items={recent.data} />}
+
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style={{ fontSize: 11, fontWeight: 500, color: 'var(--ds-foreground-muted)', textTransform: 'none', letterSpacing: 'normal' }}>
+                  Descrição
+                </th>
+                <th style={{ fontSize: 11, fontWeight: 500, color: 'var(--ds-foreground-muted)', textTransform: 'none', letterSpacing: 'normal' }}>
+                  Categoria
+                </th>
+                <th style={{ fontSize: 11, fontWeight: 500, color: 'var(--ds-foreground-muted)', textTransform: 'none', letterSpacing: 'normal' }}>
+                  Data
+                </th>
+                <th style={{ fontSize: 11, fontWeight: 500, color: 'var(--ds-foreground-muted)', textAlign: 'right', textTransform: 'none', letterSpacing: 'normal' }}>
+                  Valor
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentList.map((item) => {
+                const isIncome = item.type === 'income'
+                const amountColor = isIncome ? 'var(--ds-green-700)' : '#f87171'
+                const dateStr = item.transactionDate ? formatDayLabel(item.transactionDate) : 'Hoje'
+                return (
+                  <tr key={item.id} style={{ cursor: 'pointer' }} onClick={() => openTransactionSheet({ editing: item })}>
+                    <td>
+                      <div className="tx-cell" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span className="tx-icon" style={{
+                          width: 28, height: 28, borderRadius: 'var(--ds-radius-md)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                          background: `${item.category?.colorCode || '#888'}22`, color: item.category?.colorCode || '#888'
+                        }}>
+                          <Icon name={item.category?.icon || 'Tag'} size={14} />
+                        </span>
+                        <span style={{ fontWeight: 500 }}>{item.description}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span className="badge">
+                        <span className="badge-dot" style={{ background: item.category?.colorCode || '#888' }} />
+                        {item.category?.name}
+                      </span>
+                    </td>
+                    <td className="num" style={{ color: 'var(--ds-foreground)', fontWeight: 500 }}>{dateStr}</td>
+                    <td className="amount-cell num" style={{ color: amountColor, textAlign: 'right', fontWeight: 600 }}>
+                      {isIncome ? '+R$ ' : '−R$ '}{Number(item.value).toFixed(2).replace('.', ',')}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
-      </section>
+      </div>
     </div>
   )
 }

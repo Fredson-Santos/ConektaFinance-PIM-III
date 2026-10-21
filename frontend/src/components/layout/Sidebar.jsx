@@ -29,8 +29,10 @@ export function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="brand">
-        <div className="auth-brand-mark" style={{ width: 34, height: 34, borderRadius: 10, fontSize: 14 }}>
-          C
+        <div className="brand-mark">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 3L14 9L20 11L14 13L12 19L10 13L4 11L10 9L12 3Z" />
+          </svg>
         </div>
         <span className="brand-name">ConektaFinance</span>
       </div>
@@ -44,29 +46,41 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <button type="button" className="ds-btn ds-btn-blue side-cta" onClick={() => openOverlay('transaction')}>
-        <Plus size={16} />
+      <button type="button" className="side-cta" onClick={() => openOverlay('transaction')}>
+        <Plus size={14} />
         Novo lançamento
       </button>
 
       <div className="sidebar-footer">
-        <div className="theme-pill" role="radiogroup" aria-label="Tema">
-          <button type="button" className={theme === 'light' ? 'active' : ''} onClick={() => setTheme('light')} aria-label="Tema claro">
-            <Sun size={14} /> Claro
-          </button>
-          <button type="button" className={theme === 'dark' ? 'active' : ''} onClick={() => setTheme('dark')} aria-label="Tema escuro">
-            <Moon size={14} /> Escuro
-          </button>
-        </div>
-        <div style={{ position: 'relative' }}>
-          <button type="button" className="user-trigger" onClick={() => toggleOverlay('user')} aria-haspopup="menu">
+        <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
+          <button type="button" className="user-trigger" onClick={() => toggleOverlay('user')} aria-haspopup="menu" title="Menu da conta">
             <Avatar name={user?.displayName || user?.fullName || 'CF'} src={user?.avatarUrl} />
             <span className="user-info">
-              <b>{user?.displayName || user?.fullName}</b>
+              <b>{user?.displayName || user?.fullName || 'Usuário'}</b>
               <span>Conta pessoal</span>
             </span>
           </button>
           <UserPopover onLogout={handleLogout} />
+        </div>
+        <div className="theme-switch-pill" role="radiogroup" aria-label="Tema">
+          <button
+            type="button"
+            className={`theme-pill-btn ${theme === 'light' ? 'active' : ''}`}
+            onClick={() => setTheme('light')}
+            aria-label="Tema claro"
+            title="Modo Claro"
+          >
+            <Sun size={13} />
+          </button>
+          <button
+            type="button"
+            className={`theme-pill-btn ${theme === 'dark' ? 'active' : ''}`}
+            onClick={() => setTheme('dark')}
+            aria-label="Tema escuro"
+            title="Modo Escuro"
+          >
+            <Moon size={13} />
+          </button>
         </div>
       </div>
     </aside>

@@ -16,14 +16,19 @@ export function AuthScreen() {
   return (
     <div className="auth-view">
       <div className="auth-card ds-card" style={{ maxWidth: 440 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div className="auth-brand-mark">C</div>
-          <div>
-            <div className="auth-badge">Plataforma ConektaFinance</div>
+        <div className="auth-brand-head">
+          <div className="brand-mark" style={{ width: 36, height: 36, marginBottom: 12 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 3L14 9L20 11L14 13L12 19L10 13L4 11L10 9L12 3Z" />
+            </svg>
           </div>
+          <div className="auth-badge">
+            <span className="badge-dot" style={{ background: 'var(--ds-green-700)' }} />
+            Plataforma ConektaFinance SaaS
+          </div>
+          <h1 className="auth-title">Acesse sua conta</h1>
+          <p className="auth-sub">Entre rapidamente com o seu WhatsApp ou utilize suas credenciais.</p>
         </div>
-        <h1 className="auth-title">Acesse sua conta</h1>
-        <p className="auth-sub">Controle suas finanças com inteligência, em poucos toques.</p>
 
         <div className="auth-tabs" role="tablist">
           <button

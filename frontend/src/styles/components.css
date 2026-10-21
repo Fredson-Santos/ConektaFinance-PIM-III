@@ -22,17 +22,16 @@
 }
 
 .auth-brand-mark {
-  width: 46px;
-  height: 46px;
-  border-radius: 13px;
-  background: linear-gradient(135deg, var(--ds-blue-700), var(--ds-teal-700));
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-foreground);
+  color: var(--ds-foreground-contrast);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: 18px;
-  color: #fff;
-  letter-spacing: -0.02em;
+  font-weight: 700;
+  font-size: 16px;
 }
 
 .auth-badge {
@@ -338,11 +337,13 @@
   font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
 .page-sub {
   font-size: 11.5px;
   color: var(--ds-foreground-muted);
+  white-space: nowrap;
 }
 
 .search-trigger {
@@ -712,33 +713,6 @@
   color: var(--ds-foreground-muted);
 }
 
-.ai-fab {
-  position: fixed;
-  z-index: 800;
-  width: 54px;
-  height: 54px;
-  border-radius: 18px;
-  border: 1px solid rgba(0, 112, 243, 0.4);
-  background: linear-gradient(135deg, var(--ds-blue-700), var(--ds-teal-700));
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: grab;
-  box-shadow: 0 12px 32px rgba(0, 112, 243, 0.35);
-  touch-action: none;
-  right: 20px;
-  bottom: 96px;
-}
-
-.ai-fab:active {
-  cursor: grabbing;
-}
-
-.ai-fab.dragging {
-  cursor: grabbing;
-  transition: none;
-}
 
 .ai-fab-label {
   position: fixed;

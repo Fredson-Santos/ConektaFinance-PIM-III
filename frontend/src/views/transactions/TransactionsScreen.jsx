@@ -74,7 +74,7 @@ export function TransactionsScreen() {
   }
 
   return (
-    <>
+    <div className="gastos-container">
       <div className="gastos-header">
         <div>
           <h2 className="card-title" style={{ fontSize: 17 }}>Histórico de gastos</h2>
@@ -113,6 +113,7 @@ export function TransactionsScreen() {
                 active={String(category.id) === String(categoryId)}
                 onClick={() => setCategoryId(String(category.id))}
               >
+                <b style={{ background: category.colorCode || '#888' }} />
                 {category.name}
               </Chip>
             ))}
@@ -164,7 +165,7 @@ export function TransactionsScreen() {
         <aside className="gastos-side-col desktop-only" style={{ position: 'sticky', top: 88, display: 'flex', flexDirection: 'column', gap: 16 }}>
           <LimitUsageCard state={budgetsState} />
           <TopCategoriesCard state={topCategoriesState} />
-          <div className="ds-card side-card">
+          <div className="card side-card">
             <div className="side-card-title">Gestão de despesas</div>
             <div className="quick-actions">
               <button type="button" className="quick-action" onClick={() => openTransactionSheet()}>
@@ -180,7 +181,7 @@ export function TransactionsScreen() {
           </div>
         </aside>
       </div>
-    </>
+    </div>
   )
 }
 
@@ -203,7 +204,7 @@ function LimitUsageCard({ state }) {
   const percentage = totalLimit > 0 ? Math.round((totalSpent / totalLimit) * 100) : 0
   const tone = percentage > 100 ? 'over' : percentage >= 80 ? 'warn' : null
   return (
-    <div className="ds-card side-card">
+    <div className="card side-card">
       <div className="side-card-title">Consumo do limite</div>
       <div className="overview-big" style={{ fontSize: 20 }}>
         {formatCurrency(totalSpent)}
@@ -222,7 +223,7 @@ function TopCategoriesCard({ state }) {
   const max = Math.max(...items.map((item) => item.total), 1)
   if (items.length === 0) {
     return (
-      <div className="ds-card side-card">
+      <div className="card side-card">
         <div className="side-card-title">Maiores categorias</div>
         <span className="text-faint" style={{ fontSize: 12 }}>
           Registre gastos para ver o ranking do mês.
@@ -231,7 +232,7 @@ function TopCategoriesCard({ state }) {
     )
   }
   return (
-    <div className="ds-card side-card">
+    <div className="card side-card">
       <div className="side-card-title">Maiores categorias</div>
       {items.map((item) => (
         <div className="cat-meter-item" key={item.categoryId}>

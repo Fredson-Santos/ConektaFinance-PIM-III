@@ -32,18 +32,22 @@ export function SettingsScreen() {
   return (
     <div className="cfg-layout">
       <div className="cfg-nav" role="tablist" aria-label="Seções de configurações">
-        {TABS.map((item) => (
-          <button
-            key={item.value}
-            type="button"
-            role="tab"
-            aria-selected={tab === item.value}
-            className={`cfg-tab ${tab === item.value ? 'active' : ''}`}
-            onClick={() => setTab(item.value)}
-          >
-            {item.label}
-          </button>
-        ))}
+        {TABS.map((item) => {
+          const IconComp = item.icon
+          return (
+            <button
+              key={item.value}
+              type="button"
+              role="tab"
+              aria-selected={tab === item.value}
+              className={`cfg-nav-item ${tab === item.value ? 'active' : ''}`}
+              onClick={() => setTab(item.value)}
+            >
+              <IconComp size={14} className="icon" />
+              {item.label}
+            </button>
+          )
+        })}
       </div>
 
       {tab === 'geral' ? <GeneralTab /> : null}
@@ -121,9 +125,9 @@ function GeneralTab() {
   }
 
   return (
-    <div className="cfg-pane">
-      <section className="ds-card cfg-card" aria-label="Foto de perfil">
-        <div className="cfg-card-title"><Camera size={16} /> Foto de perfil</div>
+    <div className="cfg-pane active">
+      <section className="card cfg-card" aria-label="Foto de perfil">
+        <div className="card-head"><p className="card-title">Foto de Perfil</p></div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <Avatar name={user?.fullName} src={user?.avatarUrl} size={64} />
           <div style={{ display: 'flex', gap: 8 }}>
@@ -140,8 +144,11 @@ function GeneralTab() {
         <span className="ds-hint">Formatos aceitos: JPG, PNG ou WebP. Máximo de 2MB.</span>
       </section>
 
-      <form className="ds-card cfg-card" onSubmit={saveProfile} aria-label="Dados pessoais">
-        <div className="cfg-card-title"><User size={16} /> Dados pessoais</div>
+      <form className="card cfg-card" onSubmit={saveProfile} aria-label="Dados pessoais">
+        <div className="card-head" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <p className="card-title" style={{ margin: 0 }}>Dados Pessoais</p>
+          <Button type="submit" loading={savingProfile}>Salvar alterações</Button>
+        </div>
         <div className="cfg-row">
           <Field label="Nome completo">
             <Input value={form.fullName} onChange={(event) => setForm({ ...form, fullName: event.target.value })} />
@@ -162,11 +169,13 @@ function GeneralTab() {
             <Input value={form.occupation} onChange={(event) => setForm({ ...form, occupation: event.target.value })} />
           </Field>
         </div>
-        <Button type="submit" loading={savingProfile}>Salvar alterações</Button>
       </form>
 
-      <form className="ds-card cfg-card" onSubmit={savePreferences} aria-label="Parâmetros orçamentários">
-        <div className="cfg-card-title">Parâmetros orçamentários</div>
+      <form className="card cfg-card" onSubmit={savePreferences} aria-label="Parâmetros orçamentários">
+        <div className="card-head" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <p className="card-title" style={{ margin: 0 }}>Parâmetros Orçamentários</p>
+          <Button type="submit" loading={savingPrefs}>Atualizar metas</Button>
+        </div>
         <div className="cfg-row">
           <Field label="Teto orçamentário mensal (R$)">
             <Input inputMode="decimal" value={ceiling} onChange={(event) => setCeiling(event.target.value)} />
@@ -182,7 +191,6 @@ function GeneralTab() {
           </Field>
         </div>
         <span className="ds-hint">Moeda operacional: {user?.currency || 'BRL'} — Real Brasileiro (R$)</span>
-        <Button type="submit" variant="blue" loading={savingPrefs}>Atualizar metas</Button>
       </form>
     </div>
   )
@@ -218,9 +226,12 @@ function PasswordTab() {
   }
 
   return (
-    <form className="cfg-pane" onSubmit={submit} aria-label="Alterar senha">
-      <section className="ds-card cfg-card">
-        <div className="cfg-card-title"><Lock size={16} /> Alterar senha</div>
+    <form className="cfg-pane active" onSubmit={submit} aria-label="Alterar senha">
+      <section className="card cfg-card">
+        <div className="card-head" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <p className="card-title" style={{ margin: 0 }}>Alterar Senha de Acesso</p>
+          <Button type="submit" loading={saving}>Atualizar senha</Button>
+        </div>
         <Field label="Senha atual">
           <PasswordInput autoComplete="current-password" value={current} onChange={(event) => setCurrent(event.target.value)} />
         </Field>
@@ -233,7 +244,6 @@ function PasswordTab() {
         <Field label="Confirmar nova senha" error={error}>
           <PasswordInput autoComplete="new-password" value={confirm} onChange={(event) => setConfirm(event.target.value)} />
         </Field>
-        <Button type="submit" loading={saving}>Atualizar senha</Button>
       </section>
     </form>
   )
@@ -281,9 +291,9 @@ function PrivacyTab() {
   }
 
   return (
-    <div className="cfg-pane">
-      <section className="ds-card cfg-card" aria-label="Modo discreto">
-        <div className="cfg-card-title">Privacidade em locais públicos</div>
+    <div className="cfg-pane active">
+      <section className="card cfg-card" aria-label="Modo discreto">
+        <div className="card-head"><p className="card-title">Privacidade de Exibição</p></div>
         <div className="toggle-row">
           <span>
             <b>Modo discreto</b>
@@ -302,8 +312,8 @@ function PrivacyTab() {
         </div>
       </section>
 
-      <section className="ds-card cfg-card" aria-label="Importação e exportação">
-        <div className="cfg-card-title"><Upload size={16} /> Importação e exportação</div>
+      <section className="card cfg-card" aria-label="Importação e exportação">
+        <div className="card-head"><p className="card-title">Importação e Exportação</p></div>
         <div className="quick-actions">
           <button type="button" className="quick-action" onClick={() => openOverlay('import')}>
             <span className="qa-icon"><Upload size={15} /></span> Importar extrato / planilha
@@ -325,8 +335,8 @@ function PrivacyTab() {
         </div>
       </section>
 
-      <section className="ds-card danger-card" aria-label="Zona de perigo">
-        <div className="cfg-card-title"><Trash2 size={16} /> Zona de perigo</div>
+      <section className="card danger-card" aria-label="Zona de perigo">
+        <div className="card-head"><p className="card-title">Zona de Perigo</p></div>
         <div className="toggle-row">
           <span>
             <b>Redefinir registros financeiros</b>

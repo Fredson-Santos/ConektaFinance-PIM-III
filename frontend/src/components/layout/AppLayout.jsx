@@ -12,7 +12,9 @@ import { TransactionSheet } from '../transactions/TransactionSheet'
 
 export function AppLayout() {
   return (
-    <div className="app-shell">
+    <>
+      <div className="app-glow" />
+      <div className="app-shell">
       <Sidebar />
       <main className="main-area">
         <PwaInstallBanner />
@@ -29,6 +31,7 @@ export function AppLayout() {
       <ImportSheet />
       <TransactionSheet />
     </div>
+    </>
   )
 }
 
