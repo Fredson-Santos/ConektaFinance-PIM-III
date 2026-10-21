@@ -23,18 +23,34 @@ export function Topbar() {
 
   return (
     <header className="topbar">
-      <div>
-        <div className="page-title">{title}</div>
-        <div className="page-sub">{subtitle}</div>
+      <div className="topbar-left">
+        <div className="topbar-brand mobile-only">
+          <div className="brand-mark" style={{ width: 26, height: 26 }}>
+            <svg className="icon" style={{ width: 13, height: 13 }}><use href="#i-sparkle" /></svg>
+          </div>
+        </div>
+        <div>
+          <p className="page-title">{title}</p>
+          <p className="page-sub">{subtitle}</p>
+        </div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div className="topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <button type="button" className="search-trigger desktop-only" onClick={() => openOverlay('cmdk')}>
           <Search size={14} />
-          <span>Buscar ou executar</span>
-          <kbd className="kbd">/</kbd>
+          <span className="desktop-only">Buscar ou executar</span>
+          <kbd className="kbd desktop-only">/</kbd>
         </button>
-        <button type="button" className="icon-btn" aria-label={`Alertas de orçamento (${count} não lidos)`} onClick={() => openOverlay('notif')}>
-          <Bell size={18} />
+        <button
+          type="button"
+          className="btn-icon mobile-only"
+          aria-label="Buscar"
+          onClick={() => openOverlay('cmdk')}
+          style={{ width: 34, height: 34, borderRadius: 'var(--ds-radius-md)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: '1px solid var(--ds-border)', color: 'var(--ds-foreground)' }}
+        >
+          <Search size={14} />
+        </button>
+        <button type="button" className="btn-icon icon-btn" aria-label={`Alertas de orçamento (${count} não lidos)`} onClick={() => openOverlay('notif')} style={{ width: 34, height: 34, position: 'relative' }}>
+          <Bell size={16} />
           {count > 0 ? <Dot /> : null}
         </button>
         <button type="button" className="btn desktop-only" aria-label="Importar extrato" onClick={() => openOverlay('import')}>
@@ -45,11 +61,13 @@ export function Topbar() {
         </button>
         <button
           type="button"
-          className="icon-btn mobile-only"
+          className="btn-icon mobile-only"
           aria-label="Configurações"
           onClick={() => navigate('/configuracoes')}
+          title="Menu da conta"
+          style={{ width: 30, height: 30, padding: 0, border: 'none', background: 'none', cursor: 'pointer' }}
         >
-          <Avatar name={user?.displayName || user?.fullName || 'CF'} src={user?.avatarUrl} size={26} />
+          <Avatar name={user?.displayName || user?.fullName || 'UT'} src={user?.avatarUrl} size={28} />
         </button>
       </div>
     </header>

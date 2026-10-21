@@ -124,7 +124,16 @@ export function ReportsScreen() {
       )}
 
       {isMobile ? (
-        <MobileReports summary={summary} byCategory={byCategory} trend={trend} insights={insights} />
+        <MobileReports
+          summary={summary}
+          byCategory={byCategory}
+          trend={trend}
+          insights={insights}
+          period={period}
+          setPeriod={setPeriod}
+          range={range}
+          label={label}
+        />
       ) : (
         <DesktopReports summary={summary} byCategory={byCategory} trend={trend} insights={insights} previousCategories={previousCategories} />
       )}
@@ -182,47 +191,173 @@ function KpiCard({ label, value, badge, foot }) {
   )
 }
 
-function MobileReports({ summary, byCategory, trend, insights }) {
+function MobileReports({ summary, byCategory, trend, insights, period, setPeriod, range, label }) {
+  const toast = useToast()
   const savedAverage = useMemo(() => {
     const items = trend.data || []
     if (items.length === 0) return 0
     return items.reduce((sum, item) => sum + item.saved, 0) / items.length
   }, [trend.data])
 
+  const trendPairs = useMemo(() => {
+    const list = trend.data || []
+    if (list.length === 0) return []
+    const maxIncome = Math.max(...list.map((t) => t.income), 1)
+    return list.map((item, idx) => ({
+      period: item.period,
+      monthLabel: item.period ? item.period.split('/')[0] : '',
+      inPct: Math.min(100, Math.round((item.income / maxIncome) * 100)),
+      outPct: Math.min(100, Math.round((item.expense / maxIncome) * 100)),
+      isLast: idx === list.length - 1,
+    }))
+  }, [trend.data])
+
+  const categoryList = byCategory.data || []
+  const donutColors = ['#0070f3', '#f5a623', '#8e4ec6', '#e93d82', '#00cc88', '#666666']
+  const insight = (insights.data || [])[0]
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <KpiCard
-        label="Sobra média por mês"
-        value={formatCurrency(savedAverage)}
-        badge={<Badge variant={savedAverage >= 0 ? 'ok' : 'bad'}>{savedAverage >= 0 ? '+' : ''}{formatCurrency(Math.abs(savedAverage))} por mês</Badge>}
-      />
+    <div className="mobile-rel-content">
+      <div className="seg" style={{ marginTop: 4 }} id="periodMobile" role="radiogroup" aria-label="Período">
+        {PERIODS.map((p) => (
+          <button
+            key={p.value}
+            type="button"
+            role="radio"
+            aria-checked={period === p.value}
+            className={period === p.value ? 'on' : ''}
+            onClick={() => setPeriod(p.value)}
+          >
+            {p.label}
+          </button>
+        ))}
+      </div>
 
-      <section className="card" aria-label="Entradas e saídas por mês">
-        <div className="card-head">
-          <h3 className="card-title">Entradas e saídas</h3>
+      <section className="res">
+        <div className="sub">Sobra média por mês</div>
+        <div className="big">
+          <small>R$</small>
+          {formatCurrency(savedAverage).replace('R$', '').trim()}
         </div>
-        <div className="card-body">
-          <InOutBars trend={trend} />
+        <div style={{ marginTop: 10, display: 'flex', gap: 8, alignItems: 'center', fontSize: 12.5, color: 'var(--ds-foreground-muted)' }}>
+          <span className={`badge ${savedAverage >= 0 ? 'b-ok' : 'b-bad'}`}>
+            {savedAverage >= 0 ? '+' : ''}{formatCurrency(savedAverage)}
+          </span>{' '}
+          por mês
         </div>
       </section>
 
-      <section className="card" aria-label="Composição dos gastos">
-        <div className="card-head">
-          <h3 className="card-title">Para onde foi o dinheiro</h3>
-        </div>
-        <div className="card-body">
-          <Donut byCategory={byCategory} />
+      {/* Entradas e saídas */}
+      <section className="sec">
+        <h2>Entradas e saídas</h2>
+        <div className="card">
+          <div className="leg">
+            <span><i style={{ background: 'var(--ds-green-500, #00cc88)' }} />Entradas</span>
+            <span><i style={{ background: 'var(--ds-gray-alpha-400)' }} />Saídas</span>
+          </div>
+          <div className="pairs" role="img" aria-label="Entradas e saídas">
+            {trendPairs.length > 0 ? (
+              trendPairs.map((p) => (
+                <div key={p.period} className={`pair ${p.isLast ? 'now' : ''}`}>
+                  <div className="bars">
+                    <span className="in" style={{ height: `${Math.max(6, p.inPct)}%` }} />
+                    <span className="out" style={{ height: `${Math.max(6, p.outPct)}%` }} />
+                  </div>
+                  <em>{p.monthLabel}</em>
+                </div>
+              ))
+            ) : (
+              <p style={{ color: 'var(--ds-foreground-muted)', fontSize: 12 }}>Nenhum dado no período.</p>
+            )}
+          </div>
         </div>
       </section>
 
-      <section className="card" style={{ padding: 16, display: 'flex', gap: 10, alignItems: 'center' }}>
-        <span className="ai-avatar" style={{ width: 28, height: 28 }}>
-          <Sparkles size={14} />
-        </span>
-        <p style={{ fontSize: 12.5, color: 'var(--ds-foreground-muted)' }}>
-          {(insights.data || [])[0]?.description || 'Continue registrando lançamentos para receber análises da IA.'}
-        </p>
+      {/* Para onde foi o dinheiro */}
+      <section className="sec">
+        <h2>Para onde foi o dinheiro</h2>
+        <div className="card donut-row">
+          <div className="donut">
+            <div className="donut-center">
+              <span className="big">{formatCurrency(summary.data?.totalExpense || 0)}</span>
+              <span className="sub">Total saídas</span>
+            </div>
+          </div>
+          <div className="dl">
+            {categoryList.slice(0, 4).map((cat, idx) => (
+              <div key={cat.categoryId || cat.name}>
+                <span>
+                  <i style={{ background: cat.colorCode || donutColors[idx % donutColors.length] }} />
+                  {cat.name}
+                </span>
+                <b>{formatPercent(cat.percentage || 0, { decimals: 0 })}</b>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
+
+      {/* Comparado ao mês anterior */}
+      <section className="sec">
+        <h2>Desempenho por categoria</h2>
+        <div className="card cmp">
+          {categoryList.slice(0, 4).map((cat) => (
+            <div className="cmp-row" key={cat.categoryId || cat.name}>
+              <div>
+                <div className="n" style={{ fontWeight: 500 }}>{cat.name}</div>
+                <div className="sub" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>
+                  {formatCurrency(cat.total)}
+                </div>
+              </div>
+              <span className="badge b-ok">{formatPercent(cat.percentage, { decimals: 0 })}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Assistente IA */}
+      <section className="sec ai-sec">
+        <div className="card ai">
+          <div className="ico">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" />
+              <path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z" />
+            </svg>
+          </div>
+          <div>
+            <p>
+              {insight ? insight.description : 'Sua média de gastos está equilibrada nos últimos meses.'}{' '}
+              <span style={{ color: 'var(--ds-foreground-muted)' }}>{insight?.suggestion || 'Continue acompanhando suas metas.'}</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Exportar PDF */}
+      <button
+        type="button"
+        className="btn"
+        style={{ width: '100%', marginTop: 16 }}
+        id="btnExportPdfMobile"
+        onClick={() => {
+          if (!summary.data || !byCategory.data) {
+            toast.push('Aguarde o carregamento do relatório.', 'error')
+            return
+          }
+          exportMonthlyPdf({
+            period: { label, key: range.start.slice(0, 7) },
+            summary: summary.data,
+            byCategory: byCategory.data,
+          })
+        }}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        Exportar relatório em PDF
+      </button>
     </div>
   )
 }

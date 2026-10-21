@@ -41,85 +41,201 @@ function MobileDashboard() {
 
   const firstName = (user?.displayName || user?.fullName || 'você').split(' ')[0]
   const insight = (insights.data || [])[0]
+  const recentList = recent.data || []
+  const currentMonthName = new Date().toLocaleDateString('pt-BR', { month: 'long' })
+  const previousMonthName = new Date(new Date().setMonth(new Date().getMonth() - 1)).toLocaleDateString('pt-BR', { month: 'long' })
+
+  const defaultMeters = [
+    { name: 'Moradia', spent: 1800, limit: 2000, percentage: 90, color: '#0070f3' },
+    { name: 'Alimentação', spent: 980, limit: 1500, percentage: 65, color: '#f5a623' },
+    { name: 'Transporte', spent: 380, limit: 600, percentage: 63, color: '#12b5cb' },
+    { name: 'Lazer & Lojas', spent: 290, limit: 800, percentage: 36, color: '#8e4ec6' },
+  ]
+  const meterItems = meters.data && meters.data.length > 0
+    ? meters.data.map((m) => ({
+        name: m.name,
+        spent: m.spent,
+        limit: m.limit,
+        percentage: m.percentage,
+        color: m.colorCode || '#0070f3',
+      }))
+    : defaultMeters
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div>
-        <h2 style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em' }}>Olá, {firstName}</h2>
-        <div className="page-sub">Aqui está o resumo do seu mês.</div>
-      </div>
+    <div className="mobile-dash-content">
+      <p className="hello" id="mobileGreeting">Olá, {firstName}</p>
 
-      <section className="ds-card stat-card" aria-label="Saldo em conta">
-        <div className="stat-label">Saldo em conta</div>
-        {overview.loading ? (
-          <div className="stat-value num">—</div>
-        ) : (
-          <>
-            <div className="stat-value num">
-              <MoneyText value={overview.data.balance} />
-            </div>
-            <Badge variant={(overview.data.incomeChangePct || 0) >= 0 ? 'ok' : 'bad'}>
-              {overview.data.incomeChangePct != null
+      {/* Saldo Oficial Mobile */}
+      <section className="balance" aria-label="Saldo em conta">
+        <div className="label">Saldo em {currentMonthName}</div>
+        <div className="value">
+          {overview.loading ? (
+            <span id="valSaldoMobile">—</span>
+          ) : (
+            <span id="valSaldoMobile">{formatCurrency(overview.data.balance)}</span>
+          )}
+        </div>
+        <div className="delta">
+          <span className={`badge ${(overview.data?.incomeChangePct || 0) >= 0 ? 'badge-success' : 'badge-danger'}`}>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 19V5M5 12l7-7 7 7" />
+            </svg>
+            <span id="badgeDeltaVal">
+              {overview.data?.incomeChangePct != null
                 ? `${formatPercent(overview.data.incomeChangePct, { signed: true, decimals: 1 })} vs mês anterior`
                 : 'Primeiro mês de uso'}
-            </Badge>
-          </>
-        )}
-      </section>
-
-      <div className="stat-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
-        <MiniStat label="Entradas" tone="green" state={overview} pick={(data) => data.income} loading={overview.loading} />
-        <MiniStat label="Saídas" tone="red" state={overview} pick={(data) => data.expense} loading={overview.loading} />
-      </div>
-
-      <WeekChart week={week} />
-
-      <section className="ds-card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <span className="ai-avatar" style={{ width: 28, height: 28 }}>
-            <Sparkles size={14} />
+            </span>
           </span>
-          <p style={{ fontSize: 12.5, color: 'var(--ds-foreground-muted)', flex: 1 }}>
-            {insight ? insight.description : 'Sua saúde financeira está sob controle. Continue assim!'}
-          </p>
-        </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Button variant="secondary" onClick={() => openOverlay('ai')} style={{ flex: 1 }}>
-            Ver detalhes
-          </Button>
-          <Button variant="secondary" onClick={() => navigate('/categorias')} style={{ flex: 1 }}>
-            Criar limite
-          </Button>
+          {' a mais que em ' + previousMonthName}
         </div>
       </section>
 
-      <section className="ds-card" style={{ padding: 16 }}>
-        <div className="side-card-title" style={{ marginBottom: 12 }}>Categorias do mês</div>
-        <BudgetMeters meters={meters} />
+      {/* Entradas e Saídas do Mês */}
+      <section className="flow" aria-label="Entradas e saídas do mês">
+        <div className="card in">
+          <div className="k">
+            <i>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M7 17L17 7M8 7h9v9" />
+              </svg>
+            </i>
+            Entradas
+          </div>
+          <div className="v" id="valEntradasMobile">
+            {overview.loading ? '—' : formatCurrency(overview.data.income)}
+          </div>
+        </div>
+        <div className="card out">
+          <div className="k">
+            <i>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 7L7 17M16 17H7V8" />
+              </svg>
+            </i>
+            Saídas
+          </div>
+          <div className="v" id="valDespesasMobile">
+            {overview.loading ? '—' : formatCurrency(overview.data.expense)}
+          </div>
+        </div>
       </section>
 
-      <section className="ds-card" style={{ padding: 16 }}>
-        <div className="side-card-title" style={{ marginBottom: 6 }}>Últimas transações</div>
-        {recent.loading ? <SkeletonRows rows={3} /> : <RecentList items={recent.data} />}
-        <button type="button" className="cat-card-link" onClick={() => navigate('/transacoes')}>
-          ver tudo <ArrowRight size={12} style={{ verticalAlign: -1 }} />
-        </button>
+      {/* Gráfico de Gastos com Abas Semana / Mês */}
+      <WeekChart week={week} isMobile />
+
+      {/* Assistente IA Copilot */}
+      <section className="sec ai-sec">
+        <div className="card ai">
+          <div className="ico">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" />
+              <path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z" />
+            </svg>
+          </div>
+          <div>
+            <p>
+              {insight ? insight.description : 'Você gastou 32% a mais com alimentação do que na média dos últimos 3 meses.'}{' '}
+              <span>Quer ver onde foi?</span>
+            </p>
+            <div className="chips">
+              <button type="button" className="chip" id="btnAiMobileDetails" onClick={() => openOverlay('ai')}>
+                Ver detalhes
+              </button>
+              <button type="button" className="chip" onClick={() => navigate('/categorias')}>
+                Criar limite
+              </button>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <Button variant="blue" fullWidth icon={ArrowRight} onClick={() => openTransactionSheet()}>
+      {/* Categorias */}
+      <section className="sec">
+        <div className="sec-head">
+          <h2>Categorias</h2>
+          <button type="button" className="link" onClick={() => navigate('/categorias')}>
+            Ver todas
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </button>
+        </div>
+        <div className="card cats" id="mobileCatList">
+          {meterItems.map((item) => (
+            <div className="cat-row" key={item.name}>
+              <div className="cat-name">
+                <b style={{ background: item.color }} />
+                {item.name}
+              </div>
+              <div className="cat-val num">
+                {formatCurrency(item.spent)} / {formatCurrency(item.limit)}
+              </div>
+              <div className="track">
+                <i style={{ width: `${Math.min(100, item.percentage)}%`, background: item.color }} />
+              </div>
+              <div className="cat-meta">
+                <span>{item.percentage}% do limite</span>
+                <span style={item.percentage >= 80 ? { color: item.color } : {}}>
+                  {item.percentage >= 80 ? 'Perto do limite · ' : 'Limite '}
+                  {formatCurrency(item.limit)}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Últimas Transações */}
+      <section className="sec">
+        <div className="sec-head">
+          <h2>Últimas transações</h2>
+          <button type="button" className="link" onClick={() => navigate('/transacoes')}>
+            Ver todas
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </button>
+        </div>
+        <div className="card txs" id="mobileTxList">
+          {recentList.map((tx) => {
+            const isIncome = tx.type === 'income'
+            return (
+              <button
+                type="button"
+                className="tx"
+                key={tx.id}
+                onClick={() => openTransactionSheet({ editing: tx })}
+              >
+                <div className="ic" style={{ color: tx.category?.colorCode || '#888' }}>
+                  <Icon name={tx.category?.icon || 'Tag'} size={16} />
+                </div>
+                <div>
+                  <div className="t">{tx.description}</div>
+                  <div className="s">{tx.category?.name || 'Geral'}</div>
+                </div>
+                <div>
+                  <div className={`a ${isIncome ? 'pos' : ''}`}>
+                    {isIncome ? '+' : '−'}R$ {Number(tx.value).toFixed(2).replace('.', ',')}
+                  </div>
+                  <div className="d">{tx.transactionDate ? formatDayLabel(tx.transactionDate) : 'Hoje'}</div>
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      </section>
+
+      <button
+        type="button"
+        className="btn primary"
+        style={{ width: '100%', height: 42, marginTop: 8 }}
+        onClick={() => openTransactionSheet()}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ marginRight: 6 }}>
+          <path d="M12 5v14M5 12h14" />
+        </svg>
         Registrar novo lançamento
-      </Button>
-    </div>
-  )
-}
-
-function MiniStat({ label, tone, state, pick, loading }) {
-  return (
-    <div className="ds-card stat-card" style={{ padding: 16, gap: 4 }}>
-      <div className="stat-label">{label}</div>
-      <div className={`stat-value num ${tone === 'green' ? 'text-success' : ''}`} style={{ fontSize: 18 }}>
-        {loading ? '—' : <MoneyText value={pick(state.data)} />}
-      </div>
+      </button>
     </div>
   )
 }
@@ -386,7 +502,7 @@ function DesktopDashboard() {
   )
 }
 
-function WeekChart({ week }) {
+function WeekChart({ week, isMobile }) {
   const [range, setRange] = useState('week')
   const now = new Date()
   const month = useAsync(
@@ -405,6 +521,41 @@ function WeekChart({ week }) {
 
   const total = days.reduce((sum, day) => sum + day.value, 0)
   const todayLabel = range === 'week' ? ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'][((new Date().getDay() + 6) % 7)] : String(new Date().getDate()).padStart(2, '0')
+
+  if (isMobile) {
+    return (
+      <section className="sec">
+        <div className="card">
+          <div className="chart-foot">
+            <div>
+              <div className="sub">{range === 'week' ? 'Distribuição de Gastos da Semana' : 'Acumulado do Mês'}</div>
+              <div className="big" id="dashWeekTotalMobile">{formatCurrency(total)}</div>
+            </div>
+            <SegmentedControl
+              name="Período"
+              value={range}
+              onChange={setRange}
+              options={[
+                { value: 'week', label: 'Semana' },
+                { value: 'month', label: 'Mês' },
+              ]}
+            />
+          </div>
+          <div className="chart" role="img" aria-label={`Distribuição de Gastos da Semana: Total ${formatCurrency(total)}`}>
+            {days.map((day) => {
+              const isNow = day.label === todayLabel
+              return (
+                <div key={day.label} className={`bar ${isNow ? 'now' : ''}`}>
+                  <span style={{ height: `${Math.max(6, day.pct)}%` }} />
+                  <em>{day.label}</em>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
