@@ -105,10 +105,14 @@ export default defineConfig({
   ],
   server: {
     port: 5173,
-    host: true,
+    host: '0.0.0.0',
     proxy: {
       '/api': {
-        target: 'http://localhost:5041',
+        target: 'http://127.0.0.1:5041',
+        changeOrigin: true,
+      },
+      '/uploads': {
+        target: 'http://127.0.0.1:5041',
         changeOrigin: true,
       },
     },
