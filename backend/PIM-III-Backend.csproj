@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>PIM_III_Backend</RootNamespace>
+    <UserSecretsId>13b030e5-4dc4-4461-9bea-e96110042a3b</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
