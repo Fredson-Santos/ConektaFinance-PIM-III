@@ -157,4 +157,18 @@ public class LlmCopilotClientTests
         reply.Content.Should().Be("Oi! Como posso ajudar?");
         _toolProvider.Verify(p => p.ExecuteAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<JsonElement>()), Times.Never);
     }
+
+    [Fact]
+    public async Task Prompt_do_sistema_nao_contem_dados_do_usuario()
+    {
+        var client = CreateClient(_ => Completion("""{"content":"ok","actions":[]}"""));
+
+        await client.ReplyAsync(Request("resumo"));
+
+        var systemMessage = _handler.RequestBodies[0];
+        systemMessage.Should().Contain("PROIBICOES");
+        systemMessage.Should().NotContainAny(
+            "monthlyCeiling", "monthlyIncome", "monthlyExpense",
+            "overBudgetCategories", "Contexto financeiro atual do usuario");
+    }
 }

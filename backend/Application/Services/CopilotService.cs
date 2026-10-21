@@ -70,6 +70,7 @@ public class CopilotService(
             context);
 
         var reply = await aiClient.ReplyAsync(request);
+        reply = GuardPromptLeak(reply);
         var assistantMessage = new ChatMessage
         {
             UserId = userId,
@@ -160,6 +161,33 @@ public class CopilotService(
         string.IsNullOrWhiteSpace(payload)
             ? null
             : JsonSerializer.Deserialize<List<CopilotActionDto>>(payload);
+
+    private static readonly string[] PromptLeakMarkers =
+    [
+        "Voce e o agente financeiro do ConektaFinance",
+        "REGRAS DE ACAO",
+        "PROIBICOES:",
+        "FORMATO DA RESPOSTA FINAL",
+        "sistema anexa automaticamente o rascunho"
+    ];
+
+    /// <summary>
+    /// Guarda-corpo contra vazamento do prompt do sistema: se a resposta do LLM
+    /// reproduzir trechos literais das instrucoes internas, ela e substituida por
+    /// uma recusa antes de ser persistida ou exibida.
+    /// </summary>
+    internal static CopilotReply GuardPromptLeak(CopilotReply reply)
+    {
+        var leaked = PromptLeakMarkers.Any(marker =>
+            reply.Content.Contains(marker, StringComparison.OrdinalIgnoreCase));
+
+        if (!leaked)
+            return reply;
+
+        return new CopilotReply(
+            "Prefiro nao compartilhar minhas instrucoes internas. Posso te ajudar com suas financas: resumo do mes, onde economizar ou registrar um lancamento.",
+            []);
+    }
 
     private static void MarkConsumed(List<CopilotActionDto> actions, CopilotActionDto draft, int? transactionId)
     {
