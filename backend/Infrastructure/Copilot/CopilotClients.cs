@@ -212,7 +212,7 @@ public class LlmCopilotClient(
     {
         var baseUrl = configuration["Copilot:BaseUrl"]?.TrimEnd('/');
         var apiKey = configuration["Copilot:ApiKey"];
-        var model = configuration["Copilot:Model"] ?? "z-ai/glm-5.3-flash";
+        var model = configuration["Copilot:Model"] ?? "nvidia/nemotron-3.5-lightning-30b-a3b";
         if (string.IsNullOrWhiteSpace(baseUrl) || string.IsNullOrWhiteSpace(apiKey))
             throw new InvalidOperationException("Cliente de LLM nao configurado.");
 
