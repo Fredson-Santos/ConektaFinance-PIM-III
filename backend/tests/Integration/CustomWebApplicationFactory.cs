@@ -16,6 +16,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         builder.UseEnvironment("Development");
         builder.UseSetting("Storage:UploadsPath",
             Path.Combine(Path.GetTempPath(), "conekta-test-uploads"));
+        builder.UseSetting("RateLimit:AuthPermitLimit", "10000");
+        builder.UseSetting("RateLimit:AuthWindowSeconds", "60");
         builder.ConfigureServices(services =>
         {
             _connection.Open();

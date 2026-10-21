@@ -62,12 +62,21 @@ public class ChatMessageRepository(AppDbContext context) : IChatMessageRepositor
             .Take(take)
             .ToListAsync();
 
+    public Task<ChatMessage?> GetByIdAndUserAsync(int id, int userId) =>
+        context.ChatMessages.FirstOrDefaultAsync(m => m.Id == id && m.UserId == userId);
+
     public Task<int> CountSinceAsync(int userId, ChatRole role, DateTime since) =>
         context.ChatMessages.CountAsync(m => m.UserId == userId && m.Role == role && m.CreatedAt >= since);
 
     public async Task AddAsync(ChatMessage message)
     {
         context.ChatMessages.Add(message);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(ChatMessage message)
+    {
+        context.ChatMessages.Update(message);
         await context.SaveChangesAsync();
     }
 

@@ -14,7 +14,11 @@ public class CopilotController(ICopilotService copilotService) : BaseApiControll
 
     [HttpPost("messages")]
     public async Task<ActionResult<CopilotExchangeResponse>> SendMessage(SendCopilotMessageRequest request) =>
-        Ok(await copilotService.SendMessageAsync(CurrentUserId, request.Content));
+        Ok(await copilotService.SendMessageAsync(CurrentUserId, request.Content, request.ImageBase64));
+
+    [HttpPost("messages/{id:int}/confirm")]
+    public async Task<ActionResult<CopilotMessageDto>> Confirm(int id) =>
+        Ok(await copilotService.ConfirmDraftAsync(CurrentUserId, id));
 
     [HttpDelete("history")]
     public async Task<ActionResult> ClearHistory()

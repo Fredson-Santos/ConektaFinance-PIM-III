@@ -132,7 +132,11 @@ builder.Services.AddRateLimiter(options =>
     options.AddPolicy("auth", context =>
         RateLimitPartition.GetFixedWindowLimiter(
             context.Connection.RemoteIpAddress?.ToString() ?? "anonimo",
-            _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1) }));
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = builder.Configuration.GetValue("RateLimit:AuthPermitLimit", 20),
+                Window = TimeSpan.FromSeconds(builder.Configuration.GetValue("RateLimit:AuthWindowSeconds", 60))
+            }));
     options.AddPolicy("otp", context =>
         RateLimitPartition.GetFixedWindowLimiter(
             $"otp:{context.Connection.RemoteIpAddress?.ToString() ?? "anonimo"}",
@@ -155,6 +159,8 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IAlertService, AlertService>();
+builder.Services.AddScoped<ICopilotToolProvider, CopilotToolProvider>();
+builder.Services.AddScoped<ICopilotImageStorage, LocalCopilotImageStorage>();
 builder.Services.AddScoped<RuleBasedCopilotClient>();
 if (!string.IsNullOrWhiteSpace(builder.Configuration["Copilot:BaseUrl"]) &&
     !string.IsNullOrWhiteSpace(builder.Configuration["Copilot:ApiKey"]))

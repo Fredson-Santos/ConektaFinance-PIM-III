@@ -42,7 +42,7 @@ public class CopilotFlowTests : IClassFixture<CustomWebApplicationFactory>
         });
 
         var exchange = await (await client.PostAsJsonAsync("/api/v1/copilot/messages",
-            new SendCopilotMessageRequest("Me de um resumo do mes"))).Content
+            new SendCopilotMessageRequest("Me de um resumo do mes", null))).Content
             .ReadFromJsonAsync<CopilotExchangeResponse>(Json);
 
         exchange!.UserMessage.Role.Should().Be("user");
@@ -51,24 +51,73 @@ public class CopilotFlowTests : IClassFixture<CustomWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Registrar_gasto_retorna_acao_que_o_front_confirma()
+    public async Task Registrar_gasto_gera_rascunho_e_confirmacao_grava_no_banco()
     {
         var client = await CreateUserClientAsync();
 
         var exchange = await (await client.PostAsJsonAsync("/api/v1/copilot/messages",
-            new SendCopilotMessageRequest("Registrar um gasto de R$ 45 no uber"))).Content
+            new SendCopilotMessageRequest("Registrar um gasto de R$ 45 no uber", null))).Content
             .ReadFromJsonAsync<CopilotExchangeResponse>(Json);
 
-        var action = exchange!.AssistantMessage.Actions.Should().ContainSingle(a => a.Tool == "open_transaction_sheet").Subject;
+        var action = exchange!.AssistantMessage.Actions.Should()
+            .ContainSingle(a => a.Tool == "draft_transaction").Subject;
+        action.Status.Should().Be("pending");
         action.Args!["value"].ToString().Should().Be("45");
         action.Args["categoryName"].ToString().Should().Be("Transporte");
+
+        var confirm = await client.PostAsJsonAsync(
+            $"/api/v1/copilot/messages/{exchange.AssistantMessage.Id}/confirm", new { });
+        confirm.StatusCode.Should().Be(HttpStatusCode.OK);
+        var confirmation = await confirm.Content.ReadFromJsonAsync<CopilotMessageDto>(Json);
+        confirmation!.Content.Should().Contain("R$ 45,00");
+
+        var list = await (await client.GetAsync("/api/v1/transactions?page=1&pageSize=20")).Content
+            .ReadFromJsonAsync<TransactionListResponse>(Json);
+        list!.Items.Should().Contain(t => t.Value == 45m && t.Category.Name == "Transporte");
+
+        var history = await (await client.GetAsync("/api/v1/copilot/history")).Content
+            .ReadFromJsonAsync<CopilotHistoryResponse>(Json);
+        history!.Items.Should().Contain(m => m.Content.Contains("R$ 45,00"));
+    }
+
+    [Fact]
+    public async Task Confirmar_o_mesmo_rascunho_duas_vezes_retorna_409()
+    {
+        var client = await CreateUserClientAsync();
+        var exchange = await (await client.PostAsJsonAsync("/api/v1/copilot/messages",
+            new SendCopilotMessageRequest("Registrar um gasto de R$ 12,50 na padaria", null))).Content
+            .ReadFromJsonAsync<CopilotExchangeResponse>(Json);
+
+        var first = await client.PostAsJsonAsync(
+            $"/api/v1/copilot/messages/{exchange!.AssistantMessage.Id}/confirm", new { });
+        first.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var second = await client.PostAsJsonAsync(
+            $"/api/v1/copilot/messages/{exchange.AssistantMessage.Id}/confirm", new { });
+        second.StatusCode.Should().Be(HttpStatusCode.Conflict);
+    }
+
+    [Fact]
+    public async Task Confirmar_mensagem_de_outro_usuario_retorna_404()
+    {
+        var client = await CreateUserClientAsync();
+        var other = await CreateUserClientAsync();
+
+        var exchange = await (await other.PostAsJsonAsync("/api/v1/copilot/messages",
+            new SendCopilotMessageRequest("Registrar um gasto de R$ 10 no mercado", null))).Content
+            .ReadFromJsonAsync<CopilotExchangeResponse>(Json);
+
+        var response = await client.PostAsJsonAsync(
+            $"/api/v1/copilot/messages/{exchange!.AssistantMessage.Id}/confirm", new { });
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
     public async Task Historico_registra_as_trocas_e_limpeza_apaga()
     {
         var client = await CreateUserClientAsync();
-        await client.PostAsJsonAsync("/api/v1/copilot/messages", new SendCopilotMessageRequest("resumo do mes"));
+        await client.PostAsJsonAsync("/api/v1/copilot/messages", new SendCopilotMessageRequest("resumo do mes", null));
 
         var history = await (await client.GetAsync("/api/v1/copilot/history")).Content
             .ReadFromJsonAsync<CopilotHistoryResponse>(Json);
@@ -93,9 +142,9 @@ public class CopilotFlowTests : IClassFixture<CustomWebApplicationFactory>
         var auth = await register.Content.ReadFromJsonAsync<AuthResponse>(Json);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", auth!.Token);
 
-        var first = await client.PostAsJsonAsync("/api/v1/copilot/messages", new SendCopilotMessageRequest("oi"));
-        var second = await client.PostAsJsonAsync("/api/v1/copilot/messages", new SendCopilotMessageRequest("resumo"));
-        var third = await client.PostAsJsonAsync("/api/v1/copilot/messages", new SendCopilotMessageRequest("economizar"));
+        var first = await client.PostAsJsonAsync("/api/v1/copilot/messages", new SendCopilotMessageRequest("oi", null));
+        var second = await client.PostAsJsonAsync("/api/v1/copilot/messages", new SendCopilotMessageRequest("resumo", null));
+        var third = await client.PostAsJsonAsync("/api/v1/copilot/messages", new SendCopilotMessageRequest("economizar", null));
 
         first.StatusCode.Should().Be(HttpStatusCode.OK);
         second.StatusCode.Should().Be(HttpStatusCode.OK);
