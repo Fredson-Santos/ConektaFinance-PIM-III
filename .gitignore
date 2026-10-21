@@ -71,6 +71,7 @@ obj/
 *.db-wal
 *.db-journal
 appsettings.*.local.json
+backend/wwwroot/uploads/
 
 # Playwright / E2E Tests
 **/test-results/
