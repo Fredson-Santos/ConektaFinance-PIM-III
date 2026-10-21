@@ -873,6 +873,23 @@
   animation: aiFabWiggle 0.85s var(--ds-ease);
 }
 
+.ai-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  z-index: 1040;
+}
+
+@media (max-width: 880px) {
+  .ai-backdrop {
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+}
+
 .ai-panel {
   position: fixed;
   z-index: 1100;
@@ -947,6 +964,97 @@
   flex-direction: column;
   gap: 6px;
   margin-top: 8px;
+}
+
+.ai-msg-image {
+  display: block;
+  max-width: 100%;
+  width: 180px;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  border: 1px solid var(--ds-border);
+  object-fit: cover;
+}
+
+.ai-draft-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.ai-confirm-btn {
+  background: var(--ds-blue-700);
+  color: #fff;
+  border-color: transparent;
+}
+
+.ai-confirm-btn:hover {
+  filter: brightness(1.1);
+}
+
+.ai-draft-consumed {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--ds-foreground-muted);
+}
+
+.ai-attach-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: var(--ds-radius-full);
+  border: 1px solid var(--ds-border);
+  background: var(--ds-background-200);
+  color: var(--ds-foreground-muted);
+  cursor: pointer;
+  transition: all var(--ds-duration-fast) var(--ds-ease);
+}
+
+.ai-attach-btn:hover:not(:disabled) {
+  color: var(--ds-foreground);
+  border-color: var(--ds-border-strong);
+}
+
+.ai-attach-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ai-pending-image {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 16px;
+  padding: 8px;
+  border: 1px solid var(--ds-border-subtle);
+  border-radius: 12px;
+  background: var(--ds-gray-alpha-200);
+}
+
+.ai-pending-image img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--ds-border);
+}
+
+.ai-pending-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ds-foreground-muted);
 }
 
 .ai-suggest {

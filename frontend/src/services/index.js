@@ -90,7 +90,9 @@ export const insightService = {
 
 export const copilotService = {
   history: () => get('/copilot/history'),
-  sendMessage: (content) => post('/copilot/messages', { content }),
+  sendMessage: (content, imageBase64 = null) =>
+    post('/copilot/messages', { content, imageBase64 }),
+  confirm: (messageId) => post(`/copilot/messages/${messageId}/confirm`, {}),
   clearHistory: () => del('/copilot/history'),
 }
 

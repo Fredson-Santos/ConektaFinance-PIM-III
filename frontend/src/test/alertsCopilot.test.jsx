@@ -23,6 +23,7 @@ vi.mock('../services', async (importOriginal) => {
       ...original.copilotService,
       history: vi.fn(),
       sendMessage: vi.fn(),
+      confirm: vi.fn(),
       clearHistory: vi.fn(),
     },
     userService: {
@@ -116,8 +117,70 @@ describe('AiPanel', () => {
     fireEvent.change(input, { target: { value: 'Registrar gasto de R$ 45 no uber' } })
     fireEvent.click(screen.getByRole('button', { name: 'Enviar' }))
 
-    await waitFor(() => expect(copilotService.sendMessage).toHaveBeenCalledWith('Registrar gasto de R$ 45 no uber'))
+    await waitFor(() => expect(copilotService.sendMessage).toHaveBeenCalledWith('Registrar gasto de R$ 45 no uber', null))
     expect(await screen.findByText('Abrir lançamento pré-preenchido')).toBeInTheDocument()
+  })
+
+  it('confirma rascunho da ia e marca a acao como consumida', async () => {
+    copilotService.sendMessage.mockResolvedValue({
+      userMessage: { id: 10, role: 'user', content: 'foto da nota', createdAt: new Date().toISOString() },
+      assistantMessage: {
+        id: 11,
+        role: 'assistant',
+        content: 'Encontrei na nota: R$ 45,90. Confirma o lançamento?',
+        actions: [
+          { tool: 'draft_transaction', args: { type: 'expense', value: 45.9, description: 'Ifood' }, status: 'pending' },
+        ],
+        createdAt: new Date().toISOString(),
+      },
+    })
+    copilotService.confirm.mockResolvedValue({
+      id: 12,
+      role: 'assistant',
+      content: 'Lançamento registrado com sucesso: Ifood de R$ 45,90 em Alimentação.',
+      createdAt: new Date().toISOString(),
+    })
+    renderWithOverlay('ai', AiPanel)
+
+    const input = screen.getByLabelText('Mensagem para o assistente')
+    fireEvent.change(input, { target: { value: 'foto da nota' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar' }))
+
+    fireEvent.click(await screen.findByRole('button', { name: /confirmar lançamento/i }))
+
+    await waitFor(() => expect(copilotService.confirm).toHaveBeenCalledWith(11))
+    expect(await screen.findByText(/Ifood de R\$ 45,90 em Alimentação/i)).toBeInTheDocument()
+    expect(screen.getByText(/lançamento confirmado/i)).toBeInTheDocument()
+  })
+
+  it('rejeita anexo de formato nao suportado', async () => {
+    const { container } = renderWithOverlay('ai', AiPanel)
+
+    const fileInput = container.querySelector('input[type="file"]')
+    fireEvent.change(fileInput, {
+      target: { files: [new File(['conteudo'], 'documento.pdf', { type: 'application/pdf' })] },
+    })
+
+    expect(await screen.findByText(/Formatos aceitos: JPEG, PNG ou WebP\./)).toBeInTheDocument()
+  })
+
+  it('anexa nota fiscal e envia imagem junto com a mensagem', async () => {
+    const { container } = renderWithOverlay('ai', AiPanel)
+
+    const fileInput = container.querySelector('input[type="file"]')
+    fireEvent.change(fileInput, {
+      target: { files: [new File(['conteudo'], 'nota.png', { type: 'image/png' })] },
+    })
+
+    expect(await screen.findByAltText('Nota fiscal selecionada')).toBeInTheDocument()
+
+    const input = screen.getByLabelText('Mensagem para o assistente')
+    fireEvent.change(input, { target: { value: 'lê essa nota' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar' }))
+
+    await waitFor(() =>
+      expect(copilotService.sendMessage).toHaveBeenCalledWith('lê essa nota', expect.stringMatching(/^data:/)),
+    )
   })
 
   it('exibe mensagem de erro quando a cota falha', async () => {
