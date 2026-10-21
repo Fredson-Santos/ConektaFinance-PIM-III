@@ -159,6 +159,48 @@ public class LlmCopilotClientTests
     }
 
     [Fact]
+    public async Task Segunda_chamada_de_create_transaction_no_mesmo_turno_e_bloqueada()
+    {
+        var client = CreateClient(index => index switch
+        {
+            0 => ToolCallCompletion("call_1", "create_transaction",
+                """{"type":"expense","description":"Ifood","value":55,"categoryName":"Alimentação"}"""),
+            1 => ToolCallCompletion("call_2", "create_transaction",
+                """{"type":"expense","description":"Ifood","value":55,"categoryName":"Alimentação"}"""),
+            _ => Completion("""{"content":"Registrado R$ 55,00 em Alimentação.","actions":[]}""")
+        });
+        _toolProvider.Setup(p => p.ExecuteAsync(1, "create_transaction", It.IsAny<JsonElement>()))
+            .ReturnsAsync("""{"success":true,"transactionId":91,"description":"Ifood","value":55,"category":"Alimentação"}""");
+
+        var reply = await client.ReplyAsync(Request("gastei 55 no ifood"));
+
+        reply.Content.Should().Be("Registrado R$ 55,00 em Alimentação.");
+        _toolProvider.Verify(p => p.ExecuteAsync(1, "create_transaction", It.IsAny<JsonElement>()), Times.Once);
+        _handler.RequestBodies[2].Should().Contain("ja registrado nesta mensagem");
+    }
+
+    [Fact]
+    public async Task Nova_tentativa_de_create_apos_falha_e_permitida()
+    {
+        var client = CreateClient(index => index switch
+        {
+            0 => ToolCallCompletion("call_1", "create_transaction",
+                """{"type":"expense","description":"Presente","value":50,"categoryName":"Pets"}"""),
+            1 => ToolCallCompletion("call_2", "create_transaction",
+                """{"type":"expense","description":"Presente","value":50,"categoryName":"Lazer"}"""),
+            _ => Completion("""{"content":"Registrado em Lazer.","actions":[]}""")
+        });
+        _toolProvider.SetupSequence(p => p.ExecuteAsync(1, "create_transaction", It.IsAny<JsonElement>()))
+            .ReturnsAsync("""{"error":"Categoria 'Pets' não encontrada. Disponíveis: Alimentação, Lazer."}""")
+            .ReturnsAsync("""{"success":true,"transactionId":92,"description":"Presente","value":50,"category":"Lazer"}""");
+
+        var reply = await client.ReplyAsync(Request("comprei um presente de 50 reais"));
+
+        reply.Content.Should().Be("Registrado em Lazer.");
+        _toolProvider.Verify(p => p.ExecuteAsync(1, "create_transaction", It.IsAny<JsonElement>()), Times.Exactly(2));
+    }
+
+    [Fact]
     public async Task Prompt_do_sistema_nao_contem_dados_do_usuario()
     {
         var client = CreateClient(_ => Completion("""{"content":"ok","actions":[]}"""));
