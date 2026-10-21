@@ -14,15 +14,15 @@ export function AppLayout() {
   return (
     <>
       <div className="app-glow" />
-      <div className="app-shell">
-      <Sidebar />
-      <main className="main-area">
-        <PwaInstallBanner />
-        <Topbar />
-        <div className="view-container">
-          <Outlet />
-        </div>
-      </main>
+      <div className="app-shell app">
+        <Sidebar />
+        <main className="main-area main">
+          <PwaInstallBanner />
+          <Topbar />
+          <div className="view-container">
+            <Outlet />
+          </div>
+        </main>
       <BottomNav />
       <NotificationsPopover />
       <CommandPalette />

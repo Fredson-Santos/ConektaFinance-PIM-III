@@ -62,6 +62,7 @@ export function AiPanel() {
 
   const runAction = (action) => {
     const args = action.args || {}
+    closeOverlay('ai')
     openTransactionSheet({
       type: args.type || 'expense',
       description: args.description,
