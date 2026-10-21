@@ -88,6 +88,7 @@ Todas as tools recebem o `userId` do token JWT — nunca um id vindo do LLM.
 
 - Cota diária existente (30 mensagens) + rate limiting "auth" já aplicado ao controller.
 - Limite de iterações do loop (default 4) impede loop infinito de tool calls.
+- **Idempotência de escrita por turno:** o loop bloqueia uma segunda execução de `create_transaction` na mesma mensagem após sucesso — o LLM recebe um resultado instrutivo ("já registrado nesta mensagem") em vez de duplicar o lançamento. Nova tentativa após *falha* permanece permitida (ex.: modelo corrige a categoria e refaz).
 - Imagens: validação de tipo (jpeg/png/webp) e tamanho (≤ 5 MB), salvas em `Storage:UploadsPath/copilot/`.
 - `create_transaction`/`draft_transaction` só aceitam categorias do próprio usuário (busca por nome; sem match → tool devolve lista de nomes válidos para o LLM pedir esclarecimento).
 - IA sempre mockada nos testes (regra `tests.md`); sem rede na suíte.
