@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using PIM_III_Backend.Application.Services;
+using PIM_III_Backend.Infrastructure.Copilot;
 using PIM_III_Backend.Infrastructure.Persistence;
 
 namespace PIM_III_Backend.Tests.Integration;
@@ -25,6 +28,16 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             if (descriptor is not null)
                 services.Remove(descriptor);
             services.AddDbContext<AppDbContext>(options => options.UseSqlite(_connection));
+
+            // Regra tests.md: a IA e sempre simulada na suíte — nem user secrets
+            // locais do dev podem ligar o LLM real nos testes de integracao.
+            var copilotDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(ICopilotAiClient));
+            if (copilotDescriptor is not null)
+                services.Remove(copilotDescriptor);
+            services.AddScoped<ICopilotAiClient>(sp => new CompositeCopilotClient(
+                null,
+                new RuleBasedCopilotClient(),
+                sp.GetRequiredService<ILogger<CompositeCopilotClient>>()));
         });
     }
 
