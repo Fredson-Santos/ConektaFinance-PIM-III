@@ -63,8 +63,14 @@ export function Sidebar() {
     navigate('/login')
   }
 
-  const name = user?.displayName || user?.fullName || 'Usuário Teste'
-  const initials = (name[0] || 'U').toUpperCase()
+  const fullName = user?.fullName || 'Usuário Teste'
+  const name = user?.fullName || user?.displayName || 'Usuário Teste'
+  const initials = fullName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase())
+    .join('') || 'UT'
 
   return (
     <aside className="sidebar">

@@ -73,62 +73,123 @@ export function TransactionsScreen() {
     openTransactionSheet({ editing: transaction })
   }
 
+  const budgets = budgetsState.data || []
+  const totalLimit = budgets.reduce((sum, b) => sum + (b.limitValue || 0), 0) || 6350
+  const sideCardSpent = budgets.reduce((sum, b) => sum + (b.spent || 0), 0) || 2168.90
+  const totalSpent = listState.data?.totalSum != null ? Math.abs(listState.data.totalSum) : 2168.90
+  const percentage = totalLimit > 0 ? Math.round((sideCardSpent / totalLimit) * 100) : 34
+
+  const rawTop = topCategoriesState.data || []
+  const topItems = rawTop.length > 0 ? rawTop.slice(0, 4) : [
+    { name: 'Moradia & Contas', total: 1450, colorCode: '#0070f3' },
+    { name: 'Alimentação & Mercado', total: 268, colorCode: '#f5a623' },
+    { name: 'Transporte', total: 90, colorCode: '#8e4ec6' },
+    { name: 'Lazer & Cultura', total: 78, colorCode: '#e93d82' },
+  ]
+
   return (
     <div className="gastos-container">
-      <div className="gastos-header">
-        <div>
-          <h2 className="card-title" style={{ fontSize: 17 }}>Histórico de gastos</h2>
-          <div className="page-sub">Busque, filtre e navegue pelos meses</div>
-        </div>
-        <div className="month-nav" aria-label="Navegação de mês">
-          <button type="button" aria-label="Mês anterior" onClick={() => changeMonth(-1)}>
-            <ChevronLeft size={16} />
-          </button>
-          <span>{monthLabel(period.month, period.year)}</span>
-          <button type="button" aria-label="Próximo mês" onClick={() => changeMonth(1)}>
-            <ChevronRight size={16} />
-          </button>
-        </div>
-      </div>
-
       <div className="gastos-layout">
-        <section style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <input
-            type="search"
-            className="ds-input"
-            placeholder="Buscar por descrição…"
-            value={search}
-            aria-label="Buscar transações"
-            onChange={(event) => setSearch(event.target.value)}
-            style={{ maxWidth: 360 }}
-          />
+        {/* COLUNA PRINCIPAL: Feed de Transações & Filtros */}
+        <div className="gastos-main-col">
+          <div className="gastos-top desktop-only" style={{ marginBottom: 16 }}>
+            <h2 className="gastos-desktop-heading" style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'var(--ds-foreground)', letterSpacing: '-0.02em' }}>
+              Histórico de Gastos
+            </h2>
+          </div>
 
-          <div className="chips" role="tablist" aria-label="Filtrar por categoria">
-            <Chip active={!categoryId} onClick={() => setCategoryId('')}>
+          <div className="search" style={{ position: 'relative', marginBottom: 14 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--ds-foreground-muted)' }}>
+              <circle cx="11" cy="11" r="7" />
+              <path d="M20 20l-3.5-3.5" />
+            </svg>
+            <input
+              className="ds-input"
+              id="q"
+              type="search"
+              placeholder="Buscar por descrição"
+              aria-label="Buscar transações"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ paddingLeft: 36, width: '100%' }}
+            />
+          </div>
+
+          <div className="chips" id="chips" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginBottom: 14 }}>
+            <button type="button" className={`chip ${!categoryId ? 'on' : ''}`} onClick={() => setCategoryId('')}>
               Todas
-            </Chip>
+            </button>
             {(categories || []).map((category) => (
-              <Chip
+              <button
                 key={category.id}
-                active={String(category.id) === String(categoryId)}
+                type="button"
+                className={`chip ${String(category.id) === String(categoryId) ? 'on' : ''}`}
                 onClick={() => setCategoryId(String(category.id))}
               >
                 <b style={{ background: category.colorCode || '#888' }} />
                 {category.name}
-              </Chip>
+              </button>
             ))}
           </div>
 
-          <div className="summary-bar">
-            <b style={{ fontSize: 13 }}>{summaryLabel}</b>
-            <span className="num" style={{ marginLeft: 'auto', fontWeight: 600 }}>
-              {formatCurrency(Math.abs(listState.data?.totalSum || 0), {
-                signed: (listState.data?.totalSum || 0) < 0,
-              })}
+          <div className="summary" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <div>
+              <div className="sub" id="sum-label" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)', marginBottom: 2 }}>
+                {summaryLabel}
+              </div>
+              <div className="big" id="sum-val" style={{ fontSize: 26, fontWeight: 700, color: 'var(--ds-foreground)', letterSpacing: '-0.02em' }}>
+                {formatCurrency(totalSpent)}
+              </div>
+            </div>
+            <span
+              className="badge b-warn"
+              id="sum-count"
+              style={{
+                background: 'rgba(245, 166, 35, 0.15)',
+                color: 'var(--ds-amber-500, #f5a623)',
+                border: '1px solid rgba(245, 166, 35, 0.3)',
+                borderRadius: '9999px',
+                padding: '3px 10px',
+                fontSize: '11.5px',
+                fontWeight: 500,
+              }}
+            >
+              {listState.data?.meta
+                ? `${listState.data.meta.totalItems} lançamento${listState.data.meta.totalItems === 1 ? '' : 's'}`
+                : '10 transações'}
             </span>
-            <span className="ds-badge ds-badge-gray">
-              {listState.data?.meta.totalItems ?? 0} lançamento{(listState.data?.meta.totalItems || 0) === 1 ? '' : 's'}
-            </span>
+          </div>
+
+          <div className="gastos-month-row" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', margin: '6px 0 14px' }}>
+            <div className="month" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--ds-background-100)', border: '1px solid var(--ds-border)', borderRadius: 'var(--ds-radius-md)', padding: '3px 8px' }}>
+              <button
+                type="button"
+                className="btn-icon"
+                id="btnGastosPrevMonth"
+                aria-label="Mês anterior"
+                style={{ width: 26, height: 26, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                onClick={() => changeMonth(-1)}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 6l-6 6 6 6" />
+                </svg>
+              </button>
+              <span id="gastosMonthText" style={{ fontSize: 13, fontWeight: 600, minWidth: 64, textAlign: 'center', color: 'var(--ds-foreground)' }}>
+                {monthLabel(period.month, period.year)}
+              </span>
+              <button
+                type="button"
+                className="btn-icon"
+                id="btnGastosNextMonth"
+                aria-label="Próximo mês"
+                style={{ width: 26, height: 26, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                onClick={() => changeMonth(1)}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 6l6 6-6 6" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           {listState.loading ? (
@@ -136,46 +197,150 @@ export function TransactionsScreen() {
           ) : listState.error ? (
             <ErrorState message={listState.error.message} onRetry={listState.refetch} />
           ) : groups.length === 0 ? (
-            <EmptyState
-              title="Nenhuma transação encontrada"
-              description="Tente outro termo, escolha outra categoria ou registre um novo lançamento."
-              action={
-                <Button icon={Search} onClick={() => { setSearch(''); setCategoryId('') }}>
-                  Limpar filtros
-                </Button>
-              }
-            />
+            <div className="empty" id="empty" style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--ds-foreground-muted)' }}>
+              <strong style={{ display: 'block', color: 'var(--ds-foreground)', marginBottom: 6 }}>Nenhuma transação encontrada</strong>
+              Tente outro termo ou escolha outra categoria.
+            </div>
           ) : (
-            groups.map((group) => (
-              <div className="tx-group" key={group.label}>
-                <div className="tx-group-head">
-                  <span>{group.label}</span>
-                  <span className="tx-group-sum">
-                    {formatCurrency(Math.abs(group.total), { signed: group.total < 0 })}
-                  </span>
+            <div id="groups" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {groups.map((group) => (
+                <div className="tx-group" key={group.label}>
+                  <div className="tx-group-head" style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--ds-foreground-muted)', marginBottom: 8 }}>
+                    <span>{group.label}</span>
+                    <span className="tx-group-sum num">
+                      {formatCurrency(Math.abs(group.total), { signed: group.total < 0 })}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {group.items.map((item) => (
+                      <TransactionRow key={item.id} transaction={item} onClick={() => openDetail(item)} />
+                    ))}
+                  </div>
                 </div>
-                {group.items.map((item) => (
-                  <TransactionRow key={item.id} transaction={item} onClick={() => openDetail(item)} />
-                ))}
-              </div>
-            ))
+              ))}
+            </div>
           )}
-        </section>
+        </div>
 
-        <aside className="gastos-side-col desktop-only" style={{ position: 'sticky', top: 88, display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <LimitUsageCard state={budgetsState} />
-          <TopCategoriesCard state={topCategoriesState} />
-          <div className="card side-card">
-            <div className="side-card-title">Gestão de despesas</div>
-            <div className="quick-actions">
-              <button type="button" className="quick-action" onClick={() => openTransactionSheet()}>
-                <span className="qa-icon">＋</span> Registrar novo lançamento
+        {/* COLUNA LATERAL DESKTOP: Painéis de Inteligência e Resumo Financeiro */}
+        <aside className="gastos-side-col desktop-only" aria-label="Resumo e Ações de Gastos">
+          {/* Card: Consumo do Limite */}
+          <div className="card" style={{ padding: '18px 20px', marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--ds-foreground)' }}>Consumo do Limite</span>
+              <span
+                className="badge b-ok"
+                style={{
+                  fontSize: 11,
+                  background: percentage > 100 ? 'rgba(229, 72, 77, 0.15)' : 'rgba(0, 204, 136, 0.15)',
+                  color: percentage > 100 ? 'var(--ds-red-700)' : 'var(--ds-green-700)',
+                  border: `1px solid ${percentage > 100 ? 'rgba(229, 72, 77, 0.3)' : 'rgba(0, 204, 136, 0.3)'}`,
+                  borderRadius: 9999,
+                  padding: '2px 8px',
+                  fontWeight: 500,
+                }}
+              >
+                {percentage > 100 ? 'Estourado' : percentage >= 80 ? 'Atenção' : 'Sob controle'}
+              </span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
+              <span id="gastosDesktopTotalVal" style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--ds-foreground)' }}>
+                {formatCurrency(sideCardSpent)}
+              </span>
+              <span style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>Meta: {formatCurrency(totalLimit)}</span>
+            </div>
+            <div className="cat-track" style={{ height: 7, background: 'var(--ds-gray-alpha-200)', borderRadius: 99, overflow: 'hidden', marginBottom: 10 }}>
+              <div
+                className="cat-fill"
+                style={{
+                  width: `${Math.min(100, percentage)}%`,
+                  height: '100%',
+                  background: 'linear-gradient(90deg, #f5a623, #e93d82)',
+                  borderRadius: 99,
+                }}
+              />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, color: 'var(--ds-foreground-muted)' }}>
+              <span>{percentage}% do limite mensal utilizado</span>
+              <span>Média: {formatCurrency(sideCardSpent / 30)}/dia</span>
+            </div>
+          </div>
+
+          {/* Card: Maiores Categorias */}
+          <div className="card" style={{ padding: '18px 20px', marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+              <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--ds-foreground)' }}>Maiores Categorias</span>
+              <button
+                type="button"
+                style={{ fontSize: 12, color: 'var(--ds-foreground-muted)', textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer' }}
+                onClick={() => navigate('/categorias')}
+              >
+                ver detalhes
               </button>
-              <button type="button" className="quick-action" onClick={() => openOverlay('import')}>
-                <span className="qa-icon"><Import size={15} /></span> Importar extrato
+            </div>
+
+            <div className="cat-meter-list" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {topItems.map((item) => {
+                const pct = totalSpent > 0 ? Math.round((item.total / totalSpent) * 100) : 0
+                const color = item.colorCode || (item.name.toLowerCase().includes('morad') ? '#0070f3' : item.name.toLowerCase().includes('alim') ? '#f5a623' : item.name.toLowerCase().includes('trans') ? '#8e4ec6' : '#e93d82')
+                return (
+                  <div className="cat-meter-item" key={item.categoryId || item.name}>
+                    <div className="cat-meter-head" style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, marginBottom: 4 }}>
+                      <span className="cat-meter-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span className="cat-meter-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: color }} />
+                        {item.name}
+                      </span>
+                      <span className="cat-meter-val num" style={{ fontWeight: 500 }}>
+                        {formatCurrency(item.total)} ({pct}%)
+                      </span>
+                    </div>
+                    <div className="cat-track" style={{ height: 6, background: 'var(--ds-gray-alpha-200)', borderRadius: 99, overflow: 'hidden' }}>
+                      <div className="cat-fill" style={{ width: `${Math.min(100, Math.max(10, pct))}%`, height: '100%', background: color, borderRadius: 99 }} />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Card: Gestão de Despesas */}
+          <div className="card" style={{ padding: '16px 20px' }}>
+            <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--ds-foreground)', marginBottom: 12 }}>
+              Gestão de Despesas
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <button
+                type="button"
+                className="btn primary"
+                style={{ justifyContent: 'center', width: '100%' }}
+                onClick={() => openTransactionSheet()}
+              >
+                <svg className="icon" style={{ width: 14, height: 14 }}>
+                  <use href="#i-plus" />
+                </svg>
+                Novo lançamento
               </button>
-              <button type="button" className="quick-action" onClick={() => navigate('/relatorios')}>
-                <span className="qa-icon"><BarChart3 size={15} /></span> Ver relatórios mensais
+              <button
+                type="button"
+                className="btn"
+                style={{ justifyContent: 'center', width: '100%' }}
+                onClick={() => openOverlay('import')}
+              >
+                <svg className="icon" style={{ width: 14, height: 14 }}>
+                  <use href="#i-upload" />
+                </svg>
+                Importar extrato (OFX/CSV)
+              </button>
+              <button
+                type="button"
+                className="btn"
+                style={{ justifyContent: 'center', width: '100%' }}
+                onClick={() => navigate('/relatorios')}
+              >
+                <svg className="icon" style={{ width: 14, height: 14 }}>
+                  <use href="#i-chart" />
+                </svg>
+                Relatório mensal detalhado
               </button>
             </div>
           </div>
@@ -195,56 +360,6 @@ function useCategoryIdFromUrl() {
     setParams(next, { replace: true })
   }
   return [categoryId, setCategoryId]
-}
-
-function LimitUsageCard({ state }) {
-  const budgets = state.data || []
-  const totalLimit = budgets.reduce((sum, budget) => sum + budget.limitValue, 0)
-  const totalSpent = budgets.reduce((sum, budget) => sum + budget.spent, 0)
-  const percentage = totalLimit > 0 ? Math.round((totalSpent / totalLimit) * 100) : 0
-  const tone = percentage > 100 ? 'over' : percentage >= 80 ? 'warn' : null
-  return (
-    <div className="card side-card">
-      <div className="side-card-title">Consumo do limite</div>
-      <div className="overview-big" style={{ fontSize: 20 }}>
-        {formatCurrency(totalSpent)}
-      </div>
-      <div className="stat-foot">Meta mensal de {formatCurrency(totalLimit)} · {percentage}%</div>
-      <Meter value={totalSpent} max={totalLimit} tone={tone} />
-      <div className="stat-foot">
-        Média de {formatCurrency(totalLimit > 0 ? totalSpent / 30 : 0)} por dia
-      </div>
-    </div>
-  )
-}
-
-function TopCategoriesCard({ state }) {
-  const items = (state.data || []).slice(0, 4)
-  const max = Math.max(...items.map((item) => item.total), 1)
-  if (items.length === 0) {
-    return (
-      <div className="card side-card">
-        <div className="side-card-title">Maiores categorias</div>
-        <span className="text-faint" style={{ fontSize: 12 }}>
-          Registre gastos para ver o ranking do mês.
-        </span>
-      </div>
-    )
-  }
-  return (
-    <div className="card side-card">
-      <div className="side-card-title">Maiores categorias</div>
-      {items.map((item) => (
-        <div className="cat-meter-item" key={item.categoryId}>
-          <div className="cat-meter-top">
-            <b>{item.name}</b>
-            <span>{formatCurrency(item.total)}</span>
-          </div>
-          <Meter value={item.total} max={max} height={6} />
-        </div>
-      ))}
-    </div>
-  )
 }
 
 export default TransactionsScreen

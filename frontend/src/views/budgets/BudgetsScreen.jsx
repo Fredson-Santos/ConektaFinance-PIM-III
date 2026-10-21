@@ -54,38 +54,76 @@ export function BudgetsScreen() {
 
   return (
     <>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+      <div className="toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
         <div>
           <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-.03em', color: 'var(--ds-foreground)' }}>Categorias & Orçamentos</div>
           <div className="sub" style={{ fontSize: 13, color: 'var(--ds-foreground-muted)' }}>Acompanhe seus limites mensais e veja o total gasto em todas as categorias</div>
         </div>
         <button type="button" className="btn primary" onClick={() => setFormModal({ mode: 'create' })}>
-          <Plus size={14} /> Nova categoria
+          <Plus size={14} style={{ marginRight: 6 }} /> Nova categoria
         </button>
       </div>
 
-      <section className="card overview-card" aria-label="Consolidado do mês" style={{ padding: 20, marginBottom: 24 }}>
-        <div className="overview-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-          <div>
-            <div className="stat-label" style={{ fontSize: 13, color: 'var(--ds-foreground-muted)' }}>Total do mês</div>
-            <div className="overview-big" style={{ fontSize: 28, fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
-              {formatCurrency(overview.totalSpent)} <span className="text-faint" style={{ fontSize: 13, fontWeight: 400 }}>de {formatCurrency(overview.totalLimit)}</span>
-            </div>
+      <section className="card" aria-label="Consolidado do mês" style={{ padding: 20, marginBottom: 24 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 8 }}>
+          <span className="sub" style={{ fontSize: 13, fontWeight: 500, color: 'var(--ds-foreground-muted)' }}>Total gasto juntando tudo</span>
+          <span
+            className="badge b-ok"
+            style={{
+              fontSize: 11.5,
+              padding: '3px 10px',
+              flexShrink: 0,
+              background: overview.status === 'over' ? 'rgba(229, 72, 77, 0.15)' : 'rgba(0, 204, 136, 0.15)',
+              color: overview.status === 'over' ? 'var(--ds-red-700)' : 'var(--ds-green-700)',
+              border: `1px solid ${overview.status === 'over' ? 'rgba(229, 72, 77, 0.3)' : 'rgba(0, 204, 136, 0.3)'}`,
+              borderRadius: 9999,
+            }}
+          >
+            {overview.statusLabel}
+          </span>
+        </div>
+
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 30, fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--ds-foreground)', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
+            {formatCurrency(overview.totalSpent)}
           </div>
-          <Badge variant={STATUS_BADGES[overview.status].variant}>{overview.statusLabel}</Badge>
+          <div style={{ fontSize: 12.5, color: 'var(--ds-foreground-muted)', marginTop: 4 }}>
+            de um limite total de <strong style={{ color: 'var(--ds-foreground)' }}>{formatCurrency(overview.totalLimit)}</strong>
+          </div>
         </div>
-        <div className="cat-track" style={{ height: 8, background: 'var(--ds-gray-alpha-200)', borderRadius: 99, overflow: 'hidden', margin: '10px 0' }}>
-          <div className="cat-fill" style={{
-            width: `${Math.min(100, overview.percentage)}%`,
-            height: '100%',
-            background: overview.status === 'ok' ? 'linear-gradient(90deg, #0070f3, #00cc88)' : overview.status === 'warn' ? '#f5a623' : '#e5484d',
-            borderRadius: 99
-          }} />
+
+        <div className="cat-track" style={{ height: 8, background: 'var(--ds-gray-alpha-200)', borderRadius: 99, overflow: 'hidden' }}>
+          <div
+            className="cat-fill"
+            style={{
+              width: `${Math.min(100, overview.percentage)}%`,
+              height: '100%',
+              background: overview.status === 'over' ? 'var(--ds-red-700)' : 'linear-gradient(90deg, #0070f3, #00cc88)',
+              borderRadius: 99,
+            }}
+          />
         </div>
-        <div className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>
-          {formatCurrency(overview.remaining)} livres restantes nos tetos do mês
+
+        <div style={{ fontSize: 12, color: 'var(--ds-foreground-muted)', marginTop: 8, marginBottom: 12 }}>
+          {formatCurrency(overview.remaining)} livres restantes
+        </div>
+
+        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', fontSize: 12, color: 'var(--ds-foreground-muted)', borderTop: '1px solid var(--ds-gray-alpha-200)', paddingTop: 12 }}>
+          {(categories || []).filter((c) => c.kind === 'expense').slice(0, 5).map((c) => (
+            <span key={c.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: c.colorCode || '#0070f3' }} />
+              {c.name}: <strong style={{ color: 'var(--ds-foreground)' }}>{formatCurrency(c.spent || 0)}</strong>
+            </span>
+          ))}
         </div>
       </section>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+        <h2 style={{ fontSize: 15, fontWeight: 600, margin: 0, color: 'var(--ds-foreground)' }}>Categorias</h2>
+        <span className="sub" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>
+          {(categories || []).filter((c) => c.kind === 'expense').length} cadastradas
+        </span>
+      </div>
 
       {loading ? (
         <div className="cat-grid">
@@ -147,53 +185,79 @@ export function BudgetsScreen() {
 }
 
 function CategoryCard({ category, onOpenExtrato, onSetLimit, onEdit }) {
-  const badge = STATUS_BADGES[category.status] || STATUS_BADGES.noLimit
   const spent = category.spent || 0
   const limit = category.limit || 0
+  const pct = limit > 0 ? Math.round((spent / limit) * 100) : null
+  const isOver = pct && pct > 100
+  const isWarn = pct && pct >= 80 && pct <= 100
+  const barColor = isOver ? 'var(--ds-red-700, #e5484d)' : isWarn ? 'var(--ds-amber-500, #f5a623)' : (category.colorCode || '#0070f3')
+  const remaining = limit > 0 ? Math.max(0, limit - spent) : null
+
   return (
-    <article className="card cat-card">
-      <div className="cat-card-top">
-        <span className="cat-icon" style={{ background: `${category.colorCode}22`, color: category.colorCode, borderColor: `${category.colorCode}55` }}>
-          <Icon name={category.icon} size={18} />
+    <div className="cat-card" style={{ cursor: 'pointer' }} onClick={onOpenExtrato}>
+      <div className="cat-card-head" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <span className="cat-icon-wrap" style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--ds-radius-lg)', background: 'var(--ds-gray-alpha-200)', border: '1px solid var(--ds-border)' }}>
+          <Icon name={category.icon || 'tag'} size={16} style={{ color: category.colorCode || '#0070f3' }} />
         </span>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div className="cat-card-name">{category.name}</div>
-          <div className="cat-card-desc">{category.description || 'Sem descrição'}</div>
-        </div>
-        <button type="button" className="icon-btn" aria-label={`Editar ${category.name}`} onClick={onEdit}>
-          ⋯
-        </button>
+        <span
+          className={`badge ${isOver ? 'b-bad' : isWarn ? 'b-warn' : limit > 0 ? 'b-ok' : ''}`}
+          style={{
+            fontSize: 10.5,
+            padding: '2px 8px',
+            borderRadius: 9999,
+            background: isOver ? 'rgba(229, 72, 77, 0.15)' : isWarn ? 'rgba(245, 166, 35, 0.15)' : limit > 0 ? 'rgba(0, 204, 136, 0.15)' : 'var(--ds-gray-alpha-100)',
+            color: isOver ? 'var(--ds-red-700)' : isWarn ? 'var(--ds-amber-500)' : limit > 0 ? 'var(--ds-green-700)' : 'var(--ds-foreground-muted)',
+            border: `1px solid ${isOver ? 'rgba(229, 72, 77, 0.3)' : isWarn ? 'rgba(245, 166, 35, 0.3)' : limit > 0 ? 'rgba(0, 204, 136, 0.3)' : 'var(--ds-border)'}`,
+          }}
+        >
+          {isOver ? 'Estourado' : isWarn ? 'Em Atenção' : limit > 0 ? 'Sob controle' : 'Sem teto'}
+        </span>
       </div>
 
-      <div className="cat-card-amounts">
-        {limit > 0 ? `${formatCurrency(spent)} de ${formatCurrency(limit)}` : `${formatCurrency(spent)} · sem teto`}
-      </div>
+      <p className="cat-card-name" style={{ fontSize: 14.5, fontWeight: 600, margin: '0 0 4px', color: 'var(--ds-foreground)' }}>
+        {category.name}
+      </p>
+      <p className="cat-card-desc" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)', margin: '0 0 12px' }}>
+        {category.description || 'Sem descrição'}
+      </p>
 
       {limit > 0 ? (
         <>
-          <Meter value={spent} max={limit} tone={category.status} />
-          <div className="cat-card-meta">
-            <span>
-              {spent > limit
-                ? `Excesso de ${formatCurrency(spent - limit)}`
-                : `Disponível: ${formatCurrency(limit - spent)}`}
+          <div className="cat-card-foot" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 12.5, marginBottom: 6 }}>
+            <span className="cat-limit-val num" style={{ fontWeight: 600, color: 'var(--ds-foreground)' }}>
+              {formatCurrency(spent)}{' '}
+              <span style={{ fontWeight: 400, fontSize: 11.5, color: 'var(--ds-foreground-muted)' }}>
+                / {formatCurrency(limit)}
+              </span>
             </span>
-            <Badge variant={badge.variant}>{badge.label}</Badge>
+            <span className="cat-pct-val num" style={{ fontWeight: 600, color: barColor }}>
+              {pct}%
+            </span>
+          </div>
+          <div className="mini-bar" style={{ height: 6, background: 'var(--ds-gray-alpha-200)', borderRadius: 99, overflow: 'hidden' }}>
+            <div className="mini-bar-fill" style={{ width: `${Math.min(pct, 100)}%`, height: '100%', background: barColor, borderRadius: 99 }} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 11, color: 'var(--ds-foreground-muted)' }}>
+            <span>{isOver ? `Excesso de ${formatCurrency(spent - limit)}` : `Disponível: ${formatCurrency(remaining)}`}</span>
+            <span style={{ color: 'var(--ds-blue-600)', fontWeight: 500 }}>ver extrato →</span>
           </div>
         </>
       ) : (
-        <div className="cat-card-meta" style={{ justifyContent: 'space-between' }}>
-          <span className="text-faint">Nenhum teto configurado</span>
-          <Button variant="secondary" onClick={onSetLimit} style={{ minHeight: 32, padding: '4px 12px', fontSize: 12 }}>
+        <div style={{ marginTop: 12, padding: '8px 10px', background: 'var(--ds-gray-alpha-100)', borderRadius: 'var(--ds-radius-sm)', fontSize: 11.5, color: 'var(--ds-foreground-muted)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>Nenhum teto configurado</span>
+          <button
+            type="button"
+            style={{ color: 'var(--ds-blue-600)', fontWeight: 500, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            onClick={(e) => {
+              e.stopPropagation()
+              onSetLimit()
+            }}
+          >
             Definir teto
-          </Button>
+          </button>
         </div>
       )}
-
-      <button type="button" className="cat-card-link" onClick={onOpenExtrato}>
-        ver extrato <ArrowRight size={12} style={{ verticalAlign: -1 }} />
-      </button>
-    </article>
+    </div>
   )
 }
 

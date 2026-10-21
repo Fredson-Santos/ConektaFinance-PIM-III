@@ -7,9 +7,9 @@ import { Avatar } from '../common/Avatar'
 
 const PAGE_META = {
   '/dashboard': ['Dashboard', 'Sua visão geral financeira'],
-  '/transacoes': ['Histórico de gastos', 'Todos os seus lançamentos'],
-  '/categorias': ['Categorias & Orçamentos', 'Tetos e consumo por categoria'],
-  '/relatorios': ['Relatórios', 'Análises e evolução financeira'],
+  '/transacoes': ['Gastos', 'Gerencie todas as suas despesas'],
+  '/categorias': ['Categorias', 'Organize suas despesas e limites por categoria'],
+  '/relatorios': ['Relatórios', 'Balanço semestral & inteligência preditiva · Abril a Setembro de 2026'],
   '/configuracoes': ['Configurações', 'Perfil, segurança e privacidade'],
 }
 
@@ -57,20 +57,7 @@ export function Topbar() {
 }
 
 function Dot() {
-  return (
-    <span
-      style={{
-        position: 'absolute',
-        top: 7,
-        right: 8,
-        width: 8,
-        height: 8,
-        borderRadius: '50%',
-        background: 'var(--ds-red-700)',
-        border: '2px solid var(--ds-background-100)',
-      }}
-    />
-  )
+  return <span className="notif-dot" />
 }
 
 export default Topbar

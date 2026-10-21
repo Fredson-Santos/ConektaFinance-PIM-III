@@ -12,10 +12,11 @@ export function Avatar({ name, src, size = 34, radius = '50%' }) {
         width: size,
         height: size,
         borderRadius: radius,
-        background: 'linear-gradient(135deg, var(--ds-blue-700), var(--ds-teal-700))',
-        color: '#fff',
+        background: 'var(--ds-gray-alpha-200)',
+        border: '1px solid var(--ds-border)',
+        color: 'var(--ds-foreground)',
         fontSize: Math.round(size * 0.36),
-        fontWeight: 700,
+        fontWeight: 600,
         flexShrink: 0,
       }}
       aria-hidden="true"
