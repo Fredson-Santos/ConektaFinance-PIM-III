@@ -96,7 +96,7 @@ Todas as tools recebem o `userId` do token JWT — nunca um id vindo do LLM.
 
 ```
 Copilot__BaseUrl=https://integrate.api.nvidia.com/v1
-Copilot__Model=z-ai/glm-5.3-flash                      # function calling (testado: tool_calls OK)
+Copilot__Model=nvidia/nemotron-3.5-lightning-30b-a3b   # benchmark: 1,8s (glm-5.3-flash: 106,9s)
 Copilot__VisionModel=meta/llama-3.2-90b-vision-instruct  # leitura de nota fiscal
 Copilot__ApiKey=<chave gratuita em build.nvidia.com>
 ```
