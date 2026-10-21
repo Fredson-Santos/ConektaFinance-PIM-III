@@ -20,6 +20,7 @@ export function AiPanel() {
   const [confirmingId, setConfirmingId] = useState(null)
   const fileInputRef = useRef(null)
   const bottomRef = useRef(null)
+  const sendingRef = useRef(false)
 
   useEffect(() => {
     if (!overlays.ai || messages.length > 0 || typing) return
@@ -54,7 +55,8 @@ export function AiPanel() {
   const send = async (content) => {
     const text = (content || input).trim()
     const image = pendingImage
-    if ((!text && !image) || typing) return
+    if ((!text && !image) || typing || sendingRef.current) return
+    sendingRef.current = true
     setInput('')
     setPendingImage(null)
     setTyping(true)
@@ -80,6 +82,7 @@ export function AiPanel() {
         { id: `error-${Date.now()}`, role: 'assistant', content: error.message, createdAt: new Date().toISOString() },
       ])
     } finally {
+      sendingRef.current = false
       setTyping(false)
     }
   }
