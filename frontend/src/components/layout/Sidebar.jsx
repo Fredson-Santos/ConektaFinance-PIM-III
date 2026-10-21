@@ -7,16 +7,53 @@ import { useToast } from '../../context/ToastContext'
 import { Avatar } from '../common/Avatar'
 
 const NAV_ITEMS = [
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/transacoes', label: 'Gastos', icon: Receipt },
-  { to: '/categorias', label: 'Categorias', icon: Target },
-  { to: '/relatorios', label: 'Relatórios', icon: BarChart3 },
+  {
+    to: '/dashboard',
+    label: 'Dashboard',
+    icon: () => (
+      <svg className="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="8" height="8" rx="1.6" />
+        <rect x="13" y="3" width="8" height="5" rx="1.6" />
+        <rect x="13" y="11" width="8" height="10" rx="1.6" />
+        <rect x="3" y="13" width="8" height="8" rx="1.6" />
+      </svg>
+    ),
+  },
+  {
+    to: '/transacoes',
+    label: 'Gastos',
+    icon: () => (
+      <svg className="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 3H18V21L15.5 19L13 21L11 19L8.5 21L6 19V3Z" />
+        <path d="M9 8H15M9 12H15M9 16H13" />
+      </svg>
+    ),
+  },
+  {
+    to: '/categorias',
+    label: 'Categorias',
+    icon: () => (
+      <svg className="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M11 3H4V10L14 20L21 13L11 3Z" />
+        <circle cx="8" cy="7" r="1.2" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
+  {
+    to: '/relatorios',
+    label: 'Relatórios',
+    icon: () => (
+      <svg className="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 20V11M12 20V4M20 20V14" />
+      </svg>
+    ),
+  },
 ]
 
 export function Sidebar() {
   const { user, logout } = useAuth()
   const { theme, setTheme } = useTheme()
-  const { openOverlay, toggleOverlay } = useUi()
+  const { openOverlay, toggleOverlay, overlays } = useUi()
   const toast = useToast()
   const navigate = useNavigate()
 
@@ -25,6 +62,9 @@ export function Sidebar() {
     toast.push('Sessão encerrada. Até logo!')
     navigate('/login')
   }
+
+  const name = user?.displayName || user?.fullName || 'Usuário Teste'
+  const initials = (name[0] || 'U').toUpperCase()
 
   return (
     <aside className="sidebar">
@@ -40,7 +80,7 @@ export function Sidebar() {
       <nav className="side-nav" aria-label="Navegação principal">
         {NAV_ITEMS.map((item) => (
           <NavLink key={item.to} to={item.to} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-            <item.icon size={17} />
+            <item.icon />
             {item.label}
           </NavLink>
         ))}
@@ -52,13 +92,22 @@ export function Sidebar() {
       </button>
 
       <div className="sidebar-footer">
-        <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
-          <button type="button" className="user-trigger" onClick={() => toggleOverlay('user')} aria-haspopup="menu" title="Menu da conta">
-            <Avatar name={user?.displayName || user?.fullName || 'CF'} src={user?.avatarUrl} />
-            <span className="user-info">
-              <b>{user?.displayName || user?.fullName || 'Usuário'}</b>
-              <span>Conta pessoal</span>
-            </span>
+        <div className="user-menu-wrap" id="userMenuWrap">
+          <button
+            type="button"
+            className={`user-trigger ${overlays.user ? 'active' : ''}`}
+            onClick={() => toggleOverlay('user')}
+            aria-haspopup="menu"
+            title="Menu da conta"
+          >
+            <div className="avatar">{initials}</div>
+            <div className="user-info">
+              <p className="user-name">{name}</p>
+              <p className="user-role">Conta pessoal</p>
+            </div>
+            <svg className="icon user-chevron" style={{ width: 12, height: 12, marginLeft: 'auto' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M6 9L12 15L18 9" />
+            </svg>
           </button>
           <UserPopover onLogout={handleLogout} />
         </div>
@@ -89,26 +138,31 @@ export function Sidebar() {
 
 function UserPopover({ onLogout }) {
   const { overlays, closeOverlay } = useUi()
+  const { user } = useAuth()
   const navigate = useNavigate()
   if (!overlays.user) return null
   return (
-    <div
-      className="popover"
-      style={{ position: 'absolute', bottom: 54, left: 0, width: 230 }}
-      onMouseLeave={() => closeOverlay('user')}
-    >
+    <div className="user-popover open" id="userPopover">
+      <div className="user-popover-header">
+        <p className="user-popover-name">{user?.displayName || user?.fullName || 'Usuário Teste'}</p>
+        <p className="user-popover-email">{user?.email || 'usuario@conektafinance.com'}</p>
+      </div>
+      <div className="user-popover-divider" />
       <button
         type="button"
-        className="cmdk-item"
+        className="user-popover-item"
         onClick={() => {
           closeOverlay('user')
           navigate('/configuracoes')
         }}
       >
-        <Settings size={15} /> Configurações
+        <Settings size={14} className="icon" />
+        <span>Configurações</span>
       </button>
-      <button type="button" className="cmdk-item" style={{ color: 'var(--ds-red-700)' }} onClick={onLogout}>
-        <LogOut size={15} /> Sair da conta
+      <div className="user-popover-divider" />
+      <button type="button" className="user-popover-item danger" onClick={onLogout}>
+        <LogOut size={14} className="icon" />
+        <span>Sair</span>
       </button>
     </div>
   )

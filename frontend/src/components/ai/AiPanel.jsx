@@ -74,32 +74,31 @@ export function AiPanel() {
 
   return (
     <>
-      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1050 }} onClick={() => closeOverlay('ai')} aria-hidden="true" />
-      <section className="ai-panel" role="dialog" aria-label="Assistente de IA ConektaFinance">
-        <header className="ai-panel-header">
-          <span className="ai-avatar">
-            <Sparkles size={16} />
-          </span>
-          <div style={{ flex: 1 }}>
-            <b style={{ fontSize: 13.5 }}>Assistente de IA</b>
-            <div className="page-sub" style={{ fontSize: 11 }}>Analisa seus dados financeiros</div>
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', zIndex: 1040 }} onClick={() => closeOverlay('ai')} aria-hidden="true" />
+      <section className="ai-panel open" style={{ zIndex: 1050 }} role="dialog" aria-label="Assistente de IA ConektaFinance">
+        <header className="ai-head">
+          <div className="ai-head-title">
+            <Sparkles size={15} className="icon" />
+            <span>Assistente de IA Conekta</span>
           </div>
-          <button type="button" className="icon-btn" aria-label="Limpar histórico" onClick={clear}>
-            <Trash2 size={16} />
-          </button>
-          <button type="button" className="icon-btn" aria-label="Fechar assistente" onClick={() => closeOverlay('ai')}>
-            <X size={17} />
-          </button>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <button type="button" className="sheet-close" aria-label="Limpar histórico" onClick={clear} title="Limpar histórico">
+              <Trash2 size={14} />
+            </button>
+            <button type="button" className="sheet-close" aria-label="Fechar assistente" onClick={() => closeOverlay('ai')} title="Fechar">
+              <X size={15} />
+            </button>
+          </div>
         </header>
 
         <div className="ai-messages">
           {messages.length === 0 && !typing ? (
-            <div className="ai-msg assistant">
+            <div className="ai-msg msg assistant bot">
               Olá! Posso resumir seu mês, apontar onde economizar e abrir o formulário para registrar um gasto. Como posso ajudar?
             </div>
           ) : null}
           {messages.map((message) => (
-            <div key={message.id} className={`ai-msg ${message.role}`}>
+            <div key={message.id} className={`ai-msg msg ${message.role === 'assistant' ? 'assistant bot' : 'user'}`}>
               {message.content}
               {message.actions?.length ? (
                 <div className="ai-msg-actions">
@@ -119,7 +118,7 @@ export function AiPanel() {
             </div>
           ))}
           {typing ? (
-            <div className="ai-msg assistant" aria-label="Digitando">
+            <div className="ai-msg msg assistant bot" aria-label="Digitando">
               <span className="typing-dots">
                 <i />
                 <i />
@@ -141,20 +140,19 @@ export function AiPanel() {
         ) : null}
 
         <form
-          className="ai-composer"
+          className="ai-input-row"
           onSubmit={(event) => {
             event.preventDefault()
             send()
           }}
         >
           <input
-            className="ds-input"
             placeholder="Pergunte algo ou peça um lançamento…"
             value={input}
             onChange={(event) => setInput(event.target.value)}
             aria-label="Mensagem para o assistente"
           />
-          <button type="submit" className="ds-btn ds-btn-blue" disabled={typing || !input.trim()}>
+          <button type="submit" className="btn primary" style={{ borderRadius: 'var(--ds-radius-full)', padding: '6px 14px', fontSize: 12.5 }} disabled={typing || !input.trim()}>
             Enviar
           </button>
         </form>

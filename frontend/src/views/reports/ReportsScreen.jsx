@@ -1,15 +1,5 @@
 import { useMemo, useState } from 'react'
 import { FileDown, FileJson, FileText, Sparkles } from 'lucide-react'
-import {
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
 import { reportService, insightService } from '../../services'
 import { useAsync } from '../../hooks/useAsync'
 import { useToast } from '../../context/ToastContext'
@@ -225,34 +215,7 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
         />
       </div>
 
-      <section className="card" aria-label="Evolução de 6 meses">
-        <div className="card-head">
-          <h3 className="card-title">Evolução dos últimos 6 meses</h3>
-        </div>
-        <div className="card-body">
-          {trend.loading ? (
-            <SkeletonCard height={220} />
-          ) : (
-            <div style={{ width: '100%', height: 260 }}>
-              <ResponsiveContainer>
-                <LineChart data={trend.data || []} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
-                  <CartesianGrid stroke="var(--ds-grid-line)" vertical={false} />
-                  <XAxis dataKey="period" stroke="var(--ds-foreground-faint)" fontSize={11} tickLine={false} />
-                  <YAxis stroke="var(--ds-foreground-faint)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(value) => formatCompact(value).replace('R$ ', '')} />
-                  <Tooltip
-                    formatter={(value) => formatCurrency(value)}
-                    contentStyle={{ background: 'var(--ds-background-100)', border: '1px solid var(--ds-border-strong)', borderRadius: 8, fontSize: 12 }}
-                  />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Line type="monotone" dataKey="income" name="Receitas" stroke="var(--ds-green-700)" strokeWidth={2} dot={{ r: 3 }} />
-                  <Line type="monotone" dataKey="expense" name="Despesas" stroke="var(--ds-red-700)" strokeWidth={2} dot={{ r: 3 }} />
-                  <Line type="monotone" dataKey="saved" name="Guardado" stroke="var(--ds-blue-700)" strokeWidth={2} dot={{ r: 3 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-        </div>
-      </section>
+      <SixMonthsEvolutionChart trend={trend} />
 
       <div className="grid-2">
         <section className="card" aria-label="Composição dos gastos">
@@ -294,6 +257,167 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
       </div>
 
       <CategoryTable byCategory={byCategory} previousCategories={previousCategories} />
+    </div>
+  )
+}
+
+function SixMonthsEvolutionChart({ trend }) {
+  const items = trend.data || []
+  if (trend.loading) return <SkeletonCard height={280} />
+  if (items.length === 0) {
+    return <EmptyState title="Sem dados no período" description="Registre lançamentos para gerar a evolução." />
+  }
+
+  const avgIncome = Math.round(items.reduce((s, i) => s + (i.income || 0), 0) / items.length)
+  const avgExpense = Math.round(items.reduce((s, i) => s + (i.expense || 0), 0) / items.length)
+  const avgSaved = Math.round(items.reduce((s, i) => s + (i.saved || 0), 0) / items.length)
+
+  const allValues = items.flatMap((i) => [i.income || 0, i.expense || 0, Math.max(0, i.saved || 0)])
+  const rawMax = Math.max(...allValues, 1000)
+  const maxVal = Math.ceil(rawMax / 1000) * 1000
+
+  const steps = [
+    { y: 30, val: maxVal },
+    { y: 80, val: Math.round(maxVal * 0.85) },
+    { y: 130, val: Math.round(maxVal * 0.65) },
+    { y: 180, val: Math.round(maxVal * 0.45) },
+    { y: 230, val: Math.round(maxVal * 0.15) },
+  ]
+
+  const getY = (val) => {
+    const clamped = Math.max(0, Math.min(val, maxVal))
+    return 230 - (clamped / maxVal) * 200
+  }
+
+  const count = items.length
+  const getX = (idx) => {
+    if (count <= 1) return 400
+    return 130 + (idx / (count - 1)) * 630
+  }
+
+  const incomePoints = items.map((item, idx) => ({ x: getX(idx), y: getY(item.income || 0) }))
+  const expensePoints = items.map((item, idx) => ({ x: getX(idx), y: getY(item.expense || 0) }))
+  const savedPoints = items.map((item, idx) => ({ x: getX(idx), y: getY(Math.max(0, item.saved || 0)) }))
+
+  const incomePath = `M ${incomePoints.map((p) => `${p.x},${p.y}`).join(' L ')}`
+  const expensePath = `M ${expensePoints.map((p) => `${p.x},${p.y}`).join(' L ')}`
+  const savedPath = `M ${savedPoints.map((p) => `${p.x},${p.y}`).join(' L ')}`
+
+  const firstX = getX(0)
+  const lastX = getX(count - 1)
+  const incomeArea = `${incomePath} L ${lastX},230 L ${firstX},230 Z`
+  const expenseArea = `${expensePath} L ${lastX},230 L ${firstX},230 Z`
+  const savedArea = `${savedPath} L ${lastX},230 L ${firstX},230 Z`
+
+  return (
+    <div className="card" style={{ marginBottom: 20 }} aria-label="Evolução de 6 meses">
+      <div className="card-head">
+        <div>
+          <p className="card-title">Evolução dos Últimos 6 Meses</p>
+          <span className="stat-foot">Comparativo mensal entre Receitas, Despesas e Saldo Líquido Guardado</span>
+        </div>
+        <div className="chart-6m-legend">
+          <span className="chart-6m-legend-item">
+            <span className="badge-dot" style={{ background: 'var(--ds-green-700)' }} />
+            Receitas (Méd. {formatCurrency(avgIncome)})
+          </span>
+          <span className="chart-6m-legend-item">
+            <span className="badge-dot" style={{ background: 'var(--ds-blue-600)' }} />
+            Despesas (Méd. {formatCurrency(avgExpense)})
+          </span>
+          <span className="chart-6m-legend-item">
+            <span className="badge-dot" style={{ background: 'var(--ds-gray-500)' }} />
+            Reserva Líquida (Méd. {formatCurrency(avgSaved)})
+          </span>
+        </div>
+      </div>
+
+      <div className="chart-6m-line-wrap">
+        <svg className="chart-6m-svg" viewBox="0 0 800 280" preserveAspectRatio="xMidYMid meet">
+          {steps.map((s, i) => (
+            <line key={i} className="chart-6m-grid-line" x1={60} y1={s.y} x2={760} y2={s.y} />
+          ))}
+
+          {steps.map((s, i) => (
+            <text key={i} className="chart-6m-val-label" x={54} y={s.y + 4} textAnchor="end">
+              {formatCompact(s.val).replace('R$', '').trim()}
+            </text>
+          ))}
+
+          <defs>
+            <linearGradient id="areaGradReceita" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--ds-green-700)" stopOpacity="0.15" />
+              <stop offset="100%" stopColor="var(--ds-green-700)" stopOpacity="0.01" />
+            </linearGradient>
+            <linearGradient id="areaGradDespesa" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--ds-blue-600)" stopOpacity="0.12" />
+              <stop offset="100%" stopColor="var(--ds-blue-600)" stopOpacity="0.01" />
+            </linearGradient>
+            <linearGradient id="areaGradReserva" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--ds-gray-500)" stopOpacity="0.10" />
+              <stop offset="100%" stopColor="var(--ds-gray-500)" stopOpacity="0.01" />
+            </linearGradient>
+          </defs>
+
+          <path className="chart-6m-area receita" d={incomeArea} fill="url(#areaGradReceita)" />
+          <path className="chart-6m-area despesa" d={expenseArea} fill="url(#areaGradDespesa)" />
+          <path className="chart-6m-area reserva" d={savedArea} fill="url(#areaGradReserva)" />
+
+          <path className="chart-6m-path receita" d={incomePath} />
+          <path className="chart-6m-path despesa" d={expensePath} />
+          <path className="chart-6m-path reserva" d={savedPath} />
+
+          {items.map((item, idx) => {
+            const x = getX(idx)
+            const isLast = idx === count - 1
+            const label = item.period?.slice(0, 7) || ''
+            return (
+              <text
+                key={idx}
+                className={`chart-6m-axis-label ${isLast ? 'active-month' : ''}`}
+                x={x}
+                y={254}
+                textAnchor="middle"
+              >
+                {label}
+              </text>
+            )
+          })}
+
+          {items.map((item, idx) => {
+            const x = getX(idx)
+            const yInc = getY(item.income || 0)
+            const yExp = getY(item.expense || 0)
+            const ySav = getY(Math.max(0, item.saved || 0))
+            const tooltipX = idx > count - 2 ? x - 170 : Math.max(60, x - 50)
+            return (
+              <g className="chart-6m-group-g" key={idx}>
+                <rect className="chart-6m-hover-zone" x={x - 48} y={20} width={96} height={240} />
+                <line className="chart-6m-hover-line" x1={x} y1={30} x2={x} y2={230} />
+                <circle className="chart-6m-dot receita" cx={x} cy={yInc} r={4} />
+                <circle className="chart-6m-dot despesa" cx={x} cy={yExp} r={4} />
+                <circle className="chart-6m-dot reserva" cx={x} cy={ySav} r={4} />
+                <g className="chart-6m-tooltip-g" transform={`translate(${tooltipX}, 0)`}>
+                  <rect className="chart-6m-tooltip-bg" x={0} y={0} width={160} height={80} rx={8} />
+                  <text className="chart-6m-tooltip-text bold" x={12} y={18} fontSize={11}>{item.period}</text>
+                  <text className="chart-6m-tooltip-text muted" x={12} y={34}>Receitas:</text>
+                  <text className="chart-6m-tooltip-text bold" x={148} y={34} textAnchor="end" fill="var(--ds-green-700)">
+                    {formatCurrency(item.income || 0)}
+                  </text>
+                  <text className="chart-6m-tooltip-text muted" x={12} y={50}>Despesas:</text>
+                  <text className="chart-6m-tooltip-text bold" x={148} y={50} textAnchor="end" fill="var(--ds-blue-600)">
+                    {formatCurrency(item.expense || 0)}
+                  </text>
+                  <text className="chart-6m-tooltip-text muted" x={12} y={66}>Guardado:</text>
+                  <text className="chart-6m-tooltip-text bold" x={148} y={66} textAnchor="end">
+                    {formatCurrency(item.saved || 0)}
+                  </text>
+                </g>
+              </g>
+            )
+          })}
+        </svg>
+      </div>
     </div>
   )
 }
