@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Sparkles, X, Trash2, ArrowRight, Paperclip, Check } from 'lucide-react'
+import Markdown from 'react-markdown'
 import { copilotService } from '../../services'
 import { useUi } from '../../context/UiContext'
 import { useToast } from '../../context/ToastContext'
@@ -205,7 +206,11 @@ export function AiPanel() {
                   loading="lazy"
                 />
               ) : null}
-              {message.content}
+              {message.role === 'assistant' ? (
+                <Markdown>{message.content}</Markdown>
+              ) : (
+                message.content
+              )}
               {message.actions?.length ? (
                 <div className="ai-msg-actions">
                   {message.actions.map((action, index) => renderAction(message, action, index))}

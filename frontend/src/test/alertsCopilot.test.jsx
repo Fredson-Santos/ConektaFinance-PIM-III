@@ -183,6 +183,28 @@ describe('AiPanel', () => {
     )
   })
 
+  it('renderiza markdown nas respostas do assistente', async () => {
+    copilotService.sendMessage.mockResolvedValue({
+      userMessage: { id: 10, role: 'user', content: 'resumo de hoje', createdAt: new Date().toISOString() },
+      assistantMessage: {
+        id: 11,
+        role: 'assistant',
+        content: 'Hoje você gastou **R$ 45,90**.\n\n*Itens de hoje:*\n- iFood\n- Mercado',
+        createdAt: new Date().toISOString(),
+      },
+    })
+    renderWithOverlay('ai', AiPanel)
+
+    const input = screen.getByLabelText('Mensagem para o assistente')
+    fireEvent.change(input, { target: { value: 'resumo de hoje' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar' }))
+
+    expect((await screen.findByText('R$ 45,90')).tagName).toBe('STRONG')
+    expect(screen.getByText('iFood').tagName).toBe('LI')
+    expect(screen.getByText('Mercado').tagName).toBe('LI')
+    expect(screen.getByText(/itens de hoje:/i).tagName).toBe('EM')
+  })
+
   it('exibe mensagem de erro quando a cota falha', async () => {
     copilotService.sendMessage.mockRejectedValue(
       Object.assign(new Error('Você atingiu o limite de mensagens do assistente por hoje. Volte amanhã.'), { status: 429 }),

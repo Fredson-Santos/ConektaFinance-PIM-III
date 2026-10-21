@@ -966,6 +966,66 @@
   margin-top: 8px;
 }
 
+.ai-msg p {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.ai-msg p + p {
+  margin-top: 8px;
+}
+
+.ai-msg ul,
+.ai-msg ol {
+  margin: 6px 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ai-msg ul {
+  list-style: disc;
+}
+
+.ai-msg ol {
+  list-style: decimal;
+}
+
+.ai-msg li {
+  margin: 0;
+}
+
+.ai-msg strong {
+  font-weight: 700;
+}
+
+.ai-msg em {
+  font-style: italic;
+}
+
+.ai-msg code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--ds-gray-alpha-200);
+  border: 1px solid var(--ds-border-subtle);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+.ai-msg blockquote {
+  margin: 6px 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--ds-border-strong);
+  color: var(--ds-foreground-muted);
+}
+
+.ai-msg hr {
+  border: none;
+  border-top: 1px solid var(--ds-border-subtle);
+  margin: 8px 0;
+}
+
 .ai-msg-image {
   display: block;
   max-width: 100%;
