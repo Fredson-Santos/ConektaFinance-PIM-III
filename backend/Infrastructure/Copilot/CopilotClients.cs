@@ -137,7 +137,7 @@ public class LlmCopilotClient(
 
     public async Task<ReceiptExtract?> ExtractReceiptAsync(string imageBase64)
     {
-        var model = configuration["Copilot:VisionModel"];
+        var model = configuration["Copilot:VisionModel"] ?? "nvidia/nemotron-3.5-super-vl-120b-a12b";
         if (string.IsNullOrWhiteSpace(model))
             throw new InvalidOperationException("Modelo de visao nao configurado (Copilot:VisionModel).");
 
@@ -217,6 +217,7 @@ public class LlmCopilotClient(
             throw new InvalidOperationException("Cliente de LLM nao configurado.");
 
         var client = httpClientFactory.CreateClient();
+        client.Timeout = TimeSpan.FromSeconds(configuration.GetValue("Copilot:RequestTimeoutSeconds", 120));
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
 
         var maxIterations = Math.Max(configuration.GetValue("Copilot:MaxToolIterations", 4), 1);
@@ -300,6 +301,7 @@ public class LlmCopilotClient(
         if (string.IsNullOrWhiteSpace(baseUrl) || string.IsNullOrWhiteSpace(apiKey))
             throw new InvalidOperationException("Cliente de LLM nao configurado.");
         var client = httpClientFactory.CreateClient();
+        client.Timeout = TimeSpan.FromSeconds(configuration.GetValue("Copilot:RequestTimeoutSeconds", 120));
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
         var message = await SendMessageAsync(client, baseUrl, payload);
         return message.ValueKind == JsonValueKind.Object &&
