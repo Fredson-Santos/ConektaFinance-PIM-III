@@ -164,7 +164,7 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ActionPayload")
-                        .HasMaxLength(1000)
+                        .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Content")
@@ -173,6 +173,10 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(300)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Role")

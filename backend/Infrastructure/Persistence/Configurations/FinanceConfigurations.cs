@@ -59,7 +59,8 @@ public class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMessage>
         builder.ToTable("ChatMessages");
         builder.HasKey(m => m.Id);
         builder.Property(m => m.Content).IsRequired().HasMaxLength(4000);
-        builder.Property(m => m.ActionPayload).HasMaxLength(1000);
+        builder.Property(m => m.ActionPayload).HasMaxLength(2000);
+        builder.Property(m => m.ImageUrl).HasMaxLength(300);
         builder.HasOne(m => m.User)
             .WithMany(u => u.ChatMessages)
             .HasForeignKey(m => m.UserId)

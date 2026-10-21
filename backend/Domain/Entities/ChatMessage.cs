@@ -10,5 +10,6 @@ public class ChatMessage
     public ChatRole Role { get; set; } = ChatRole.User;
     public string Content { get; set; } = string.Empty;
     public string? ActionPayload { get; set; }
+    public string? ImageUrl { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
