@@ -29,10 +29,62 @@ services:
     depends_on:
       - backend
 
+  # Canal WhatsApp (Evolution API v2 sobre Baileys) + dependencias obrigatorias
+  # (PostgreSQL e Redis). O webhook trafega pela rede interna do compose:
+  # evolution -> http://backend:8080/api/v1/webhooks/whatsapp
+  evolution:
+    image: evoapicloud/evolution-api:v2.3.7
+    container_name: conektafinance-evolution
+    restart: always
+    env_file:
+      - .env
+    environment:
+      AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY}
+      SERVER_URL: ${EVOLUTION_SERVER_URL}
+      DEL_INSTANCE: "false"
+      DATABASE_ENABLED: "true"
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: postgresql://${EVOLUTION_POSTGRES_USER}:${EVOLUTION_POSTGRES_PASSWORD}@evolution-postgres:5432/${EVOLUTION_POSTGRES_DB}
+      CACHE_REDIS_ENABLED: "true"
+      CACHE_REDIS_URI: redis://evolution-redis:6379
+      CACHE_LOCAL_ENABLED: "false"
+    ports:
+      - "8082:8080"
+    volumes:
+      - evolution_instances:/evolution/instances
+    depends_on:
+      - evolution-postgres
+      - evolution-redis
+
+  evolution-postgres:
+    image: postgres:16-alpine
+    container_name: conektafinance-evolution-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${EVOLUTION_POSTGRES_DB}
+      POSTGRES_USER: ${EVOLUTION_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${EVOLUTION_POSTGRES_PASSWORD}
+    volumes:
+      - evolution_postgres_data:/var/lib/postgresql/data
+
+  evolution-redis:
+    image: redis:7-alpine
+    container_name: conektafinance-evolution-redis
+    restart: always
+    command: redis-server --appendonly yes
+    volumes:
+      - evolution_redis_data:/data
+
 volumes:
   sqlite_data:
     driver: local
   uploads_data:
+    driver: local
+  evolution_instances:
+    driver: local
+  evolution_postgres_data:
+    driver: local
+  evolution_redis_data:
     driver: local
 
 networks:
