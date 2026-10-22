@@ -523,10 +523,10 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
 
       {/* DUPLA DE ANÁLISE: DISTRIBUIÇÃO POR CATEGORIA + INSIGHTS IA */}
       <div className="grid-2" style={{ alignItems: 'stretch' }}>
-            {/* Card 1: Composição dos Gastos com Altura Total e Análise de Concentração */}
-            <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', boxSizing: 'border-box' }}>
+            {/* Card 1: Composição dos Gastos com Proporção Equilibrada */}
+            <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 14, height: '100%', boxSizing: 'border-box' }}>
               <div>
-                <div className="card-head" style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="card-head" style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <p className="card-title" style={{ fontSize: 14.5, fontWeight: 600, margin: 0 }}>Composição dos gastos</p>
                     <span className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>Participação relativa na média semestral</span>
@@ -540,15 +540,15 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
                 <Donut byCategory={byCategory} />
               </div>
 
-              {/* Seção Inferior: Destaques de Concentração e Barra Proporcional */}
-              <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--ds-border)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, fontSize: 11.5, color: 'var(--ds-foreground-muted)' }}>
+              {/* Seção Inferior: Barra Proporcional e Métricas Compactas */}
+              <div style={{ paddingTop: 10, borderTop: '1px solid var(--ds-border)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, fontSize: 11.5, color: 'var(--ds-foreground-muted)' }}>
                   <span>Distribuição proporcional contínua</span>
                   <span>Top 3 somam <strong style={{ color: 'var(--ds-foreground)' }}>{formatPercent(top3Ratio, { decimals: 1 })}</strong></span>
                 </div>
 
                 {/* Barra segmentada horizontal */}
-                <div style={{ display: 'flex', height: 7, borderRadius: 999, overflow: 'hidden', background: 'var(--ds-gray-alpha-200)', marginBottom: 12 }}>
+                <div style={{ display: 'flex', height: 6, borderRadius: 999, overflow: 'hidden', background: 'var(--ds-gray-alpha-200)', marginBottom: 10 }}>
                   {compItems.map((item, idx) => (
                     <div
                       key={idx}
@@ -562,41 +562,33 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
                   ))}
                 </div>
 
-                {/* 2 Mini Cards Analíticos */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                  <div style={{ padding: '10px 12px', borderRadius: 'var(--ds-radius-md)', background: 'var(--ds-background-200)', border: '1px solid var(--ds-border)' }}>
-                    <span style={{ fontSize: 11, color: 'var(--ds-foreground-muted)', display: 'block', marginBottom: 4 }}>
-                      Maior centro de custo
-                    </span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: topCat.colorCode, flexShrink: 0 }} />
-                      <strong style={{ fontSize: 13, color: 'var(--ds-foreground)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {topCat.name}
+                {/* 2 Mini Destaques Compactos */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  <div style={{ padding: '8px 10px', borderRadius: 'var(--ds-radius-md)', background: 'var(--ds-background-200)', border: '1px solid var(--ds-border)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: topCat.colorCode, flexShrink: 0 }} />
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <span style={{ fontSize: 10.5, color: 'var(--ds-foreground-muted)', display: 'block', lineHeight: 1.1 }}>Maior custo</span>
+                      <strong style={{ fontSize: 12, color: 'var(--ds-foreground)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+                        {topCat.name} ({formatPercent(topCat.pct, { decimals: 0 })})
                       </strong>
                     </div>
-                    <span style={{ fontSize: 11.5, color: 'var(--ds-foreground-muted)' }}>
-                      {formatCurrency(topCat.total)} · <strong style={{ color: 'var(--ds-foreground)' }}>{formatPercent(topCat.pct, { decimals: 1 })}</strong>
-                    </span>
                   </div>
 
-                  <div style={{ padding: '10px 12px', borderRadius: 'var(--ds-radius-md)', background: 'var(--ds-background-200)', border: '1px solid var(--ds-border)' }}>
-                    <span style={{ fontSize: 11, color: 'var(--ds-foreground-muted)', display: 'block', marginBottom: 4 }}>
-                      Índice de concentração
-                    </span>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ds-foreground)', marginBottom: 2 }}>
-                      {formatPercent(top3Ratio, { decimals: 1 })} <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--ds-foreground-muted)' }}>no Top 3</span>
+                  <div style={{ padding: '8px 10px', borderRadius: 'var(--ds-radius-md)', background: 'var(--ds-background-200)', border: '1px solid var(--ds-border)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <span style={{ fontSize: 10.5, color: 'var(--ds-foreground-muted)', display: 'block', lineHeight: 1.1 }}>Top 3 categorias</span>
+                      <strong style={{ fontSize: 12, color: 'var(--ds-foreground)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+                        {formatPercent(top3Ratio, { decimals: 1 })} do total
+                      </strong>
                     </div>
-                    <span style={{ fontSize: 11.5, color: 'var(--ds-foreground-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
-                      {formatCurrency(top3Tot)} nas 3 principais
-                    </span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Card 2: Diagnóstico & Insights da IA com Altura Total */}
+            {/* Card 2: Diagnóstico & Insights da IA em Grid 2x2 Harmonizado */}
             <div className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
-              <div className="card-head" style={{ marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div className="card-head" style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <p className="card-title" style={{ fontSize: 14.5, fontWeight: 600, margin: 0 }}>Diagnóstico & Insights da IA</p>
                   <span className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>Análise automatizada de padrões e economias</span>
@@ -607,72 +599,72 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
                 </span>
               </div>
 
-          <div className="ai-insight-list">
-            {insights.data && insights.data.length > 0 ? (
-              insights.data.map((insight, idx) => (
-                <div key={idx} style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
-                  <Badge variant={insight.severity === 'critical' ? 'bad' : insight.severity === 'warning' ? 'warn' : 'blue'}>
-                    {insight.severity === 'critical' ? 'Crítico' : insight.severity === 'warning' ? 'Atenção' : 'Info'}
-                  </Badge>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ fontWeight: 600, fontSize: 13, margin: '0 0 2px' }}>{insight.title}</p>
-                    <p style={{ fontSize: 12, color: 'var(--ds-foreground-muted)', margin: '0 0 2px' }}>{insight.description}</p>
-                    {insight.suggestion ? <p style={{ fontSize: 12, color: 'var(--ds-green-700)', margin: 0 }}>{insight.suggestion}</p> : null}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <>
-                <div className="ai-insight-item">
-                  <div className="ai-insight-icon" style={{ color: 'var(--ds-green-700)' }}>
-                    <svg className="icon" style={{ width: 14, height: 14 }}><use href="#i-sparkle" /></svg>
-                  </div>
-                  <div className="ai-insight-content">
-                    <p className="ai-insight-title">Economia Recorrente Descoberta</p>
-                    <p className="ai-insight-desc">
-                      O corte de duas assinaturas de streaming ociosas detectadas em Julho gerou economia consolidada de <strong>R$ 190,00/mês</strong>.
-                    </p>
-                  </div>
-                </div>
+              <div className="ai-insight-list" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8, flex: 1 }}>
+                {insights.data && insights.data.length > 0 ? (
+                  insights.data.slice(0, 4).map((insight, idx) => (
+                    <div key={idx} className="ai-insight-item" style={{ display: 'flex', gap: 8, padding: '10px 12px', minWidth: 0, boxSizing: 'border-box' }}>
+                      <Badge variant={insight.severity === 'critical' ? 'bad' : insight.severity === 'warning' ? 'warn' : 'blue'}>
+                        {insight.severity === 'critical' ? 'Crítico' : insight.severity === 'warning' ? 'Atenção' : 'Info'}
+                      </Badge>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontWeight: 600, fontSize: 12, margin: '0 0 2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{insight.title}</p>
+                        <p style={{ fontSize: 11, color: 'var(--ds-foreground-muted)', margin: '0 0 2px', lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{insight.description}</p>
+                        {insight.suggestion ? <p style={{ fontSize: 10.5, color: 'var(--ds-green-700)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{insight.suggestion}</p> : null}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <>
+                    <div className="ai-insight-item" style={{ padding: '10px 12px', minWidth: 0, boxSizing: 'border-box' }}>
+                      <div className="ai-insight-icon" style={{ color: 'var(--ds-green-700)', width: 26, height: 26, flexShrink: 0 }}>
+                        <svg className="icon" style={{ width: 13, height: 13 }}><use href="#i-sparkle" /></svg>
+                      </div>
+                      <div className="ai-insight-content" style={{ minWidth: 0 }}>
+                        <p className="ai-insight-title" style={{ fontSize: 12, fontWeight: 600, margin: '0 0 3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Economia Recorrente</p>
+                        <p className="ai-insight-desc" style={{ fontSize: 11, color: 'var(--ds-foreground-muted)', lineHeight: 1.35, margin: 0, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                          O corte de duas assinaturas de streaming detectadas em Julho gerou economia de <strong>R$ 190,00/mês</strong>.
+                        </p>
+                      </div>
+                    </div>
 
-                <div className="ai-insight-item">
-                  <div className="ai-insight-icon" style={{ color: 'var(--ds-blue-600)' }}>
-                    <svg className="icon" style={{ width: 14, height: 14 }}><use href="#i-trend-down" /></svg>
-                  </div>
-                  <div className="ai-insight-content">
-                    <p className="ai-insight-title">Queda Contínua em Alimentação</p>
-                    <p className="ai-insight-desc">
-                      Seus gastos com delivery caíram <strong>18% desde Maio</strong>, mantendo sua categoria de alimentação 35% abaixo do teto limite.
-                    </p>
-                  </div>
-                </div>
+                    <div className="ai-insight-item" style={{ padding: '10px 12px', minWidth: 0, boxSizing: 'border-box' }}>
+                      <div className="ai-insight-icon" style={{ color: 'var(--ds-blue-600)', width: 26, height: 26, flexShrink: 0 }}>
+                        <svg className="icon" style={{ width: 13, height: 13 }}><use href="#i-trend-down" /></svg>
+                      </div>
+                      <div className="ai-insight-content" style={{ minWidth: 0 }}>
+                        <p className="ai-insight-title" style={{ fontSize: 12, fontWeight: 600, margin: '0 0 3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Queda em Alimentação</p>
+                        <p className="ai-insight-desc" style={{ fontSize: 11, color: 'var(--ds-foreground-muted)', lineHeight: 1.35, margin: 0, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                          Gastos com delivery caíram <strong>18% desde Maio</strong>, mantendo alimentação 35% abaixo do teto.
+                        </p>
+                      </div>
+                    </div>
 
-                <div className="ai-insight-item">
-                  <div className="ai-insight-icon" style={{ color: 'var(--ds-amber-600)' }}>
-                    <svg className="icon" style={{ width: 14, height: 14 }}><use href="#i-alert" /></svg>
-                  </div>
-                  <div className="ai-insight-content">
-                    <p className="ai-insight-title">Pico Sazonal Identificado</p>
-                    <p className="ai-insight-desc">
-                      Despesa atípica de <strong>R$ 420,00</strong> em manutenção de ar condicionado em Setembro elevou temporariamente os custos residenciais.
-                    </p>
-                  </div>
-                </div>
+                    <div className="ai-insight-item" style={{ padding: '10px 12px', minWidth: 0, boxSizing: 'border-box' }}>
+                      <div className="ai-insight-icon" style={{ color: 'var(--ds-amber-600)', width: 26, height: 26, flexShrink: 0 }}>
+                        <svg className="icon" style={{ width: 13, height: 13 }}><use href="#i-alert" /></svg>
+                      </div>
+                      <div className="ai-insight-content" style={{ minWidth: 0 }}>
+                        <p className="ai-insight-title" style={{ fontSize: 12, fontWeight: 600, margin: '0 0 3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Pico Sazonal</p>
+                        <p className="ai-insight-desc" style={{ fontSize: 11, color: 'var(--ds-foreground-muted)', lineHeight: 1.35, margin: 0, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                          Despesa atípica de <strong>R$ 420,00</strong> em manutenção de ar em Setembro elevou os custos residenciais.
+                        </p>
+                      </div>
+                    </div>
 
-                <div className="ai-insight-item">
-                  <div className="ai-insight-icon" style={{ color: 'var(--ds-foreground)' }}>
-                    <svg className="icon" style={{ width: 14, height: 14 }}><use href="#i-shield" /></svg>
-                  </div>
-                  <div className="ai-insight-content">
-                    <p className="ai-insight-title">Reserva de Emergência em 82%</p>
-                    <p className="ai-insight-desc">
-                      Mantendo o aporte médio mensal de <strong>R$ 1.746,00</strong>, sua meta de R$ 15.000,00 será atingida no início de Novembro de 2026.
-                    </p>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
+                    <div className="ai-insight-item" style={{ padding: '10px 12px', minWidth: 0, boxSizing: 'border-box' }}>
+                      <div className="ai-insight-icon" style={{ color: 'var(--ds-foreground)', width: 26, height: 26, flexShrink: 0 }}>
+                        <svg className="icon" style={{ width: 13, height: 13 }}><use href="#i-shield" /></svg>
+                      </div>
+                      <div className="ai-insight-content" style={{ minWidth: 0 }}>
+                        <p className="ai-insight-title" style={{ fontSize: 12, fontWeight: 600, margin: '0 0 3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Reserva em 82%</p>
+                        <p className="ai-insight-desc" style={{ fontSize: 11, color: 'var(--ds-foreground-muted)', lineHeight: 1.35, margin: 0, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                          Mantendo o aporte médio de <strong>R$ 1.746,00</strong>, a meta de R$ 15.000,00 será batida em Novembro.
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
         </div>
       </div>
 
