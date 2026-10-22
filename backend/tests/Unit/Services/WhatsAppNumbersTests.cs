@@ -66,4 +66,31 @@ public class WhatsAppNumbersTests
         WhatsAppNumbers.ToEvolution("5511987654321").Should().Be("5511987654321");
         WhatsAppNumbers.ToEvolution("12345").Should().Be("12345");
     }
+
+    [Theory]
+    [InlineData("11987654321", "11*****4321")]
+    [InlineData("1187654321", "11*****4321")]
+    [InlineData("1234", "****")]
+    [InlineData("", "desconhecido")]
+    [InlineData(null, "desconhecido")]
+    public void MaskPhone_oculta_digitos_sensiveis(string? phone, string expected)
+    {
+        WhatsAppNumbers.MaskPhone(phone).Should().Be(expected);
+    }
+
+    [Fact]
+    public void GetLookupCandidates_gera_variantes_com_e_sem_nono_digito()
+    {
+        // 11 dígitos com 9 -> deve gerar com e sem o 9
+        WhatsAppNumbers.GetLookupCandidates("11987654321")
+            .Should().ContainInOrder("11987654321", "1187654321");
+
+        // 10 dígitos (celular sem o 9) -> deve gerar sem e com o 9
+        WhatsAppNumbers.GetLookupCandidates("1187654321")
+            .Should().ContainInOrder("1187654321", "11987654321");
+
+        // Entrada vazia
+        WhatsAppNumbers.GetLookupCandidates("")
+            .Should().BeEmpty();
+    }
 }

@@ -88,18 +88,27 @@ public class WhatsAppChannelService(
             if (phone is null)
                 return;
 
-            var user = await userRepository.GetByPhoneAsync(phone);
+            User? user = null;
+            foreach (var candidate in WhatsAppNumbers.GetLookupCandidates(phone))
+            {
+                user = await userRepository.GetByPhoneAsync(candidate);
+                if (user is not null)
+                    break;
+            }
+
             if (user is null)
             {
                 // Silencio absoluto para numeros nao vinculados: reduz risco de
                 // ban (ToS da Meta) e evita loops com outros bots.
-                logger.LogInformation("Mensagem WhatsApp de numero nao vinculado ignorada ({Phone})", phone);
+                logger.LogInformation("Mensagem WhatsApp de numero nao vinculado ignorada ({Phone})",
+                    WhatsAppNumbers.MaskPhone(phone));
                 return;
             }
 
             if (!evolutionClient.IsConfigured)
             {
-                logger.LogWarning("Evolution API nao configurada: mensagem de {Phone} descartada", phone);
+                logger.LogWarning("Evolution API nao configurada: mensagem de {Phone} descartada",
+                    WhatsAppNumbers.MaskPhone(phone));
                 return;
             }
 
@@ -109,12 +118,14 @@ public class WhatsAppChannelService(
             }
             catch (AppException exception)
             {
-                logger.LogInformation("WhatsApp de {Phone} recebeu erro de negocio: {Detail}", phone, exception.Detail);
+                logger.LogInformation("WhatsApp de {Phone} recebeu erro de negocio: {Detail}",
+                    WhatsAppNumbers.MaskPhone(phone), exception.Detail);
                 await ReplyAsync(phone, exception.Detail, cancellationToken);
             }
             catch (Exception exception)
             {
-                logger.LogError(exception, "Falha ao processar mensagem WhatsApp de {Phone}", phone);
+                logger.LogError(exception, "Falha ao processar mensagem WhatsApp de {Phone}",
+                    WhatsAppNumbers.MaskPhone(phone));
                 await ReplyAsync(phone, "Tive um problema tecnico agora. Tente novamente em instantes.",
                     cancellationToken);
             }
@@ -165,10 +176,16 @@ public class WhatsAppChannelService(
     private async Task HandleImageAsync(int userId, string phone, string remoteJid, string messageId,
         string? caption, CancellationToken cancellationToken)
     {
+        logger.LogInformation("Iniciando processamento de imagem enviada por {Phone} (messageId: {MessageId})",
+            WhatsAppNumbers.MaskPhone(phone), messageId);
+
+        using var downloadCts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
         var mediaBase64 = await evolutionClient.DownloadMediaBase64Async(remoteJid, messageId, fromMe: false,
-            cancellationToken);
+            downloadCts.Token);
         if (string.IsNullOrWhiteSpace(mediaBase64))
         {
+            logger.LogWarning("Nao foi possivel baixar midia da mensagem {MessageId} de {Phone}",
+                messageId, WhatsAppNumbers.MaskPhone(phone));
             await ReplyAsync(phone, "Nao consegui baixar a imagem. Tente enviar novamente.", cancellationToken);
             return;
         }
@@ -180,6 +197,8 @@ public class WhatsAppChannelService(
 
         var exchange = await copilotService.SendMessageAsync(userId, caption ?? string.Empty, mediaBase64);
         await ReplyWithAgentAsync(phone, exchange.AssistantMessage, cancellationToken);
+        logger.LogInformation("Confirmacao da imagem {MessageId} entregue para {Phone}",
+            messageId, WhatsAppNumbers.MaskPhone(phone));
     }
 
     private async Task HandleCommandAsync(int userId, string phone, bool confirm, CancellationToken cancellationToken)
@@ -210,6 +229,9 @@ public class WhatsAppChannelService(
         CancellationToken cancellationToken)
     {
         var reply = assistant.Content;
+        if (string.IsNullOrWhiteSpace(reply))
+            reply = "Recebi sua solicitacao e os dados foram processados com sucesso.";
+
         if (assistant.Actions?.Any(CopilotService.IsPendingDraftAction) == true)
             reply += "\n\nResponda *confirmar* para lancar ou *cancelar* para descartar.";
         await ReplyAsync(phone, AdaptToWhatsApp(reply), cancellationToken);
@@ -219,13 +241,24 @@ public class WhatsAppChannelService(
     {
         try
         {
-            await evolutionClient.SendTextAsync(phone, text, cancellationToken);
+            // Usamos timeout dedicado e independente do ciclo de vida da requisicao HTTP
+            // de entrada do webhook, garantindo a entrega ao remetente mesmo apos timeout da conexao do webhook.
+            using var replyCts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            await evolutionClient.SendTextAsync(phone, text, replyCts.Token);
+            logger.LogInformation("Mensagem entregue com sucesso para o WhatsApp de {Phone}",
+                WhatsAppNumbers.MaskPhone(phone));
+        }
+        catch (OperationCanceledException ex)
+        {
+            logger.LogError(ex, "Timeout de 30s ao enviar resposta WhatsApp para {Phone}",
+                WhatsAppNumbers.MaskPhone(phone));
         }
         catch (Exception exception)
         {
             // A resposta do agente ja foi persistida no historico; apenas logamos
             // a falha de entrega para nao propagar erro ao webhook.
-            logger.LogError(exception, "Falha ao enviar resposta WhatsApp para {Phone}", phone);
+            logger.LogError(exception, "Falha ao enviar resposta WhatsApp para {Phone}: {Message}",
+                WhatsAppNumbers.MaskPhone(phone), exception.Message);
         }
     }
 

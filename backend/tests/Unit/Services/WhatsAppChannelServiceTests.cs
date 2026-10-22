@@ -349,4 +349,54 @@ public class WhatsAppChannelServiceTests
             "Voce atingiu o limite de mensagens do assistente por hoje. Volte amanha.",
             It.IsAny<CancellationToken>()), Times.Once);
     }
+
+    [Fact]
+    public async Task Imagem_com_cancellation_token_cancelado_no_webhook_ainda_entrega_confirmacao_no_whatsapp()
+    {
+        _evolutionClient
+            .Setup(e => e.DownloadMediaBase64Async("5511999999999@s.whatsapp.net", "MSG-IMG-CANC", false,
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync("ZGF0YQ==");
+        _copilotService
+            .Setup(c => c.SendMessageAsync(1, "nota", "ZGF0YQ=="))
+            .ReturnsAsync(Exchange("Confirmacao da nota fiscal"));
+
+        using var canceledCts = new CancellationTokenSource();
+        canceledCts.Cancel(); // Simula cancelamento/timeout da requisição HTTP de entrada do webhook
+
+        await _service.HandleEventAsync(Payload("messages.upsert", "imageMessage",
+            new { imageMessage = new { caption = "nota", mimetype = "image/jpeg" } })
+            .Replace("MSG-X", "MSG-IMG-CANC"), canceledCts.Token);
+
+        _evolutionClient.Verify(e => e.SendTextAsync("11999999999", "Confirmacao da nota fiscal",
+            It.Is<CancellationToken>(ct => !ct.IsCancellationRequested)), Times.Once);
+    }
+
+    [Fact]
+    public async Task Imagem_enviada_por_numero_com_variante_do_nono_digito_encontra_usuario_e_responde_ao_remetente()
+    {
+        // Usuário cadastrado no banco com 11 dígitos ("11988887777"), mas mensagem vem com 10 dígitos ("551188887777")
+        _userRepository.Setup(r => r.GetByPhoneAsync("1188887777")).ReturnsAsync((User?)null);
+        _userRepository.Setup(r => r.GetByPhoneAsync("11988887777"))
+            .ReturnsAsync(new User { Id = 2, FullName = "Usuario 2", Phone = "11988887777" });
+
+        _evolutionClient
+            .Setup(e => e.DownloadMediaBase64Async("551188887777@s.whatsapp.net", "MSG-IMG-VAR", false,
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync("ZGF0YQ==");
+        _copilotService
+            .Setup(c => c.SendMessageAsync(2, "", "ZGF0YQ=="))
+            .ReturnsAsync(Exchange("Dados extraidos"));
+
+        var payload = Payload("messages.upsert", "imageMessage",
+            new { imageMessage = new { mimetype = "image/jpeg" } })
+            .Replace("5511999999999@s.whatsapp.net", "551188887777@s.whatsapp.net")
+            .Replace("MSG-X", "MSG-IMG-VAR");
+
+        await _service.HandleEventAsync(payload);
+
+        // A resposta deve ser enviada exatamente para o remetente original ("1188887777")
+        _evolutionClient.Verify(e => e.SendTextAsync("1188887777", "Dados extraidos",
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
 }

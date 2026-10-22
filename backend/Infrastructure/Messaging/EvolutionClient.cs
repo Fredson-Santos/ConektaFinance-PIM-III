@@ -28,7 +28,7 @@ public class EvolutionClient(
     {
         if (!IsConfigured)
         {
-            logger.LogWarning("Evolution API nao configurada: mensagem para {Phone} nao foi entregue", phone);
+            logger.LogWarning("Evolution API nao configurada: mensagem para {Phone} nao foi entregue", WhatsAppNumbers.MaskPhone(phone));
             return;
         }
 
@@ -39,7 +39,7 @@ public class EvolutionClient(
             delay = configuration.GetValue("Evolution:SendDelayMs", 800)
         }, BodyJson);
         await PostAsync("message/sendText/" + configuration["Evolution:Instance"], payload, cancellationToken);
-        logger.LogInformation("Mensagem WhatsApp entregue para {Phone}", phone);
+        logger.LogInformation("Mensagem WhatsApp entregue para {Phone}", WhatsAppNumbers.MaskPhone(phone));
     }
 
     public async Task<string?> DownloadMediaBase64Async(string remoteJid, string messageId, bool fromMe,
@@ -83,6 +83,7 @@ public class EvolutionClient(
     {
         var baseUrl = configuration["Evolution:BaseUrl"]!.TrimEnd('/');
         using var client = httpClientFactory.CreateClient();
+        client.Timeout = TimeSpan.FromSeconds(35);
         using var request = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/{path}")
         {
             Content = new StringContent(json, Encoding.UTF8, "application/json")

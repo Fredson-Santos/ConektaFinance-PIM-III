@@ -47,6 +47,45 @@ public static class WhatsAppNumbers
         return digits;
     }
 
+    /// <summary>
+    /// Mascara o telefone para protecao de dados pessoais (LGPD) em logs e diagnosticos,
+    /// exibindo apenas o DDD e os ultimos 4 digitos (ex.: "11*****6092").
+    /// </summary>
+    public static string MaskPhone(string? phone)
+    {
+        if (string.IsNullOrWhiteSpace(phone))
+            return "desconhecido";
+        var digits = new string(phone.Where(char.IsDigit).ToArray());
+        if (digits.Length <= 4)
+            return "****";
+        if (digits.Length <= 8)
+            return $"{digits[..2]}****{digits[^2..]}";
+        return $"{digits[..2]}*****{digits[^4..]}";
+    }
+
+    /// <summary>
+    /// Devolve os candidatos de busca no banco para tolerar telefones brasileiros
+    /// cadastrados com ou sem o nono digito (ex.: 11987654321 e 1187654321).
+    /// </summary>
+    public static IEnumerable<string> GetLookupCandidates(string phone)
+    {
+        if (string.IsNullOrWhiteSpace(phone))
+            yield break;
+
+        yield return phone;
+
+        // Se tem 10 digitos (DDD + 8 digitos), candidato com o 9:
+        if (phone.Length == 10 && char.IsDigit(phone[2]) && phone[2] >= '6')
+        {
+            yield return $"{phone[..2]}9{phone[2..]}";
+        }
+        // Se tem 11 digitos e o 3º digito e 9, candidato sem o 9:
+        else if (phone.Length == 11 && phone[2] == '9')
+        {
+            yield return $"{phone[..2]}{phone[3..]}";
+        }
+    }
+
     private static string? NormalizeDigits(string digits)
     {
         if (digits.Length is >= 12 and <= 13 && digits.StartsWith("55", StringComparison.Ordinal))

@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PIM_III_Backend.Application.Services;
 using PIM_III_Backend.Infrastructure.Copilot;
+using PIM_III_Backend.Infrastructure.Messaging;
 using PIM_III_Backend.Infrastructure.Persistence;
 
 namespace PIM_III_Backend.Tests.Integration;
@@ -38,6 +39,12 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 null,
                 new RuleBasedCopilotClient(),
                 sp.GetRequiredService<ILogger<CompositeCopilotClient>>()));
+
+            // Regra tests.md: servicos externos (Evolution API / WhatsApp) sempre mockados nos testes
+            var otpDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IOtpSender));
+            if (otpDescriptor is not null)
+                services.Remove(otpDescriptor);
+            services.AddScoped<IOtpSender, DevOtpSender>();
         });
     }
 
