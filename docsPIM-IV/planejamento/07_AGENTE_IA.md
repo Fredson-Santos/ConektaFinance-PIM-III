@@ -143,6 +143,8 @@ Cliente HTTP já é compatível com o formato OpenAI (`/chat/completions`); troc
 
 Decisão registrada: usar **API não oficial** (Evolution API sobre Baileys) — sem verificação Meta Business, deploy via Docker, pareamento por QR code. Adequado ao escopo acadêmico.
 
+> **Status: implementada** (commits `cd4c8cf`, `0b1219a`, `911e161`). Documentação completa, deploy e checklist de validação ao vivo em **[08_WHATSAPP.md](08_WHATSAPP.md)** — inclui o mesmo diagrama abaixo, já atualizado para a arquitetura real.
+
 ```
 POST /api/v1/webhooks/whatsapp (assinatura/verify token da Evolution)
    ├── resolve telefone → userId   (IUserRepository.GetByPhoneAsync já existe)
