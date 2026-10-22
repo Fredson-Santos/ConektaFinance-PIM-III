@@ -394,6 +394,31 @@ function MobileReports({ summary, byCategory, trend, insights, period, setPeriod
 }
 
 function DesktopReports({ summary, byCategory, trend, insights, previousCategories }) {
+  const rawComp = (byCategory.data || []).filter((item) => item.total > 0)
+  const isFallback = !byCategory.data || rawComp.length === 0
+  const compItems = isFallback
+    ? [
+        { categoryId: 1, name: 'Moradia', total: 1800, pct: 42, colorCode: '#0070f3' },
+        { categoryId: 2, name: 'Alimentação', total: 980, pct: 23, colorCode: '#f5a623' },
+        { categoryId: 3, name: 'Lazer & Lojas', total: 470, pct: 11, colorCode: '#8e4ec6' },
+        { categoryId: 4, name: 'Transporte', total: 380, pct: 9, colorCode: '#12b5cb' },
+        { categoryId: 5, name: 'Outros / Serviços', total: 640, pct: 15, colorCode: '#888888' },
+      ]
+    : (() => {
+        const totalSum = rawComp.reduce((sum, item) => sum + item.total, 0)
+        return rawComp.map((item) => ({
+          ...item,
+          pct: totalSum > 0 ? (item.total / totalSum) * 100 : (item.percentage || 0),
+        }))
+      })()
+
+  const compTotal = compItems.reduce((sum, item) => sum + item.total, 0)
+  const sortedComp = [...compItems].sort((a, b) => b.pct - a.pct)
+  const topCat = sortedComp[0] || { name: '—', total: 0, pct: 0, colorCode: '#0070f3' }
+  const top3List = sortedComp.slice(0, 3)
+  const top3Tot = top3List.reduce((s, i) => s + i.total, 0)
+  const top3Ratio = top3List.reduce((s, i) => s + i.pct, 0)
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
       {/* 4 KPI Cards: Indicadores Estratégicos Reais */}
@@ -497,75 +522,90 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
       <SixMonthsEvolutionChart trend={trend} />
 
       {/* DUPLA DE ANÁLISE: DISTRIBUIÇÃO POR CATEGORIA + INSIGHTS IA */}
-      <div className="grid-2">
-        {/* Card 1: Composição dos Gastos */}
-        <div className="card">
-          <div className="card-head" style={{ marginBottom: 12 }}>
-            <div>
-              <p className="card-title" style={{ fontSize: 14.5, fontWeight: 600, margin: 0 }}>Composição dos gastos</p>
-              <span className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>Participação relativa na média semestral</span>
-            </div>
-          </div>
-
-          {byCategory.data && byCategory.data.length > 0 ? (
-            <Donut byCategory={byCategory} />
-          ) : (
-            <div className="donut-row">
-              <div
-                className="donut"
-                style={{
-                  background: 'conic-gradient(#0070f3 0% 42%, #f5a623 42% 65%, #12b5cb 65% 74%, #8e4ec6 74% 85%, #888888 85% 100%)',
-                }}
-              >
-                <div className="donut-inner">
-                  <span className="donut-total num">R$ 4.270</span>
-                  <span className="donut-total-label">Média 6M</span>
+      <div className="grid-2" style={{ alignItems: 'stretch' }}>
+            {/* Card 1: Composição dos Gastos com Altura Total e Análise de Concentração */}
+            <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', boxSizing: 'border-box' }}>
+              <div>
+                <div className="card-head" style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <p className="card-title" style={{ fontSize: 14.5, fontWeight: 600, margin: 0 }}>Composição dos gastos</p>
+                    <span className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>Participação relativa na média semestral</span>
+                  </div>
+                  <span className="badge" style={{ flexShrink: 0 }}>
+                    <span className="badge-dot" style={{ background: 'var(--ds-blue-600)' }} />
+                    {compItems.length} categorias
+                  </span>
                 </div>
+
+                <Donut byCategory={byCategory} />
               </div>
 
-              <div className="legend">
-                <div className="legend-row">
-                  <span className="legend-dot" style={{ background: '#0070f3' }} />
-                  <span className="legend-name">Moradia (42%)</span>
-                  <span className="legend-val num">R$ 1.800</span>
+              {/* Seção Inferior: Destaques de Concentração e Barra Proporcional */}
+              <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--ds-border)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, fontSize: 11.5, color: 'var(--ds-foreground-muted)' }}>
+                  <span>Distribuição proporcional contínua</span>
+                  <span>Top 3 somam <strong style={{ color: 'var(--ds-foreground)' }}>{formatPercent(top3Ratio, { decimals: 1 })}</strong></span>
                 </div>
-                <div className="legend-row">
-                  <span className="legend-dot" style={{ background: '#f5a623' }} />
-                  <span className="legend-name">Alimentação (23%)</span>
-                  <span className="legend-val num">R$ 980</span>
+
+                {/* Barra segmentada horizontal */}
+                <div style={{ display: 'flex', height: 7, borderRadius: 999, overflow: 'hidden', background: 'var(--ds-gray-alpha-200)', marginBottom: 12 }}>
+                  {compItems.map((item, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        width: `${Math.max(1, item.pct)}%`,
+                        background: item.colorCode,
+                        transition: 'width 0.3s ease',
+                      }}
+                      title={`${item.name}: ${formatPercent(item.pct, { decimals: 1 })}`}
+                    />
+                  ))}
                 </div>
-                <div className="legend-row">
-                  <span className="legend-dot" style={{ background: '#12b5cb' }} />
-                  <span className="legend-name">Transporte (9%)</span>
-                  <span className="legend-val num">R$ 380</span>
-                </div>
-                <div className="legend-row">
-                  <span className="legend-dot" style={{ background: '#8e4ec6' }} />
-                  <span className="legend-name">Lazer & Lojas (11%)</span>
-                  <span className="legend-val num">R$ 470</span>
-                </div>
-                <div className="legend-row">
-                  <span className="legend-dot" style={{ background: '#888888' }} />
-                  <span className="legend-name">Outros / Serviços (15%)</span>
-                  <span className="legend-val num">R$ 640</span>
+
+                {/* 2 Mini Cards Analíticos */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div style={{ padding: '10px 12px', borderRadius: 'var(--ds-radius-md)', background: 'var(--ds-background-200)', border: '1px solid var(--ds-border)' }}>
+                    <span style={{ fontSize: 11, color: 'var(--ds-foreground-muted)', display: 'block', marginBottom: 4 }}>
+                      Maior centro de custo
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: topCat.colorCode, flexShrink: 0 }} />
+                      <strong style={{ fontSize: 13, color: 'var(--ds-foreground)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {topCat.name}
+                      </strong>
+                    </div>
+                    <span style={{ fontSize: 11.5, color: 'var(--ds-foreground-muted)' }}>
+                      {formatCurrency(topCat.total)} · <strong style={{ color: 'var(--ds-foreground)' }}>{formatPercent(topCat.pct, { decimals: 1 })}</strong>
+                    </span>
+                  </div>
+
+                  <div style={{ padding: '10px 12px', borderRadius: 'var(--ds-radius-md)', background: 'var(--ds-background-200)', border: '1px solid var(--ds-border)' }}>
+                    <span style={{ fontSize: 11, color: 'var(--ds-foreground-muted)', display: 'block', marginBottom: 4 }}>
+                      Índice de concentração
+                    </span>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ds-foreground)', marginBottom: 2 }}>
+                      {formatPercent(top3Ratio, { decimals: 1 })} <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--ds-foreground-muted)' }}>no Top 3</span>
+                    </div>
+                    <span style={{ fontSize: 11.5, color: 'var(--ds-foreground-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+                      {formatCurrency(top3Tot)} nas 3 principais
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          )}
-        </div>
 
-        {/* Card 2: Diagnóstico & Insights da IA */}
-        <div className="card">
-          <div className="card-head" style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <p className="card-title" style={{ fontSize: 14.5, fontWeight: 600, margin: 0 }}>Diagnóstico & Insights da IA</p>
-              <span className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>Análise automatizada de padrões e economias</span>
-            </div>
-            <span className="badge">
-              <span className="badge-dot" style={{ background: 'var(--ds-green-700)' }} />
-              Auditoria Ativa
-            </span>
-          </div>
+            {/* Card 2: Diagnóstico & Insights da IA com Altura Total */}
+            <div className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
+              <div className="card-head" style={{ marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <p className="card-title" style={{ fontSize: 14.5, fontWeight: 600, margin: 0 }}>Diagnóstico & Insights da IA</p>
+                  <span className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>Análise automatizada de padrões e economias</span>
+                </div>
+                <span className="badge">
+                  <span className="badge-dot" style={{ background: 'var(--ds-green-700)' }} />
+                  Auditoria Ativa
+                </span>
+              </div>
 
           <div className="ai-insight-list">
             {insights.data && insights.data.length > 0 ? (
@@ -850,12 +890,17 @@ function Donut({ byCategory }) {
           <span>no período</span>
         </div>
       </div>
-      <div className="donut-legend">
+      <div className="donut-legend" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 7 }}>
         {items.map((item) => (
-          <div className="dl-item" key={item.categoryId || item.name}>
-            <i style={{ background: item.colorCode }} />
-            <span>{item.name}</span>
-            <b className="num">{formatPercent(item.pct, { decimals: 1 })}</b>
+          <div className="dl-item" key={item.categoryId || item.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 12.5 }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+              <i style={{ width: 8, height: 8, borderRadius: '50%', background: item.colorCode, flexShrink: 0 }} />
+              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--ds-foreground)' }}>{item.name}</span>
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+              <span className="num" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>{formatCurrency(item.total)}</span>
+              <b className="num" style={{ minWidth: 42, textAlign: 'right', color: 'var(--ds-foreground)' }}>{formatPercent(item.pct, { decimals: 1 })}</b>
+            </span>
           </div>
         ))}
       </div>
