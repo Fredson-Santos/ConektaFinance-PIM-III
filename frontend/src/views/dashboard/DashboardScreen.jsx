@@ -45,21 +45,13 @@ function MobileDashboard() {
   const previousMonthName = new Date(new Date().setMonth(new Date().getMonth() - 1)).toLocaleDateString('pt-BR', { month: 'long' })
   const negativeBalance = (overview.data?.balance ?? 0) < 0
 
-  const defaultMeters = [
-    { name: 'Moradia', spent: 1800, limit: 2000, percentage: 90, color: '#0070f3' },
-    { name: 'Alimentação', spent: 980, limit: 1500, percentage: 65, color: '#f5a623' },
-    { name: 'Transporte', spent: 380, limit: 600, percentage: 63, color: '#12b5cb' },
-    { name: 'Lazer & Lojas', spent: 290, limit: 800, percentage: 36, color: '#8e4ec6' },
-  ]
-  const meterItems = meters.data && meters.data.length > 0
-    ? meters.data.map((m) => ({
-        name: m.name,
-        spent: m.spent,
-        limit: m.limit,
-        percentage: m.percentage,
-        color: m.colorCode || '#0070f3',
-      }))
-    : defaultMeters
+  const meterItems = (meters.data || []).map((m) => ({
+    name: m.name,
+    spent: m.spent,
+    limit: m.limit,
+    percentage: m.percentage,
+    color: m.colorCode || '#0070f3',
+  }))
 
   return (
     <div className="mobile-dash-content">
@@ -166,27 +158,33 @@ function MobileDashboard() {
           </button>
         </div>
         <div className="card cats" id="mobileCatList">
-          {meterItems.map((item) => (
-            <div className="cat-row" key={item.name}>
-              <div className="cat-name">
-                <b style={{ background: item.color }} />
-                {item.name}
-              </div>
-              <div className="cat-val num">
-                {formatCurrency(item.spent)} / {formatCurrency(item.limit)}
-              </div>
-              <div className="track">
-                <i style={{ width: `${Math.min(100, item.percentage)}%`, background: item.color }} />
-              </div>
-              <div className="cat-meta">
-                <span>{item.percentage}% do limite</span>
-                <span style={item.percentage >= 80 ? { color: item.color } : {}}>
-                  {item.percentage >= 80 ? 'Perto do limite · ' : 'Limite '}
-                  {formatCurrency(item.limit)}
-                </span>
-              </div>
+          {meterItems.length === 0 ? (
+            <div style={{ padding: '20px 0', textAlign: 'center', color: 'var(--ds-foreground-muted)', fontSize: 13 }}>
+              Nenhum orçamento configurado
             </div>
-          ))}
+          ) : (
+            meterItems.map((item) => (
+              <div className="cat-row" key={item.name}>
+                <div className="cat-name">
+                  <b style={{ background: item.color }} />
+                  {item.name}
+                </div>
+                <div className="cat-val num">
+                  {formatCurrency(item.spent)} / {formatCurrency(item.limit)}
+                </div>
+                <div className="track">
+                  <i style={{ width: `${Math.min(100, item.percentage)}%`, background: item.color }} />
+                </div>
+                <div className="cat-meta">
+                  <span>{item.percentage}% do limite</span>
+                  <span style={item.percentage >= 80 ? { color: item.color } : {}}>
+                    {item.percentage >= 80 ? 'Perto do limite · ' : 'Limite '}
+                    {formatCurrency(item.limit)}
+                  </span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </section>
 
@@ -264,21 +262,13 @@ function DesktopDashboard() {
   const weekdayNames = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM']
   const todayWeekday = weekdayNames[todayWeekdayIndex]
 
-  const defaultMeters = [
-    { name: 'Moradia', spent: 1800, limit: 2000, percentage: 90, color: '#0070f3' },
-    { name: 'Alimentação', spent: 980, limit: 1500, percentage: 65, color: '#f5a623' },
-    { name: 'Transporte', spent: 380, limit: 600, percentage: 63, color: '#12b5cb' },
-    { name: 'Lazer & Lojas', spent: 290, limit: 800, percentage: 36, color: '#8e4ec6' },
-  ]
-  const meterItems = meters.data && meters.data.length > 0
-    ? meters.data.map((m) => ({
-        name: m.name,
-        spent: m.spent,
-        limit: m.limit,
-        percentage: m.percentage,
-        color: m.colorCode || '#0070f3',
-      }))
-    : defaultMeters
+  const meterItems = (meters.data || []).map((m) => ({
+    name: m.name,
+    spent: m.spent,
+    limit: m.limit,
+    percentage: m.percentage,
+    color: m.colorCode || '#0070f3',
+  }))
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -303,7 +293,7 @@ function DesktopDashboard() {
               <span className="badge-dot" style={{ background: negativeBalance ? 'var(--ds-red-700)' : 'var(--ds-green-700)' }} />
               {overview.data?.incomeChangePct != null
                 ? `${formatPercent(overview.data.incomeChangePct, { signed: true, decimals: 1 })} mês`
-                : '+14.2% mês'}
+                : 'Sem histórico'}
             </span>
           </div>
           <p className="stat-value num" style={negativeBalance ? { color: 'var(--ds-red-700)' } : undefined}>
@@ -330,7 +320,7 @@ function DesktopDashboard() {
               <span className="badge-dot" style={{ background: 'var(--ds-green-700)' }} />
               {overview.data?.incomeChangePct != null
                 ? `${formatPercent(overview.data.incomeChangePct, { signed: true, decimals: 1 })} mês`
-                : '+8.4% mês'}
+                : 'Sem histórico'}
             </span>
           </div>
           <p className="stat-value num">
@@ -357,7 +347,7 @@ function DesktopDashboard() {
               <span className="badge-dot" style={{ background: 'var(--ds-red-700, #ef4444)' }} />
               {overview.data?.expenseToCeilingPercentage != null
                 ? `${formatPercent(overview.data.expenseToCeilingPercentage)} do teto`
-                : '68% do teto'}
+                : 'Sem teto'}
             </span>
           </div>
           <p className="stat-value num">
@@ -366,7 +356,7 @@ function DesktopDashboard() {
           <p className="stat-foot">
             {overview.data?.expenseToCeilingPercentage != null && overview.data?.expense
               ? `Limite de ${formatCurrency((overview.data.expense * 100) / overview.data.expenseToCeilingPercentage)}`
-              : 'Limite de R$ 6.350,00'}
+              : 'Nenhum teto configurado'}
           </p>
         </div>
       </div>
@@ -379,26 +369,26 @@ function DesktopDashboard() {
             <div>
               <p className="card-title">Distribuição de Gastos da Semana</p>
               <span className="stat-foot">
-                Média diária de {formatCurrency(week.data?.dailyAverage ?? 142)}
+                Média diária de {formatCurrency(week.data?.dailyAverage ?? 0)}
               </span>
             </div>
             <span className="num" style={{ fontSize: 12, fontWeight: 600, color: 'var(--ds-foreground)' }}>
-              Total: {formatCurrency(week.data?.total ?? 994)}
+              Total: {formatCurrency(week.data?.total ?? 0)}
             </span>
           </div>
 
           <div className="spend-chart-container" id="spendChart">
-            {(weekDays.length > 0 ? weekDays : weekdayNames.map((w, idx) => ({
+            {(weekDays.length > 0 ? weekDays : weekdayNames.map((w) => ({
               label: w,
               rawLabel: w.toLowerCase(),
-              pct: [45, 30, 65, 40, 90, 75, 32][idx] || 40,
-              value: 100,
+              pct: 0,
+              value: 0,
             }))).map((day) => {
               const isToday = day.label === todayWeekday || day.rawLabel === 'dom'
               return (
                 <div key={day.label} className={`spend-col ${isToday ? 'active' : ''}`}>
                   <div className="spend-bar-track">
-                    <div className="spend-bar-fill" style={{ height: `${Math.max(10, day.pct)}%` }} />
+                    <div className="spend-bar-fill" style={{ height: `${day.pct > 0 ? Math.max(8, day.pct) : 0}%` }} />
                   </div>
                   <span className="spend-day">{day.label}</span>
                 </div>
@@ -417,22 +407,28 @@ function DesktopDashboard() {
           </div>
 
           <div className="cat-meter-list">
-            {meterItems.map((item) => (
-              <div className="cat-meter-item" key={item.name}>
-                <div className="cat-meter-head">
-                  <span className="cat-meter-label">
-                    <span className="cat-meter-dot" style={{ background: item.color }} />
-                    {item.name}
-                  </span>
-                  <span className="cat-meter-val num">
-                    {formatCurrency(item.spent)} / {formatCurrency(item.limit)}
-                  </span>
-                </div>
-                <div className="cat-track">
-                  <div className="cat-fill" style={{ width: `${Math.min(100, item.percentage)}%`, background: item.color }} />
-                </div>
+            {meterItems.length === 0 ? (
+              <div style={{ padding: '24px 0', textAlign: 'center', color: 'var(--ds-foreground-muted)', fontSize: 13 }}>
+                Nenhum orçamento configurado
               </div>
-            ))}
+            ) : (
+              meterItems.map((item) => (
+                <div className="cat-meter-item" key={item.name}>
+                  <div className="cat-meter-head">
+                    <span className="cat-meter-label">
+                      <span className="cat-meter-dot" style={{ background: item.color }} />
+                      {item.name}
+                    </span>
+                    <span className="cat-meter-val num">
+                      {formatCurrency(item.spent)} / {formatCurrency(item.limit)}
+                    </span>
+                  </div>
+                  <div className="cat-track">
+                    <div className="cat-fill" style={{ width: `${Math.min(100, item.percentage)}%`, background: item.color }} />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -520,18 +516,19 @@ function WeekChart({ week, isMobile }) {
       }))
     }
     return [
-      { label: 'seg', pct: 45, value: 140 },
-      { label: 'ter', pct: 30, value: 95 },
-      { label: 'qua', pct: 65, value: 210 },
-      { label: 'qui', pct: 40, value: 130 },
-      { label: 'sex', pct: 90, value: 290 },
-      { label: 'sab', pct: 75, value: 240 },
-      { label: 'dom', pct: 32, value: 105 },
+      { label: 'seg', pct: 0, value: 0 },
+      { label: 'ter', pct: 0, value: 0 },
+      { label: 'qua', pct: 0, value: 0 },
+      { label: 'qui', pct: 0, value: 0 },
+      { label: 'sex', pct: 0, value: 0 },
+      { label: 'sab', pct: 0, value: 0 },
+      { label: 'dom', pct: 0, value: 0 },
     ]
   }, [week.data])
 
-  const total = days.reduce((sum, day) => sum + day.value, 0) || (week.data?.total ?? 994)
-  const dailyAverage = week.data?.dailyAverage ?? (days.length ? total / days.length : 142)
+  const sumDays = days.reduce((sum, day) => sum + (day.value || 0), 0)
+  const total = sumDays > 0 ? sumDays : (week.data?.total ?? 0)
+  const dailyAverage = week.data?.dailyAverage ?? (days.length && total > 0 ? total / days.length : 0)
   const todayIndex = (new Date().getDay() + 6) % 7
   const todayLabel = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'][todayIndex]
 
@@ -566,7 +563,7 @@ function WeekChart({ week, isMobile }) {
                       {formatCurrency(day.value)}
                     </div>
                   )}
-                  <span style={{ height: `${Math.max(6, day.pct)}%` }} />
+                  <span style={{ height: `${day.pct > 0 ? Math.max(6, day.pct) : 0}%` }} />
                   <em>{day.label}</em>
                 </div>
               )
@@ -605,7 +602,7 @@ function WeekChart({ week, isMobile }) {
                   {formatCurrency(day.value)}
                 </div>
               )}
-              <div className="week-bar" style={{ height: `${Math.max(4, day.pct)}%` }} title={formatCurrency(day.value)} />
+              <div className="week-bar" style={{ height: `${day.pct > 0 ? Math.max(4, day.pct) : 0}%` }} title={formatCurrency(day.value)} />
               <span className="week-day-label">{day.label}</span>
             </div>
           )

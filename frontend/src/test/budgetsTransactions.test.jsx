@@ -174,4 +174,14 @@ describe('TransactionsScreen', () => {
 
     expect(await screen.findByText('Nenhuma transação encontrada')).toBeInTheDocument()
   })
+
+  it('exibe estado zerado e vazio na coluna lateral quando nao ha orcamentos e maiores categorias', async () => {
+    budgetService.list.mockResolvedValue([])
+    reportService.byCategory.mockResolvedValue([])
+    renderScreen(TransactionsScreen)
+
+    expect(await screen.findByText('Sem teto')).toBeInTheDocument()
+    expect(screen.getByText('Meta: Não definida')).toBeInTheDocument()
+    expect(screen.getByText('Sem gastos registrados no período')).toBeInTheDocument()
+  })
 })

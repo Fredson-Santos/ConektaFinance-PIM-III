@@ -13,7 +13,7 @@ import { EmptyState } from '../../components/common/EmptyState'
 import { Meter } from '../../components/common/Meter'
 import { Button } from '../../components/common/Button'
 import { formatCurrency } from '../../utils/format'
-import { formatDayLabel, monthLabel, addMonths } from '../../utils/dates'
+import { formatDayLabel, monthLabel, addMonths, monthPeriod } from '../../utils/dates'
 
 export function TransactionsScreen() {
   const now = new Date()
@@ -46,9 +46,8 @@ export function TransactionsScreen() {
   )
   const topCategoriesState = useAsync(
     async () => {
-      const start = new Date(period.year, period.month - 1, 1)
-      const end = new Date(period.year, period.month, 1)
-      return reportService.byCategory(start.toISOString().slice(0, 10), end.toISOString().slice(0, 10))
+      const p = monthPeriod(period.month, period.year)
+      return reportService.byCategory(p.start, p.end)
     },
     [period.month, period.year],
   )
@@ -65,7 +64,11 @@ export function TransactionsScreen() {
     return [...byDay.values()]
   }, [listState.data])
 
-  const changeMonth = (delta) => setPeriod((current) => addMonths(current.month, current.year, delta))
+  const isCurrentOrFuture = period.year > now.getFullYear() || (period.year === now.getFullYear() && period.month >= now.getMonth() + 1)
+  const changeMonth = (delta) => {
+    if (delta > 0 && isCurrentOrFuture) return
+    setPeriod((current) => addMonths(current.month, current.year, delta))
+  }
   const filteredByChip = categoryId && (categories || []).find((category) => category.id === Number(categoryId))
   const summaryLabel = filteredByChip ? `Gastos em ${filteredByChip.name}` : 'Transações do período'
 
@@ -74,18 +77,21 @@ export function TransactionsScreen() {
   }
 
   const budgets = budgetsState.data || []
-  const totalLimit = budgets.reduce((sum, b) => sum + (b.limitValue || 0), 0) || 6350
-  const sideCardSpent = budgets.reduce((sum, b) => sum + (b.spent || 0), 0) || 2168.90
-  const totalSpent = listState.data?.totalSum != null ? Math.abs(listState.data.totalSum) : 2168.90
-  const percentage = totalLimit > 0 ? Math.round((sideCardSpent / totalLimit) * 100) : 34
+  const totalLimit = budgets.reduce((sum, b) => sum + (b.limitValue || 0), 0)
+  const sideCardSpent = budgets.reduce((sum, b) => sum + (b.spent || 0), 0)
+  const totalSpent = listState.data?.totalSum != null ? Math.abs(listState.data.totalSum) : 0
+  const percentage = totalLimit > 0 ? Math.round((sideCardSpent / totalLimit) * 100) : 0
 
   const rawTop = topCategoriesState.data || []
-  const topItems = rawTop.length > 0 ? rawTop.slice(0, 4) : [
-    { name: 'Moradia & Contas', total: 1450, colorCode: '#0070f3' },
-    { name: 'Alimentação & Mercado', total: 268, colorCode: '#f5a623' },
-    { name: 'Transporte', total: 90, colorCode: '#8e4ec6' },
-    { name: 'Lazer & Cultura', total: 78, colorCode: '#e93d82' },
-  ]
+  const topCategoriesTotal = rawTop.reduce((sum, item) => sum + (item.total || 0), 0)
+  const topItems = rawTop.slice(0, 4).map((item) => {
+    const totalBase = topCategoriesTotal > 0 ? topCategoriesTotal : (item.total || 1)
+    const pct = Math.round(((item.total || 0) / totalBase) * 100)
+    return {
+      ...item,
+      pct,
+    }
+  })
 
   return (
     <div className="gastos-container">
@@ -182,8 +188,19 @@ export function TransactionsScreen() {
                 className="btn-icon"
                 id="btnGastosNextMonth"
                 aria-label="Próximo mês"
-                style={{ width: 26, height: 26, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                onClick={() => changeMonth(1)}
+                disabled={isCurrentOrFuture}
+                style={{
+                  width: 26,
+                  height: 26,
+                  border: 'none',
+                  background: 'none',
+                  cursor: isCurrentOrFuture ? 'not-allowed' : 'pointer',
+                  opacity: isCurrentOrFuture ? 0.35 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                onClick={() => !isCurrentOrFuture && changeMonth(1)}
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 6l6 6-6 6" />
@@ -232,22 +249,24 @@ export function TransactionsScreen() {
                 className="badge b-ok"
                 style={{
                   fontSize: 11,
-                  background: percentage > 100 ? 'rgba(229, 72, 77, 0.15)' : 'rgba(0, 204, 136, 0.15)',
-                  color: percentage > 100 ? 'var(--ds-red-700)' : 'var(--ds-green-700)',
-                  border: `1px solid ${percentage > 100 ? 'rgba(229, 72, 77, 0.3)' : 'rgba(0, 204, 136, 0.3)'}`,
+                  background: totalLimit === 0 ? 'var(--ds-gray-alpha-200)' : percentage > 100 ? 'rgba(229, 72, 77, 0.15)' : 'rgba(0, 204, 136, 0.15)',
+                  color: totalLimit === 0 ? 'var(--ds-foreground-muted)' : percentage > 100 ? 'var(--ds-red-700)' : 'var(--ds-green-700)',
+                  border: `1px solid ${totalLimit === 0 ? 'var(--ds-border-subtle)' : percentage > 100 ? 'rgba(229, 72, 77, 0.3)' : 'rgba(0, 204, 136, 0.3)'}`,
                   borderRadius: 9999,
                   padding: '2px 8px',
                   fontWeight: 500,
                 }}
               >
-                {percentage > 100 ? 'Estourado' : percentage >= 80 ? 'Atenção' : 'Sob controle'}
+                {totalLimit === 0 ? 'Sem teto' : percentage > 100 ? 'Estourado' : percentage >= 80 ? 'Atenção' : 'Sob controle'}
               </span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
               <span id="gastosDesktopTotalVal" style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--ds-foreground)' }}>
                 {formatCurrency(sideCardSpent)}
               </span>
-              <span style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>Meta: {formatCurrency(totalLimit)}</span>
+              <span style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>
+                {totalLimit > 0 ? `Meta: ${formatCurrency(totalLimit)}` : 'Meta: Não definida'}
+              </span>
             </div>
             <div className="cat-track" style={{ height: 7, background: 'var(--ds-gray-alpha-200)', borderRadius: 99, overflow: 'hidden', marginBottom: 10 }}>
               <div
@@ -279,28 +298,34 @@ export function TransactionsScreen() {
               </button>
             </div>
 
-            <div className="cat-meter-list" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {topItems.map((item) => {
-                const pct = totalSpent > 0 ? Math.round((item.total / totalSpent) * 100) : 0
-                const color = item.colorCode || (item.name.toLowerCase().includes('morad') ? '#0070f3' : item.name.toLowerCase().includes('alim') ? '#f5a623' : item.name.toLowerCase().includes('trans') ? '#8e4ec6' : '#e93d82')
-                return (
-                  <div className="cat-meter-item" key={item.categoryId || item.name}>
-                    <div className="cat-meter-head" style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, marginBottom: 4 }}>
-                      <span className="cat-meter-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span className="cat-meter-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: color }} />
-                        {item.name}
-                      </span>
-                      <span className="cat-meter-val num" style={{ fontWeight: 500 }}>
-                        {formatCurrency(item.total)} ({pct}%)
-                      </span>
+            {topItems.length === 0 ? (
+              <div style={{ padding: '16px 0', textAlign: 'center', color: 'var(--ds-foreground-muted)', fontSize: 12.5 }}>
+                Sem gastos registrados no período
+              </div>
+            ) : (
+              <div className="cat-meter-list" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {topItems.map((item) => {
+                  const pct = item.pct
+                  const color = item.colorCode || (item.name.toLowerCase().includes('morad') ? '#0070f3' : item.name.toLowerCase().includes('alim') ? '#f5a623' : item.name.toLowerCase().includes('trans') ? '#8e4ec6' : '#e93d82')
+                  return (
+                    <div className="cat-meter-item" key={item.categoryId || item.name}>
+                      <div className="cat-meter-head" style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, marginBottom: 4 }}>
+                        <span className="cat-meter-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span className="cat-meter-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: color }} />
+                          {item.name}
+                        </span>
+                        <span className="cat-meter-val num" style={{ fontWeight: 500 }}>
+                          {formatCurrency(item.total)} ({pct}%)
+                        </span>
+                      </div>
+                      <div className="cat-track" style={{ height: 6, background: 'var(--ds-gray-alpha-200)', borderRadius: 99, overflow: 'hidden' }}>
+                        <div className="cat-fill" style={{ width: `${Math.min(100, Math.max(2, pct))}%`, height: '100%', background: color, borderRadius: 99 }} />
+                      </div>
                     </div>
-                    <div className="cat-track" style={{ height: 6, background: 'var(--ds-gray-alpha-200)', borderRadius: 99, overflow: 'hidden' }}>
-                      <div className="cat-fill" style={{ width: `${Math.min(100, Math.max(10, pct))}%`, height: '100%', background: color, borderRadius: 99 }} />
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
 
           {/* Card: Gestão de Despesas */}
@@ -309,17 +334,6 @@ export function TransactionsScreen() {
               Gestão de Despesas
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <button
-                type="button"
-                className="btn primary"
-                style={{ justifyContent: 'center', width: '100%' }}
-                onClick={() => openTransactionSheet()}
-              >
-                <svg className="icon" style={{ width: 14, height: 14 }}>
-                  <use href="#i-plus" />
-                </svg>
-                Novo lançamento
-              </button>
               <button
                 type="button"
                 className="btn"

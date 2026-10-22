@@ -137,4 +137,12 @@ describe('DashboardScreen', () => {
     expect(screen.getByText('Moradia')).toBeInTheDocument()
     expect(screen.getByText('R$ 1.800,00 / R$ 2.000,00')).toBeInTheDocument()
   })
+
+  it('exibe estado vazio quando nao ha medidores de orcamento cadastrados', async () => {
+    dashboardService.budgetMeters.mockResolvedValue([])
+    renderDashboard()
+
+    expect(await screen.findByText('Nenhum orçamento configurado')).toBeInTheDocument()
+    expect(screen.queryByText('Moradia')).not.toBeInTheDocument()
+  })
 })
