@@ -187,7 +187,25 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAvatarStorage, LocalAvatarStorage>();
 builder.Services.AddScoped<IStatementParser, StatementParser>();
 builder.Services.AddScoped<IImportService, ImportService>();
-builder.Services.AddSingleton<IOtpSender, DevOtpSender>();
+builder.Services.AddHttpClient();
+builder.Services.AddMemoryCache();
+
+// Canal WhatsApp (Evolution API): o mesmo CopilotService do painel web,
+// acionado pelo webhook publico /api/v1/webhooks/whatsapp.
+builder.Services.AddScoped<EvolutionClient>();
+builder.Services.AddScoped<IEvolutionClient>(sp => sp.GetRequiredService<EvolutionClient>());
+
+builder.Services.AddScoped<IOtpSender>(sp =>
+{
+    var evolution = sp.GetRequiredService<IEvolutionClient>();
+    return evolution.IsConfigured
+        ? new EvolutionOtpSender(evolution,
+            sp.GetRequiredService<IConfiguration>(),
+            sp.GetRequiredService<ILogger<EvolutionOtpSender>>())
+        : new DevOtpSender(
+            sp.GetRequiredService<ILogger<DevOtpSender>>(),
+            sp.GetRequiredService<IConfiguration>());
+});
 
 var app = builder.Build();
 
