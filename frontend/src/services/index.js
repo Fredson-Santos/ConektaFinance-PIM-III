@@ -39,7 +39,12 @@ export const categoryService = {
 
 export const budgetService = {
   upsert: (payload) => put('/budgets', payload),
-  list: (month, year) => get(`/budgets?month=${month}&year=${year}`),
+  list: (month, year) => {
+    const query = new URLSearchParams()
+    if (month != null) query.set('month', month)
+    if (year != null) query.set('year', year)
+    return get(`/budgets${query.toString() ? `?${query}` : ''}`)
+  },
 }
 
 export const transactionService = {
@@ -65,7 +70,23 @@ export const dashboardService = {
   },
   weeklyExpenses: (date) => get(`/dashboard/weekly-expenses${date ? `?date=${date}` : ''}`),
   recentTransactions: (limit = 5) => get(`/dashboard/recent-transactions?limit=${limit}`),
-  budgetMeters: (month, year, top = 4) => get(`/dashboard/budget-meters?month=${month}&year=${year}&top=${top}`),
+  budgetMeters: (monthOrParams, yearArg, topArg = 4) => {
+    let month, year, top
+    if (monthOrParams && typeof monthOrParams === 'object') {
+      month = monthOrParams.month
+      year = monthOrParams.year
+      top = monthOrParams.top ?? 4
+    } else {
+      month = monthOrParams
+      year = yearArg
+      top = topArg ?? 4
+    }
+    const query = new URLSearchParams()
+    if (month != null) query.set('month', month)
+    if (year != null) query.set('year', year)
+    if (top != null) query.set('top', top)
+    return get(`/dashboard/budget-meters${query.toString() ? `?${query}` : ''}`)
+  },
 }
 
 export const reportService = {
