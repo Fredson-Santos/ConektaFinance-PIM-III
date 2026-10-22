@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { FileDown, FileJson, FileText, Sparkles } from 'lucide-react'
+import { FileText } from 'lucide-react'
 import { reportService, insightService } from '../../services'
 import { useAsync } from '../../hooks/useAsync'
 import { useToast } from '../../context/ToastContext'
@@ -74,7 +74,6 @@ export function ReportsScreen() {
             <div className="page-sub">{label}</div>
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <SegmentedControl name="Período" value={period} onChange={setPeriod} options={PERIODS} />
             <ExportButtons period={period} range={range} summary={summary} byCategory={byCategory} label={label} />
           </div>
         </div>
@@ -89,36 +88,6 @@ export function ReportsScreen() {
           </div>
           <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <ExportButtons period={period} range={range} summary={summary} byCategory={byCategory} label={label} />
-            {period !== 'month' ? (
-              <>
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={() => {
-                    if (!summary.data || !byCategory.data) {
-                      toast.push('Aguarde o carregamento do relatório.', 'error')
-                      return
-                    }
-                    exportMonthlyPdf({
-                      period: { label, key: range.start.slice(0, 7) },
-                      summary: summary.data,
-                      byCategory: byCategory.data,
-                    })
-                  }}
-                >
-                  <svg className="icon" style={{ width: 14, height: 14 }}><use href="#i-download" /></svg>
-                  Exportar PDF
-                </button>
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={() => reportService.exportCsv(range.start, range.end).catch(() => toast.push('Falha ao exportar CSV.', 'error'))}
-                >
-                  <svg className="icon" style={{ width: 14, height: 14 }}><use href="#i-upload" /></svg>
-                  Exportar CSV
-                </button>
-              </>
-            ) : null}
           </div>
         </div>
       )}
@@ -141,42 +110,26 @@ export function ReportsScreen() {
   )
 }
 
-function ExportButtons({ period, range, summary, byCategory, label }) {
+function ExportButtons({ range, summary, byCategory, label }) {
   const toast = useToast()
-  if (period !== 'month') return null
   return (
-    <>
-      <Button
-        variant="secondary"
-        icon={FileText}
-        onClick={() => {
-          if (!summary.data || !byCategory.data) {
-            toast.push('Aguarde o carregamento do relatório.', 'error')
-            return
-          }
-          exportMonthlyPdf({
-            period: { label, key: range.start.slice(0, 7) },
-            summary: summary.data,
-            byCategory: byCategory.data,
-          })
-        }}
-      >
-        Exportar PDF
-      </Button>
-      <Button
-        variant="secondary"
-        icon={FileDown}
-        onClick={() => reportService.exportCsv(range.start, range.end).catch(() => toast.push('Falha ao exportar CSV.', 'error'))}
-      >
-        CSV
-      </Button>
-      <Button
-        variant="ghost"
-        icon={FileJson}
-        aria-label="Exportar JSON"
-        onClick={() => reportService.exportJson(range.start, range.end).catch(() => toast.push('Falha ao exportar JSON.', 'error'))}
-      />
-    </>
+    <Button
+      variant="secondary"
+      icon={FileText}
+      onClick={() => {
+        if (!summary.data || !byCategory.data) {
+          toast.push('Aguarde o carregamento do relatório.', 'error')
+          return
+        }
+        exportMonthlyPdf({
+          period: { label, key: range.start.slice(0, 7) },
+          summary: summary.data,
+          byCategory: byCategory.data,
+        })
+      }}
+    >
+      Exportar
+    </Button>
   )
 }
 
@@ -199,21 +152,53 @@ function MobileReports({ summary, byCategory, trend, insights, period, setPeriod
     return items.reduce((sum, item) => sum + item.saved, 0) / items.length
   }, [trend.data])
 
+  const [activePair, setActivePair] = useState(null)
   const trendPairs = useMemo(() => {
     const list = trend.data || []
     if (list.length === 0) return []
-    const maxIncome = Math.max(...list.map((t) => t.income), 1)
-    return list.map((item, idx) => ({
-      period: item.period,
-      monthLabel: item.period ? item.period.split('/')[0] : '',
-      inPct: Math.min(100, Math.round((item.income / maxIncome) * 100)),
-      outPct: Math.min(100, Math.round((item.expense / maxIncome) * 100)),
-      isLast: idx === list.length - 1,
-    }))
+    const maxVal = Math.max(...list.flatMap((t) => [t.income, t.expense]), 1)
+    return list.map((item, idx) => {
+      const [m, y] = (item.period || '').split('/')
+      const date = m && y ? new Date(Number(y), Number(m) - 1, 1) : null
+      const monthName = date
+        ? date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')
+        : (m || '')
+      return {
+        period: item.period,
+        monthLabel: monthName,
+        income: item.income,
+        expense: item.expense,
+        inPct: Math.min(100, Math.round((item.income / maxVal) * 100)),
+        outPct: Math.min(100, Math.round((item.expense / maxVal) * 100)),
+        isLast: idx === list.length - 1,
+      }
+    })
   }, [trend.data])
 
-  const categoryList = byCategory.data || []
   const donutColors = ['#0070f3', '#f5a623', '#8e4ec6', '#e93d82', '#00cc88', '#666666']
+  const activeCategories = useMemo(() => {
+    const raw = (byCategory.data || []).filter((cat) => (cat.total || 0) > 0)
+    const total = raw.reduce((sum, cat) => sum + cat.total, 0)
+    return raw.map((cat, idx) => ({
+      ...cat,
+      colorCode: cat.colorCode || donutColors[idx % donutColors.length],
+      calcPct: total > 0 ? (cat.total / total) * 100 : (cat.percentage || 0),
+    }))
+  }, [byCategory.data])
+
+  const mobileDonutGradient = useMemo(() => {
+    if (activeCategories.length === 0) return null
+    let acc = 0
+    const stops = activeCategories.map((cat) => {
+      const start = acc
+      acc += cat.calcPct
+      const end = Math.min(100, acc)
+      return `${cat.colorCode} ${start.toFixed(1)}% ${end.toFixed(1)}%`
+    })
+    return `conic-gradient(${stops.join(', ')})`
+  }, [activeCategories])
+
+  const categoryList = byCategory.data || []
   const insight = (insights.data || [])[0]
 
   return (
@@ -233,19 +218,70 @@ function MobileReports({ summary, byCategory, trend, insights, period, setPeriod
         ))}
       </div>
 
-      <section className="res">
-        <div className="sub">Sobra média por mês</div>
-        <div className="big">
-          <small>R$</small>
-          {formatCurrency(savedAverage).replace('R$', '').trim()}
+      {/* 4 KPIs Mobile */}
+      <div className="report-grid-kpi" style={{ marginTop: 8, marginBottom: 14 }}>
+        <div className="card" style={{ padding: '12px 14px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <span style={{ fontSize: 11.5, color: 'var(--ds-foreground-muted)' }}>Balanço líquido</span>
+            <span className={`badge ${(summary.data?.balance || 0) >= 0 ? 'b-ok' : 'b-bad'}`} style={{ fontSize: 10, padding: '2px 6px' }}>
+              {(summary.data?.balance || 0) >= 0 ? 'Azul' : 'Vermelho'}
+            </span>
+          </div>
+          <div className="num" style={{ fontSize: 17, fontWeight: 700, color: (summary.data?.balance || 0) >= 0 ? 'var(--ds-green-500, #00cc88)' : 'var(--ds-red-500)' }}>
+            {(summary.data?.balance || 0) >= 0 ? '+ ' : ''}{formatCurrency(summary.data?.balance || 0)}
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--ds-foreground-muted)', marginTop: 2 }}>
+            In {formatCompact(summary.data?.totalIncome || 0)} • Out {formatCompact(summary.data?.totalExpense || 0)}
+          </div>
         </div>
-        <div style={{ marginTop: 10, display: 'flex', gap: 8, alignItems: 'center', fontSize: 12.5, color: 'var(--ds-foreground-muted)' }}>
-          <span className={`badge ${savedAverage >= 0 ? 'b-ok' : 'b-bad'}`}>
-            {savedAverage >= 0 ? '+' : ''}{formatCurrency(savedAverage)}
-          </span>{' '}
-          por mês
+
+        <div className="card" style={{ padding: '12px 14px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <span style={{ fontSize: 11.5, color: 'var(--ds-foreground-muted)' }}>Taxa poupança</span>
+            <span className="badge" style={{ fontSize: 10, padding: '2px 6px' }}>
+              Meta 20%
+            </span>
+          </div>
+          <div className="num" style={{ fontSize: 17, fontWeight: 700 }}>
+            {summary.data?.savingsRate != null ? formatPercent(summary.data.savingsRate, { decimals: 0 }) : '0%'}
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--ds-foreground-muted)', marginTop: 2 }}>
+            {formatCompact(Math.max(0, summary.data?.balance || 0))} guardados
+          </div>
         </div>
-      </section>
+
+        <div className="card" style={{ padding: '12px 14px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <span style={{ fontSize: 11.5, color: 'var(--ds-foreground-muted)' }}>Custos fixos</span>
+            <span className="badge" style={{ fontSize: 10, padding: '2px 6px' }}>
+              {summary.data?.totalExpense && summary.data?.recurrentSpent
+                ? `${Math.round((summary.data.recurrentSpent / summary.data.totalExpense) * 100)}%`
+                : 'Fixos'}
+            </span>
+          </div>
+          <div className="num" style={{ fontSize: 17, fontWeight: 700 }}>
+            {formatCurrency(summary.data?.recurrentSpent || 0)}
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--ds-foreground-muted)', marginTop: 2 }}>
+            {summary.data?.recurrentCount || 0} contas fixas
+          </div>
+        </div>
+
+        <div className="card" style={{ padding: '12px 14px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <span style={{ fontSize: 11.5, color: 'var(--ds-foreground-muted)' }}>Maior gasto</span>
+            <span className="badge" style={{ fontSize: 10, padding: '2px 6px', color: 'var(--ds-amber-600)' }}>
+              Pico
+            </span>
+          </div>
+          <div className="num" style={{ fontSize: 17, fontWeight: 700, color: 'var(--ds-amber-600)' }}>
+            {summary.data?.largestExpense ? formatCurrency(summary.data.largestExpense.amount) : 'R$ 0'}
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--ds-foreground-muted)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {summary.data?.largestExpense?.description || 'Nenhum'}
+          </div>
+        </div>
+      </div>
 
       {/* Entradas e saídas */}
       <section className="sec">
@@ -257,15 +293,35 @@ function MobileReports({ summary, byCategory, trend, insights, period, setPeriod
           </div>
           <div className="pairs" role="img" aria-label="Entradas e saídas">
             {trendPairs.length > 0 ? (
-              trendPairs.map((p) => (
-                <div key={p.period} className={`pair ${p.isLast ? 'now' : ''}`}>
-                  <div className="bars">
-                    <span className="in" style={{ height: `${Math.max(6, p.inPct)}%` }} />
-                    <span className="out" style={{ height: `${Math.max(6, p.outPct)}%` }} />
+              trendPairs.map((p) => {
+                const isActive = activePair === p.period
+                return (
+                  <div
+                    key={p.period}
+                    className={`pair ${p.isLast ? 'now' : ''} ${isActive ? 'active' : ''}`}
+                    onClick={() => setActivePair((prev) => (prev === p.period ? null : p.period))}
+                    onMouseEnter={() => setActivePair(p.period)}
+                    onMouseLeave={() => setActivePair(null)}
+                    style={{ position: 'relative', cursor: 'pointer' }}
+                  >
+                    {isActive && (
+                      <div className="chart-bar-tooltip" style={{ minWidth: 110, textAlign: 'left', lineHeight: 1.4 }}>
+                        <div style={{ color: 'var(--ds-green-500, #00cc88)', fontSize: 11 }}>
+                          In: {formatCurrency(p.income)}
+                        </div>
+                        <div style={{ color: 'var(--ds-foreground-muted)', fontSize: 11 }}>
+                          Out: {formatCurrency(p.expense)}
+                        </div>
+                      </div>
+                    )}
+                    <div className="bars">
+                      <span className="in" style={{ height: `${Math.max(6, p.inPct)}%` }} />
+                      <span className="out" style={{ height: `${Math.max(6, p.outPct)}%` }} />
+                    </div>
+                    <em>{p.monthLabel}</em>
                   </div>
-                  <em>{p.monthLabel}</em>
-                </div>
-              ))
+                )
+              })
             ) : (
               <p style={{ color: 'var(--ds-foreground-muted)', fontSize: 12 }}>Nenhum dado no período.</p>
             )}
@@ -277,20 +333,20 @@ function MobileReports({ summary, byCategory, trend, insights, period, setPeriod
       <section className="sec">
         <h2>Para onde foi o dinheiro</h2>
         <div className="card donut-row">
-          <div className="donut">
+          <div className="donut" style={mobileDonutGradient ? { background: mobileDonutGradient } : undefined}>
             <div className="donut-center">
               <span className="big">{formatCurrency(summary.data?.totalExpense || 0)}</span>
               <span className="sub">Total saídas</span>
             </div>
           </div>
           <div className="dl">
-            {categoryList.slice(0, 4).map((cat, idx) => (
+            {activeCategories.slice(0, 4).map((cat) => (
               <div key={cat.categoryId || cat.name}>
                 <span>
-                  <i style={{ background: cat.colorCode || donutColors[idx % donutColors.length] }} />
+                  <i style={{ background: cat.colorCode }} />
                   {cat.name}
                 </span>
-                <b>{formatPercent(cat.percentage || 0, { decimals: 0 })}</b>
+                <b>{formatPercent(cat.calcPct, { decimals: 0 })}</b>
               </div>
             ))}
           </div>
@@ -333,92 +389,107 @@ function MobileReports({ summary, byCategory, trend, insights, period, setPeriod
         </div>
       </section>
 
-      {/* Exportar PDF */}
-      <button
-        type="button"
-        className="btn"
-        style={{ width: '100%', marginTop: 16 }}
-        id="btnExportPdfMobile"
-        onClick={() => {
-          if (!summary.data || !byCategory.data) {
-            toast.push('Aguarde o carregamento do relatório.', 'error')
-            return
-          }
-          exportMonthlyPdf({
-            period: { label, key: range.start.slice(0, 7) },
-            summary: summary.data,
-            byCategory: byCategory.data,
-          })
-        }}
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-          <polyline points="7 10 12 15 17 10" />
-          <line x1="12" y1="15" x2="12" y2="3" />
-        </svg>
-        Exportar relatório em PDF
-      </button>
     </div>
   )
 }
 
 function DesktopReports({ summary, byCategory, trend, insights, previousCategories }) {
-  const savingsAccumulated = useMemo(
-    () => (trend.data || []).reduce((sum, item) => sum + item.saved, 0) || 10480,
-    [trend.data],
-  )
-  const averageMonthly = summary.data?.averageMonthlyExpense || 4270
-  const totalPeriod = summary.data?.totalExpense || 25620
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-      {/* 3 KPI Cards: Métricas Semestrais Consolidadas */}
-      <div className="report-grid-kpi" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+      {/* 4 KPI Cards: Indicadores Estratégicos Reais */}
+      <div className="report-grid-kpi">
+        {/* Card 1: Balanço Líquido */}
         <div className="card">
           <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="stat-label" style={{ margin: 0, fontSize: 13, color: 'var(--ds-foreground-muted)' }}>Média mensal de gastos</span>
+            <span className="stat-label" style={{ margin: 0, fontSize: 13, color: 'var(--ds-foreground-muted)' }}>Balanço líquido</span>
             <span className="badge">
-              <span className="badge-dot" style={{ background: 'var(--ds-green-700)' }} />
-              −6.2% sem.
+              <span
+                className="badge-dot"
+                style={{ background: (summary.data?.balance || 0) >= 0 ? 'var(--ds-green-700)' : 'var(--ds-red-700)' }}
+              />
+              {(summary.data?.balance || 0) >= 0 ? 'No azul' : 'No vermelho'}
             </span>
           </div>
-          <p className="stat-value num" style={{ fontSize: 24, fontWeight: 700, margin: '4px 0', color: 'var(--ds-foreground)' }}>
-            {formatCurrency(averageMonthly)}
+          <p
+            className="stat-value num"
+            style={{
+              fontSize: 24,
+              fontWeight: 700,
+              margin: '4px 0',
+              color: (summary.data?.balance || 0) >= 0 ? 'var(--ds-green-700)' : 'var(--ds-red-700)',
+            }}
+          >
+            {(summary.data?.balance || 0) >= 0 ? '+ ' : ''}{formatCurrency(summary.data?.balance || 0)}
           </p>
           <p className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)', margin: 0 }}>
-            Total de {formatCurrency(totalPeriod)} em 6 meses
+            In: {formatCurrency(summary.data?.totalIncome || 0)} • Out: {formatCurrency(summary.data?.totalExpense || 0)}
           </p>
         </div>
 
+        {/* Card 2: Taxa de Poupança */}
         <div className="card">
           <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="stat-label" style={{ margin: 0, fontSize: 13, color: 'var(--ds-foreground-muted)' }}>Economia acumulada (6M)</span>
+            <span className="stat-label" style={{ margin: 0, fontSize: 13, color: 'var(--ds-foreground-muted)' }}>Taxa de poupança</span>
             <span className="badge">
               <span className="badge-dot" style={{ background: 'var(--ds-blue-600)' }} />
-              Meta 104%
+              {summary.data?.savingsRate != null && summary.data.savingsRate >= 20 ? 'Meta 20% atingida' : 'Poupança do período'}
             </span>
           </div>
           <p className="stat-value num" style={{ fontSize: 24, fontWeight: 700, margin: '4px 0', color: 'var(--ds-foreground)' }}>
-            {formatCurrency(savingsAccumulated)}
+            {summary.data?.savingsRate != null ? formatPercent(summary.data.savingsRate, { decimals: 1 }) : '0%'}
           </p>
+          <div style={{ height: 4, background: 'var(--ds-gray-alpha-200)', borderRadius: 999, overflow: 'hidden', margin: '6px 0' }}>
+            <div
+              style={{
+                height: '100%',
+                width: `${Math.min(100, Math.max(0, summary.data?.savingsRate || 0))}%`,
+                background: 'var(--ds-blue-600)',
+                borderRadius: 999,
+              }}
+            />
+          </div>
           <p className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)', margin: 0 }}>
-            Média de {formatCurrency(savingsAccumulated / 6)}/mês guardados
+            {formatCurrency(Math.max(0, summary.data?.balance || 0))} guardados
           </p>
         </div>
 
+        {/* Card 3: Custo Fixo Recorrente */}
         <div className="card">
           <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="stat-label" style={{ margin: 0, fontSize: 13, color: 'var(--ds-foreground-muted)' }}>Economia via IA Conekta</span>
+            <span className="stat-label" style={{ margin: 0, fontSize: 13, color: 'var(--ds-foreground-muted)' }}>Custo fixo recorrente</span>
             <span className="badge">
-              <span className="badge-dot" style={{ background: 'var(--ds-amber-600)' }} />
-              8 Otimizações
+              <span className="badge-dot" style={{ background: 'var(--ds-purple-700)' }} />
+              {summary.data?.totalExpense && summary.data?.recurrentSpent
+                ? `${Math.round((summary.data.recurrentSpent / summary.data.totalExpense) * 100)}% das saídas`
+                : 'Custos fixos'}
             </span>
           </div>
           <p className="stat-value num" style={{ fontSize: 24, fontWeight: 700, margin: '4px 0', color: 'var(--ds-foreground)' }}>
-            R$ 1.140,00
+            {formatCurrency(summary.data?.recurrentSpent || 0)}
           </p>
           <p className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)', margin: 0 }}>
-            Tarifas e assinaturas ociosas cortadas
+            {summary.data?.recurrentCount
+              ? `${summary.data.recurrentCount} compromissos cadastrados`
+              : 'Nenhum gasto fixo detectado'}
+          </p>
+        </div>
+
+        {/* Card 4: Maior Despesa Isolada */}
+        <div className="card">
+          <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span className="stat-label" style={{ margin: 0, fontSize: 13, color: 'var(--ds-foreground-muted)' }}>Maior despesa isolada</span>
+            <span className="badge">
+              <span className="badge-dot" style={{ background: 'var(--ds-amber-600)' }} />
+              {summary.data?.largestExpense
+                ? new Date(summary.data.largestExpense.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
+                : 'Sem gastos'}
+            </span>
+          </div>
+          <p className="stat-value num" style={{ fontSize: 24, fontWeight: 700, margin: '4px 0', color: 'var(--ds-amber-600)' }}>
+            {summary.data?.largestExpense ? formatCurrency(summary.data.largestExpense.amount) : 'R$ 0,00'}
+          </p>
+          <p className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {summary.data?.largestExpense?.description || 'Nenhum gasto pontual registrado'}
           </p>
         </div>
       </div>
@@ -750,19 +821,24 @@ function InOutBars({ trend }) {
 }
 
 function Donut({ byCategory }) {
-  const items = (byCategory.data || []).filter((item) => item.total > 0)
+  const rawItems = (byCategory.data || []).filter((item) => item.total > 0)
   if (byCategory.loading) return <SkeletonCard height={140} />
-  if (items.length === 0) {
+  if (rawItems.length === 0) {
     return <EmptyState title="Sem gastos no período" description="Registre lançamentos para ver a composição." />
   }
-  const total = items.reduce((sum, item) => sum + item.total, 0)
+  const total = rawItems.reduce((sum, item) => sum + item.total, 0)
+  const items = rawItems.map((item) => ({
+    ...item,
+    pct: total > 0 ? (item.total / total) * 100 : (item.percentage || 0),
+  }))
+
   let accumulated = 0
   const gradient = items
     .map((item) => {
-      const start = (accumulated / total) * 360
-      accumulated += item.total
-      const end = (accumulated / total) * 360
-      return `${item.colorCode} ${start}deg ${end}deg`
+      const start = accumulated
+      accumulated += item.pct
+      const end = Math.min(100, accumulated)
+      return `${item.colorCode} ${start.toFixed(1)}% ${end.toFixed(1)}%`
     })
     .join(', ')
 
@@ -776,10 +852,10 @@ function Donut({ byCategory }) {
       </div>
       <div className="donut-legend">
         {items.map((item) => (
-          <div className="dl-item" key={item.categoryId}>
+          <div className="dl-item" key={item.categoryId || item.name}>
             <i style={{ background: item.colorCode }} />
             <span>{item.name}</span>
-            <b className="num">{formatPercent(item.percentage, { decimals: 1 })}</b>
+            <b className="num">{formatPercent(item.pct, { decimals: 1 })}</b>
           </div>
         ))}
       </div>

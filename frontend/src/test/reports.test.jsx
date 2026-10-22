@@ -87,15 +87,18 @@ describe('ReportsScreen', () => {
     ])
   })
 
-  it('renderiza kpis de media mensal e economia acumulada', async () => {
+  it('renderiza os 4 novos kpis estrategicos na visao desktop', async () => {
     renderReports()
 
-    expect(await screen.findByText('Média mensal de gastos')).toBeInTheDocument()
-    expect(screen.getByText('Economia acumulada (6M)')).toBeInTheDocument()
-    expect(screen.getByText('R$ 6.950,00')).toBeInTheDocument()
+    expect(await screen.findByText('Balanço líquido')).toBeInTheDocument()
+    expect(screen.getByText('Taxa de poupança')).toBeInTheDocument()
+    expect(screen.getByText('Custo fixo recorrente')).toBeInTheDocument()
+    expect(screen.getByText('Maior despesa isolada')).toBeInTheDocument()
+    expect(screen.getByText('+ R$ 3.350,00')).toBeInTheDocument()
+    expect(screen.getByText('R$ 39,90')).toBeInTheDocument()
+    expect(screen.getByText('Aluguel')).toBeInTheDocument()
     expect(screen.getByText('Desempenho por categoria')).toBeInTheDocument()
     expect(screen.getAllByText('Moradia').length).toBeGreaterThan(1)
-    expect(screen.getByText('R$ 1.200,00')).toBeInTheDocument()
   })
 
   it('mostra insights da ia com severidade', async () => {
@@ -115,12 +118,33 @@ describe('ReportsScreen', () => {
     expect(screen.getByText('R$ 1,6 mil')).toBeInTheDocument()
   })
 
-  it('troca o periodo para mes e mostra exportacoes', async () => {
+  it('troca o periodo para mes e mostra apenas botao exportar sem csv', async () => {
     renderReports()
 
     fireEvent.click(await screen.findByRole('radio', { name: 'Mês' }))
     await waitFor(() => expect(reportService.summary).toHaveBeenCalled())
-    expect(await screen.findByRole('button', { name: /exportar pdf/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /csv/i })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /^exportar$/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /csv/i })).not.toBeInTheDocument()
+  })
+
+  it('mantem botao exportar visivel ao trocar para 6 meses e ano e sem botao csv', async () => {
+    window.matchMedia = vi.fn().mockReturnValue({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })
+    renderReports()
+
+    fireEvent.click(await screen.findByRole('radio', { name: '6 meses' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: /^exportar$/i })).toBeInTheDocument())
+    expect(screen.queryByRole('button', { name: /csv/i })).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Ano' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: /^exportar$/i })).toBeInTheDocument())
+    expect(screen.queryByRole('button', { name: /csv/i })).not.toBeInTheDocument()
+  })
+
+  it('no mobile renderiza apenas um controle de periodo sem duplicidade', async () => {
+    window.matchMedia = vi.fn().mockReturnValue({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })
+    renderReports()
+
+    const radioGroups = await screen.findAllByRole('radiogroup', { name: 'Período' })
+    expect(radioGroups).toHaveLength(1)
   })
 })
