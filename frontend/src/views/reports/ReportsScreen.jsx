@@ -399,10 +399,10 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
       {/* 4 KPI Cards: Indicadores Estratégicos Reais */}
       <div className="report-grid-kpi">
         {/* Card 1: Balanço Líquido */}
-        <div className="card">
-          <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="stat-label" style={{ margin: 0, fontSize: 13, color: 'var(--ds-foreground-muted)' }}>Balanço líquido</span>
-            <span className="badge">
+        <div className="card" style={{ minWidth: 0 }}>
+          <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
+            <span className="stat-label" style={{ margin: 0, fontSize: 12.5, color: 'var(--ds-foreground-muted)' }}>Balanço líquido</span>
+            <span className="badge" style={{ flexShrink: 0 }}>
               <span
                 className="badge-dot"
                 style={{ background: (summary.data?.balance || 0) >= 0 ? 'var(--ds-green-700)' : 'var(--ds-red-700)' }}
@@ -413,7 +413,7 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
           <p
             className="stat-value num"
             style={{
-              fontSize: 24,
+              fontSize: 22,
               fontWeight: 700,
               margin: '4px 0',
               color: (summary.data?.balance || 0) >= 0 ? 'var(--ds-green-700)' : 'var(--ds-red-700)',
@@ -421,21 +421,21 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
           >
             {(summary.data?.balance || 0) >= 0 ? '+ ' : ''}{formatCurrency(summary.data?.balance || 0)}
           </p>
-          <p className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)', margin: 0 }}>
+          <p className="stat-foot" style={{ fontSize: 11.5, color: 'var(--ds-foreground-muted)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             In: {formatCurrency(summary.data?.totalIncome || 0)} • Out: {formatCurrency(summary.data?.totalExpense || 0)}
           </p>
         </div>
 
         {/* Card 2: Taxa de Poupança */}
-        <div className="card">
-          <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="stat-label" style={{ margin: 0, fontSize: 13, color: 'var(--ds-foreground-muted)' }}>Taxa de poupança</span>
-            <span className="badge">
+        <div className="card" style={{ minWidth: 0 }}>
+          <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
+            <span className="stat-label" style={{ margin: 0, fontSize: 12.5, color: 'var(--ds-foreground-muted)' }}>Taxa de poupança</span>
+            <span className="badge" style={{ flexShrink: 0 }}>
               <span className="badge-dot" style={{ background: 'var(--ds-blue-600)' }} />
               {summary.data?.savingsRate != null && summary.data.savingsRate >= 20 ? 'Meta 20% atingida' : 'Poupança do período'}
             </span>
           </div>
-          <p className="stat-value num" style={{ fontSize: 24, fontWeight: 700, margin: '4px 0', color: 'var(--ds-foreground)' }}>
+          <p className="stat-value num" style={{ fontSize: 22, fontWeight: 700, margin: '4px 0', color: 'var(--ds-foreground)' }}>
             {summary.data?.savingsRate != null ? formatPercent(summary.data.savingsRate, { decimals: 1 }) : '0%'}
           </p>
           <div style={{ height: 4, background: 'var(--ds-gray-alpha-200)', borderRadius: 999, overflow: 'hidden', margin: '6px 0' }}>
@@ -448,26 +448,26 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
               }}
             />
           </div>
-          <p className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)', margin: 0 }}>
+          <p className="stat-foot" style={{ fontSize: 11.5, color: 'var(--ds-foreground-muted)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {formatCurrency(Math.max(0, summary.data?.balance || 0))} guardados
           </p>
         </div>
 
         {/* Card 3: Custo Fixo Recorrente */}
-        <div className="card">
-          <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="stat-label" style={{ margin: 0, fontSize: 13, color: 'var(--ds-foreground-muted)' }}>Custo fixo recorrente</span>
-            <span className="badge">
+        <div className="card" style={{ minWidth: 0 }}>
+          <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
+            <span className="stat-label" style={{ margin: 0, fontSize: 12.5, color: 'var(--ds-foreground-muted)' }}>Custo fixo recorrente</span>
+            <span className="badge" style={{ flexShrink: 0 }}>
               <span className="badge-dot" style={{ background: 'var(--ds-purple-700)' }} />
               {summary.data?.totalExpense && summary.data?.recurrentSpent
                 ? `${Math.round((summary.data.recurrentSpent / summary.data.totalExpense) * 100)}% das saídas`
                 : 'Custos fixos'}
             </span>
           </div>
-          <p className="stat-value num" style={{ fontSize: 24, fontWeight: 700, margin: '4px 0', color: 'var(--ds-foreground)' }}>
+          <p className="stat-value num" style={{ fontSize: 22, fontWeight: 700, margin: '4px 0', color: 'var(--ds-foreground)' }}>
             {formatCurrency(summary.data?.recurrentSpent || 0)}
           </p>
-          <p className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)', margin: 0 }}>
+          <p className="stat-foot" style={{ fontSize: 11.5, color: 'var(--ds-foreground-muted)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {summary.data?.recurrentCount
               ? `${summary.data.recurrentCount} compromissos cadastrados`
               : 'Nenhum gasto fixo detectado'}
@@ -475,20 +475,20 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
         </div>
 
         {/* Card 4: Maior Despesa Isolada */}
-        <div className="card">
-          <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="stat-label" style={{ margin: 0, fontSize: 13, color: 'var(--ds-foreground-muted)' }}>Maior despesa isolada</span>
-            <span className="badge">
+        <div className="card" style={{ minWidth: 0 }}>
+          <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
+            <span className="stat-label" style={{ margin: 0, fontSize: 12.5, color: 'var(--ds-foreground-muted)' }}>Maior despesa isolada</span>
+            <span className="badge" style={{ flexShrink: 0 }}>
               <span className="badge-dot" style={{ background: 'var(--ds-amber-600)' }} />
               {summary.data?.largestExpense
                 ? new Date(summary.data.largestExpense.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
                 : 'Sem gastos'}
             </span>
           </div>
-          <p className="stat-value num" style={{ fontSize: 24, fontWeight: 700, margin: '4px 0', color: 'var(--ds-amber-600)' }}>
+          <p className="stat-value num" style={{ fontSize: 22, fontWeight: 700, margin: '4px 0', color: 'var(--ds-amber-600)' }}>
             {summary.data?.largestExpense ? formatCurrency(summary.data.largestExpense.amount) : 'R$ 0,00'}
           </p>
-          <p className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <p className="stat-foot" style={{ fontSize: 11.5, color: 'var(--ds-foreground-muted)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {summary.data?.largestExpense?.description || 'Nenhum gasto pontual registrado'}
           </p>
         </div>
