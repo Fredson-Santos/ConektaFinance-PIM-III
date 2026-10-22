@@ -27,14 +27,10 @@ public class DashboardServiceTests
         var now = DateTime.UtcNow;
         var start = new DateTime(now.Year, now.Month, 1);
         var previousStart = start.AddMonths(-1);
-        var allStart = new DateTime(2000, 1, 1);
-        var allEnd = new DateTime(2100, 1, 1);
         _transactionRepository.Setup(r => r.SumAsync(1, TransactionType.Income, start, start.AddMonths(1), null)).ReturnsAsync(1000m);
         _transactionRepository.Setup(r => r.SumAsync(1, TransactionType.Expense, start, start.AddMonths(1), null)).ReturnsAsync(400m);
         _transactionRepository.Setup(r => r.SumAsync(1, TransactionType.Income, previousStart, start, null)).ReturnsAsync(800m);
         _transactionRepository.Setup(r => r.SumAsync(1, TransactionType.Expense, previousStart, start, null)).ReturnsAsync(500m);
-        _transactionRepository.Setup(r => r.SumAsync(1, TransactionType.Income, allStart, allEnd, null)).ReturnsAsync(1000m);
-        _transactionRepository.Setup(r => r.SumAsync(1, TransactionType.Expense, allStart, allEnd, null)).ReturnsAsync(400m);
 
         var overview = await _service.GetOverviewAsync(1, null, null);
 
@@ -44,6 +40,25 @@ public class DashboardServiceTests
         overview.IncomeChangePct.Should().Be(25);
         overview.ExpenseChangePct.Should().Be(-20);
         overview.ExpenseToCeilingPercentage.Should().BeApproximately(6.3, 0.1);
+        _transactionRepository.Verify(r => r.SumAsync(1, It.IsAny<TransactionType>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int?>()), Times.Exactly(4));
+    }
+
+    [Fact]
+    public async Task Overview_quando_gastos_superam_entradas_saldo_e_negativo()
+    {
+        SetupUser();
+        var now = DateTime.UtcNow;
+        var start = new DateTime(now.Year, now.Month, 1);
+        var previousStart = start.AddMonths(-1);
+        _transactionRepository.Setup(r => r.SumAsync(1, TransactionType.Income, start, start.AddMonths(1), null)).ReturnsAsync(1000m);
+        _transactionRepository.Setup(r => r.SumAsync(1, TransactionType.Expense, start, start.AddMonths(1), null)).ReturnsAsync(1500m);
+        _transactionRepository.Setup(r => r.SumAsync(1, It.IsAny<TransactionType>(), previousStart, start, null)).ReturnsAsync(0m);
+
+        var overview = await _service.GetOverviewAsync(1, null, null);
+
+        overview.Balance.Should().Be(-500m);
+        overview.Income.Should().Be(1000m);
+        overview.Expense.Should().Be(1500m);
     }
 
     [Fact]

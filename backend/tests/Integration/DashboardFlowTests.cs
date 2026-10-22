@@ -45,7 +45,7 @@ public class DashboardFlowTests(CustomWebApplicationFactory factory) : IClassFix
             .ReadFromJsonAsync<List<CategoryResponse>>(Json);
         var alimentacao = expenseCategories!.First().Id;
 
-        await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("income", salario, "Salario", 5000m, 1));
+        await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("income", salario, "Salario", 5000m, 0));
         await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("expense", alimentacao, "Mercado", 1200m, 0));
 
         var overview = await (await client.GetAsync("/api/v1/dashboard/overview")).Content

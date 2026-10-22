@@ -30,11 +30,9 @@ public class DashboardService(
         var expense = await transactionRepository.SumAsync(userId, TransactionType.Expense, start, end);
         var previousIncome = await transactionRepository.SumAsync(userId, TransactionType.Income, previousStart, start);
         var previousExpense = await transactionRepository.SumAsync(userId, TransactionType.Expense, previousStart, start);
-        var allIncome = await transactionRepository.SumAsync(userId, TransactionType.Income, new DateTime(2000, 1, 1), new DateTime(2100, 1, 1));
-        var allExpense = await transactionRepository.SumAsync(userId, TransactionType.Expense, new DateTime(2000, 1, 1), new DateTime(2100, 1, 1));
 
         return new DashboardOverviewResponse(
-            allIncome - allExpense,
+            income - expense,
             income,
             expense,
             monthlyCeiling > 0 ? Math.Round((double)(expense / monthlyCeiling) * 100, 1) : null,
