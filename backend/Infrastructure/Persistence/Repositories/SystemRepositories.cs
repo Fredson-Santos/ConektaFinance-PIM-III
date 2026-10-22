@@ -55,25 +55,36 @@ public class AlertRepository(AppDbContext context) : IAlertRepository
 
 public class ChatMessageRepository(AppDbContext context) : IChatMessageRepository
 {
-    public Task<List<ChatMessage>> ListRecentAsync(int userId, int take = 50) =>
-        context.ChatMessages.AsNoTracking()
-            .Where(m => m.UserId == userId)
-            .OrderByDescending(m => m.Id)
-            .Take(take)
-            .ToListAsync();
+    public Task<List<ChatMessage>> ListRecentAsync(int userId, int take = 50, ChatChannel? channel = null)
+    {
+        var query = context.ChatMessages.AsNoTracking().Where(m => m.UserId == userId);
+        if (channel.HasValue)
+            query = query.Where(m => m.Channel == channel.Value);
+
+        return query.OrderByDescending(m => m.Id).Take(take).ToListAsync();
+    }
 
     public Task<ChatMessage?> GetByIdAndUserAsync(int id, int userId) =>
         context.ChatMessages.FirstOrDefaultAsync(m => m.Id == id && m.UserId == userId);
 
-    public Task<List<ChatMessage>> ListRecentWithActionsAsync(int userId, int take = 10) =>
-        context.ChatMessages.AsNoTracking()
-            .Where(m => m.UserId == userId && m.Role == ChatRole.Assistant && m.ActionPayload != null)
-            .OrderByDescending(m => m.Id)
-            .Take(take)
-            .ToListAsync();
+    public Task<List<ChatMessage>> ListRecentWithActionsAsync(int userId, int take = 10, ChatChannel? channel = null)
+    {
+        var query = context.ChatMessages.AsNoTracking()
+            .Where(m => m.UserId == userId && m.Role == ChatRole.Assistant && m.ActionPayload != null);
+        if (channel.HasValue)
+            query = query.Where(m => m.Channel == channel.Value);
 
-    public Task<int> CountSinceAsync(int userId, ChatRole role, DateTime since) =>
-        context.ChatMessages.CountAsync(m => m.UserId == userId && m.Role == role && m.CreatedAt >= since);
+        return query.OrderByDescending(m => m.Id).Take(take).ToListAsync();
+    }
+
+    public Task<int> CountSinceAsync(int userId, ChatRole role, DateTime since, ChatChannel? channel = null)
+    {
+        var query = context.ChatMessages.Where(m => m.UserId == userId && m.Role == role && m.CreatedAt >= since);
+        if (channel.HasValue)
+            query = query.Where(m => m.Channel == channel.Value);
+
+        return query.CountAsync();
+    }
 
     public async Task AddAsync(ChatMessage message)
     {
@@ -87,10 +98,13 @@ public class ChatMessageRepository(AppDbContext context) : IChatMessageRepositor
         await context.SaveChangesAsync();
     }
 
-    public async Task ClearAsync(int userId)
+    public async Task ClearAsync(int userId, ChatChannel? channel = null)
     {
-        var messages = context.ChatMessages.Where(m => m.UserId == userId);
-        context.ChatMessages.RemoveRange(messages);
+        var query = context.ChatMessages.Where(m => m.UserId == userId);
+        if (channel.HasValue)
+            query = query.Where(m => m.Channel == channel.Value);
+
+        context.ChatMessages.RemoveRange(query);
         await context.SaveChangesAsync();
     }
 }

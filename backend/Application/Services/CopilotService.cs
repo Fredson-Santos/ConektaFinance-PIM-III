@@ -17,13 +17,13 @@ public class CopilotService(
 {
     private const int MaxImageBytes = 5 * 1024 * 1024;
 
-    public async Task<CopilotHistoryResponse> GetHistoryAsync(int userId)
+    public async Task<CopilotHistoryResponse> GetHistoryAsync(int userId, ChatChannel channel = ChatChannel.Web)
     {
-        var messages = await chatRepository.ListRecentAsync(userId, 50);
+        var messages = await chatRepository.ListRecentAsync(userId, 50, channel);
         return new CopilotHistoryResponse(messages.OrderBy(m => m.Id).Select(Map).ToList());
     }
 
-    public async Task<CopilotExchangeResponse> SendMessageAsync(int userId, string content, string? imageBase64 = null)
+    public async Task<CopilotExchangeResponse> SendMessageAsync(int userId, string content, string? imageBase64 = null, ChatChannel channel = ChatChannel.Web)
     {
         var trimmed = content?.Trim() ?? string.Empty;
         var image = ParseImage(imageBase64);
@@ -31,13 +31,13 @@ public class CopilotService(
             throw AppException.BadRequest("Mensagem vazia", "Escreva uma mensagem ou anexe uma imagem para o assistente.");
 
         var limit = configuration.GetValue("Copilot:DailyMessageLimit", 30);
-        var sentToday = await chatRepository.CountSinceAsync(userId, ChatRole.User, DateTime.UtcNow.Date);
+        var sentToday = await chatRepository.CountSinceAsync(userId, ChatRole.User, DateTime.UtcNow.Date, channel);
         if (sentToday >= limit)
             throw AppException.TooManyRequests("Limite diario atingido",
                 "Voce atingiu o limite de mensagens do assistente por hoje. Volte amanha.");
 
         var window = configuration.GetValue("Copilot:HistoryWindowSize", 12);
-        var recent = await chatRepository.ListRecentAsync(userId, window * 2 + 2);
+        var recent = await chatRepository.ListRecentAsync(userId, window * 2 + 2, channel);
         var history = recent
             .OrderBy(m => m.Id)
             .Select(m => new CopilotChatTurn(
@@ -55,6 +55,7 @@ public class CopilotService(
         {
             UserId = userId,
             Role = ChatRole.User,
+            Channel = channel,
             Content = trimmed,
             ImageUrl = image is not null ? await imageStorage.SaveAsync(userId, image.Extension, image.Stream) : null
         };
@@ -75,6 +76,7 @@ public class CopilotService(
         {
             UserId = userId,
             Role = ChatRole.Assistant,
+            Channel = channel,
             Content = reply.Content,
             ActionPayload = reply.Actions.Count > 0
                 ? JsonSerializer.Serialize(reply.Actions.Select(a => new CopilotActionDto(a.Tool, a.Args, "pending")))
@@ -134,6 +136,7 @@ public class CopilotService(
         {
             UserId = userId,
             Role = ChatRole.Assistant,
+            Channel = message.Channel,
             Content = $"Lancamento registrado com sucesso: {description}" +
                       (value is not null ? $" de R$ {value:F2}" : string.Empty) +
                       (category is not null ? $" em {category}" : string.Empty) +
@@ -167,6 +170,7 @@ public class CopilotService(
         {
             UserId = userId,
             Role = ChatRole.Assistant,
+            Channel = message.Channel,
             Content = "Lancamento cancelado. Nada foi gravado. Se quiser, envie os dados novamente."
         };
         await chatRepository.AddAsync(cancellation);
@@ -174,8 +178,8 @@ public class CopilotService(
         return Map(cancellation);
     }
 
-    public Task ClearHistoryAsync(int userId) =>
-        chatRepository.ClearAsync(userId);
+    public Task ClearHistoryAsync(int userId, ChatChannel channel = ChatChannel.Web) =>
+        chatRepository.ClearAsync(userId, channel);
 
     internal static CopilotMessageDto Map(ChatMessage message) => new(
         message.Id,

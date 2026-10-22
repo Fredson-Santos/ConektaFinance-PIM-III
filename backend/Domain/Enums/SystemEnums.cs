@@ -13,6 +13,12 @@ public enum ChatRole
     Assistant = 1
 }
 
+public enum ChatChannel
+{
+    Web = 0,
+    WhatsApp = 1
+}
+
 public enum OtpPurpose
 {
     Login = 0

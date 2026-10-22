@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using PIM_III_Backend.Application.Dtos;
 using PIM_III_Backend.Application.Exceptions;
 using PIM_III_Backend.Domain.Entities;
+using PIM_III_Backend.Domain.Enums;
 using PIM_III_Backend.Domain.Interfaces;
 
 namespace PIM_III_Backend.Application.Services;
@@ -169,7 +170,7 @@ public class WhatsAppChannelService(
             return;
         }
 
-        var exchange = await copilotService.SendMessageAsync(userId, text);
+        var exchange = await copilotService.SendMessageAsync(userId, text, channel: ChatChannel.WhatsApp);
         await ReplyWithAgentAsync(phone, exchange.AssistantMessage, cancellationToken);
     }
 
@@ -195,7 +196,8 @@ public class WhatsAppChannelService(
         if (mediaBase64.StartsWith("data:", StringComparison.OrdinalIgnoreCase) && comma >= 0)
             mediaBase64 = mediaBase64[(comma + 1)..];
 
-        var exchange = await copilotService.SendMessageAsync(userId, caption ?? string.Empty, mediaBase64);
+        var exchange = await copilotService.SendMessageAsync(userId, caption ?? string.Empty, mediaBase64,
+            channel: ChatChannel.WhatsApp);
         await ReplyWithAgentAsync(phone, exchange.AssistantMessage, cancellationToken);
         logger.LogInformation("Confirmacao da imagem {MessageId} entregue para {Phone}",
             messageId, WhatsAppNumbers.MaskPhone(phone));
@@ -220,7 +222,7 @@ public class WhatsAppChannelService(
 
     private async Task<ChatMessage?> FindPendingDraftAsync(int userId)
     {
-        var recent = await chatRepository.ListRecentWithActionsAsync(userId);
+        var recent = await chatRepository.ListRecentWithActionsAsync(userId, channel: ChatChannel.WhatsApp);
         return recent.FirstOrDefault(message =>
             CopilotService.ParseActions(message.ActionPayload)?.Any(CopilotService.IsPendingDraftAction) == true);
     }

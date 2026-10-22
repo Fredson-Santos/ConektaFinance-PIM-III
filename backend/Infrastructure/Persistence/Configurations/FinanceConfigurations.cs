@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PIM_III_Backend.Domain.Entities;
+using PIM_III_Backend.Domain.Enums;
 
 namespace PIM_III_Backend.Infrastructure.Persistence.Configurations;
 
@@ -61,11 +62,13 @@ public class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMessage>
         builder.Property(m => m.Content).IsRequired().HasMaxLength(4000);
         builder.Property(m => m.ActionPayload).HasMaxLength(2000);
         builder.Property(m => m.ImageUrl).HasMaxLength(300);
+        builder.Property(m => m.Channel).HasDefaultValue(ChatChannel.Web);
         builder.HasOne(m => m.User)
             .WithMany(u => u.ChatMessages)
             .HasForeignKey(m => m.UserId)
             .OnDelete(DeleteBehavior.Cascade);
         builder.HasIndex(m => m.UserId);
+        builder.HasIndex(m => new { m.UserId, m.Channel });
     }
 }
 

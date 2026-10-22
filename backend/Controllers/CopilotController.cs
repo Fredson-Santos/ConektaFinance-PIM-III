@@ -10,11 +10,11 @@ public class CopilotController(ICopilotService copilotService) : BaseApiControll
 {
     [HttpGet("history")]
     public async Task<ActionResult<CopilotHistoryResponse>> History() =>
-        Ok(await copilotService.GetHistoryAsync(CurrentUserId));
+        Ok(await copilotService.GetHistoryAsync(CurrentUserId, Domain.Enums.ChatChannel.Web));
 
     [HttpPost("messages")]
     public async Task<ActionResult<CopilotExchangeResponse>> SendMessage(SendCopilotMessageRequest request) =>
-        Ok(await copilotService.SendMessageAsync(CurrentUserId, request.Content, request.ImageBase64));
+        Ok(await copilotService.SendMessageAsync(CurrentUserId, request.Content, request.ImageBase64, Domain.Enums.ChatChannel.Web));
 
     [HttpPost("messages/{id:int}/confirm")]
     public async Task<ActionResult<CopilotMessageDto>> Confirm(int id) =>
@@ -23,7 +23,7 @@ public class CopilotController(ICopilotService copilotService) : BaseApiControll
     [HttpDelete("history")]
     public async Task<ActionResult> ClearHistory()
     {
-        await copilotService.ClearHistoryAsync(CurrentUserId);
+        await copilotService.ClearHistoryAsync(CurrentUserId, Domain.Enums.ChatChannel.Web);
         return NoContent();
     }
 }

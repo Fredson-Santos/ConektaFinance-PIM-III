@@ -70,7 +70,7 @@ public class WhatsAppChannelServiceTests
     public async Task Texto_do_usuario_chama_o_agente_e_responde_com_markdown_adaptado()
     {
         _copilotService
-            .Setup(c => c.SendMessageAsync(1, "oi", null))
+            .Setup(c => c.SendMessageAsync(1, "oi", null, ChatChannel.WhatsApp))
             .ReturnsAsync(Exchange("Resposta com **negrito**\n### titulo\n[link](https://x.com)"));
 
         await _service.HandleEventAsync(TextPayload("oi"));
@@ -85,7 +85,7 @@ public class WhatsAppChannelServiceTests
     public async Task Resposta_com_rascunho_pendente_adiciona_instrucao_de_confirmacao()
     {
         _copilotService
-            .Setup(c => c.SendMessageAsync(1, "gastei 10 no ifood", null))
+            .Setup(c => c.SendMessageAsync(1, "gastei 10 no ifood", null, ChatChannel.WhatsApp))
             .ReturnsAsync(Exchange("Revise os dados", [
                 new CopilotActionDto("draft_transaction",
                     new Dictionary<string, object?> { ["value"] = 10 }, "pending")
@@ -103,13 +103,14 @@ public class WhatsAppChannelServiceTests
     public async Task Confirmar_resolve_o_rascunho_pendente_mais_recente()
     {
         _chatRepository
-            .Setup(r => r.ListRecentWithActionsAsync(1, It.IsAny<int>()))
+            .Setup(r => r.ListRecentWithActionsAsync(1, It.IsAny<int>(), ChatChannel.WhatsApp))
             .ReturnsAsync([
                 new ChatMessage
                 {
                     Id = 7,
                     UserId = 1,
                     Role = ChatRole.Assistant,
+                    Channel = ChatChannel.WhatsApp,
                     ActionPayload = """[{"Tool":"draft_transaction","Args":{"value":10},"Status":"pending"}]"""
                 }
             ]);
@@ -122,7 +123,7 @@ public class WhatsAppChannelServiceTests
 
         _copilotService.Verify(c => c.ConfirmDraftAsync(1, 7), Times.Once);
         _copilotService.Verify(c => c.SendMessageAsync(
-            It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string?>()), Times.Never);
+            It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<ChatChannel>()), Times.Never);
         _evolutionClient.Verify(e => e.SendTextAsync("11999999999", "Lancamento registrado com sucesso",
             It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -131,13 +132,14 @@ public class WhatsAppChannelServiceTests
     public async Task Cancelar_resolve_o_rascunho_com_CancelDraftAsync()
     {
         _chatRepository
-            .Setup(r => r.ListRecentWithActionsAsync(1, It.IsAny<int>()))
+            .Setup(r => r.ListRecentWithActionsAsync(1, It.IsAny<int>(), ChatChannel.WhatsApp))
             .ReturnsAsync([
                 new ChatMessage
                 {
                     Id = 7,
                     UserId = 1,
                     Role = ChatRole.Assistant,
+                    Channel = ChatChannel.WhatsApp,
                     ActionPayload = """[{"Tool":"draft_transaction","Args":{"value":10},"Status":"pending"}]"""
                 }
             ]);
@@ -157,14 +159,14 @@ public class WhatsAppChannelServiceTests
     public async Task Confirmar_sem_rascunho_pendente_responde_estatica_sem_chamar_o_agente()
     {
         _chatRepository
-            .Setup(r => r.ListRecentWithActionsAsync(1, It.IsAny<int>()))
+            .Setup(r => r.ListRecentWithActionsAsync(1, It.IsAny<int>(), ChatChannel.WhatsApp))
             .ReturnsAsync([]);
 
         await _service.HandleEventAsync(TextPayload("confirmar"));
 
         _copilotService.Verify(c => c.ConfirmDraftAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
         _copilotService.Verify(c => c.SendMessageAsync(
-            It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string?>()), Times.Never);
+            It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<ChatChannel>()), Times.Never);
         _evolutionClient.Verify(e => e.SendTextAsync(
             "11999999999",
             It.Is<string>(t => t.Contains("aguardando confirmacao")),
@@ -175,13 +177,14 @@ public class WhatsAppChannelServiceTests
     public async Task Rascunho_ja_consumido_nao_e_respondido_por_confirmar()
     {
         _chatRepository
-            .Setup(r => r.ListRecentWithActionsAsync(1, It.IsAny<int>()))
+            .Setup(r => r.ListRecentWithActionsAsync(1, It.IsAny<int>(), ChatChannel.WhatsApp))
             .ReturnsAsync([
                 new ChatMessage
                 {
                     Id = 7,
                     UserId = 1,
                     Role = ChatRole.Assistant,
+                    Channel = ChatChannel.WhatsApp,
                     ActionPayload = """[{"Tool":"draft_transaction","Args":{"value":10},"Status":"consumed"}]"""
                 }
             ]);
@@ -223,7 +226,7 @@ public class WhatsAppChannelServiceTests
         _evolutionClient.Verify(e => e.SendTextAsync(It.IsAny<string>(), It.IsAny<string>(),
             It.IsAny<CancellationToken>()), Times.Never);
         _copilotService.Verify(c => c.SendMessageAsync(
-            It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string?>()), Times.Never);
+            It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<ChatChannel>()), Times.Never);
     }
 
     [Fact]
@@ -240,14 +243,14 @@ public class WhatsAppChannelServiceTests
     [Fact]
     public async Task Reentrega_do_mesmo_evento_e_idempotente()
     {
-        _copilotService.Setup(c => c.SendMessageAsync(1, It.IsAny<string>(), null))
+        _copilotService.Setup(c => c.SendMessageAsync(1, It.IsAny<string>(), null, ChatChannel.WhatsApp))
             .ReturnsAsync(Exchange("Resposta"));
 
         var payload = TextPayload("oi");
         await _service.HandleEventAsync(payload);
         await _service.HandleEventAsync(payload);
 
-        _copilotService.Verify(c => c.SendMessageAsync(1, "oi", null), Times.Once);
+        _copilotService.Verify(c => c.SendMessageAsync(1, "oi", null, ChatChannel.WhatsApp), Times.Once);
         _evolutionClient.Verify(e => e.SendTextAsync(It.IsAny<string>(), It.IsAny<string>(),
             It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -290,14 +293,14 @@ public class WhatsAppChannelServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync("ZGF0YQ==");
         _copilotService
-            .Setup(c => c.SendMessageAsync(1, "nota do mercado", "ZGF0YQ=="))
+            .Setup(c => c.SendMessageAsync(1, "nota do mercado", "ZGF0YQ==", ChatChannel.WhatsApp))
             .ReturnsAsync(Exchange("Li a nota"));
 
         await _service.HandleEventAsync(Payload("messages.upsert", "imageMessage",
             new { imageMessage = new { caption = "nota do mercado", mimetype = "image/jpeg" } })
             .Replace("MSG-X", "MSG-IMG"));
 
-        _copilotService.Verify(c => c.SendMessageAsync(1, "nota do mercado", "ZGF0YQ=="), Times.Once);
+        _copilotService.Verify(c => c.SendMessageAsync(1, "nota do mercado", "ZGF0YQ==", ChatChannel.WhatsApp), Times.Once);
         _evolutionClient.Verify(e => e.SendTextAsync("11999999999", "Li a nota",
             It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -310,13 +313,13 @@ public class WhatsAppChannelServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync("data:image/jpeg;base64,QUJD");
         _copilotService
-            .Setup(c => c.SendMessageAsync(1, "", "QUJD"))
+            .Setup(c => c.SendMessageAsync(1, "", "QUJD", ChatChannel.WhatsApp))
             .ReturnsAsync(Exchange("Resposta"));
 
         await _service.HandleEventAsync(Payload("messages.upsert", "imageMessage",
             new { imageMessage = new { mimetype = "image/jpeg" } }));
 
-        _copilotService.Verify(c => c.SendMessageAsync(1, "", "QUJD"), Times.Once);
+        _copilotService.Verify(c => c.SendMessageAsync(1, "", "QUJD", ChatChannel.WhatsApp), Times.Once);
     }
 
     [Fact]
@@ -339,7 +342,7 @@ public class WhatsAppChannelServiceTests
     public async Task Erro_de_negocio_do_agente_retorna_a_mensagem_amigavel_por_whatsapp()
     {
         _copilotService
-            .Setup(c => c.SendMessageAsync(1, "mais uma", null))
+            .Setup(c => c.SendMessageAsync(1, "mais uma", null, ChatChannel.WhatsApp))
             .ThrowsAsync(AppException.TooManyRequests("Limite diario atingido",
                 "Voce atingiu o limite de mensagens do assistente por hoje. Volte amanha."));
 
@@ -358,7 +361,7 @@ public class WhatsAppChannelServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync("ZGF0YQ==");
         _copilotService
-            .Setup(c => c.SendMessageAsync(1, "nota", "ZGF0YQ=="))
+            .Setup(c => c.SendMessageAsync(1, "nota", "ZGF0YQ==", ChatChannel.WhatsApp))
             .ReturnsAsync(Exchange("Confirmacao da nota fiscal"));
 
         using var canceledCts = new CancellationTokenSource();
@@ -385,7 +388,7 @@ public class WhatsAppChannelServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync("ZGF0YQ==");
         _copilotService
-            .Setup(c => c.SendMessageAsync(2, "", "ZGF0YQ=="))
+            .Setup(c => c.SendMessageAsync(2, "", "ZGF0YQ==", ChatChannel.WhatsApp))
             .ReturnsAsync(Exchange("Dados extraidos"));
 
         var payload = Payload("messages.upsert", "imageMessage",

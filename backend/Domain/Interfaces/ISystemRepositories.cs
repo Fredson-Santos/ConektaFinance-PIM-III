@@ -17,13 +17,13 @@ public interface IAlertRepository
 
 public interface IChatMessageRepository
 {
-    Task<List<ChatMessage>> ListRecentAsync(int userId, int take = 50);
+    Task<List<ChatMessage>> ListRecentAsync(int userId, int take = 50, ChatChannel? channel = null);
     Task<ChatMessage?> GetByIdAndUserAsync(int id, int userId);
-    Task<List<ChatMessage>> ListRecentWithActionsAsync(int userId, int take = 10);
-    Task<int> CountSinceAsync(int userId, ChatRole role, DateTime since);
+    Task<List<ChatMessage>> ListRecentWithActionsAsync(int userId, int take = 10, ChatChannel? channel = null);
+    Task<int> CountSinceAsync(int userId, ChatRole role, DateTime since, ChatChannel? channel = null);
     Task AddAsync(ChatMessage message);
     Task UpdateAsync(ChatMessage message);
-    Task ClearAsync(int userId);
+    Task ClearAsync(int userId, ChatChannel? channel = null);
 }
 
 public interface IOtpRepository

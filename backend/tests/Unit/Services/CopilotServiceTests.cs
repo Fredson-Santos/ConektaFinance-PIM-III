@@ -134,8 +134,8 @@ public class CopilotServiceTests
     [Fact]
     public async Task Enviar_mensagem_persiste_usuario_e_assistente_com_acoes()
     {
-        _chatRepository.Setup(r => r.CountSinceAsync(1, ChatRole.User, It.IsAny<DateTime>())).ReturnsAsync(0);
-        _chatRepository.Setup(r => r.ListRecentAsync(1, It.IsAny<int>())).ReturnsAsync([]);
+        _chatRepository.Setup(r => r.CountSinceAsync(1, ChatRole.User, It.IsAny<DateTime>(), It.IsAny<ChatChannel?>())).ReturnsAsync(0);
+        _chatRepository.Setup(r => r.ListRecentAsync(1, It.IsAny<int>(), It.IsAny<ChatChannel?>())).ReturnsAsync([]);
         _toolProvider.Setup(t => t.BuildContextAsync(1, It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(Context());
         _aiClient.Setup(c => c.ReplyAsync(It.IsAny<CopilotAgentRequest>()))
             .ReturnsAsync(new CopilotReply("Resumo pronto",
@@ -156,8 +156,8 @@ public class CopilotServiceTests
     [Fact]
     public async Task Resposta_com_vazamento_do_prompt_e_substituida_por_recusa()
     {
-        _chatRepository.Setup(r => r.CountSinceAsync(1, ChatRole.User, It.IsAny<DateTime>())).ReturnsAsync(0);
-        _chatRepository.Setup(r => r.ListRecentAsync(1, It.IsAny<int>())).ReturnsAsync([]);
+        _chatRepository.Setup(r => r.CountSinceAsync(1, ChatRole.User, It.IsAny<DateTime>(), It.IsAny<ChatChannel?>())).ReturnsAsync(0);
+        _chatRepository.Setup(r => r.ListRecentAsync(1, It.IsAny<int>(), It.IsAny<ChatChannel?>())).ReturnsAsync([]);
         _toolProvider.Setup(t => t.BuildContextAsync(1, It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(Context());
         _aiClient.Setup(c => c.ReplyAsync(It.IsAny<CopilotAgentRequest>()))
             .ReturnsAsync(new CopilotReply(
@@ -176,8 +176,8 @@ public class CopilotServiceTests
     [Fact]
     public async Task Enviar_imagem_extrai_nota_e_salva_arquivo()
     {
-        _chatRepository.Setup(r => r.CountSinceAsync(1, ChatRole.User, It.IsAny<DateTime>())).ReturnsAsync(0);
-        _chatRepository.Setup(r => r.ListRecentAsync(1, It.IsAny<int>())).ReturnsAsync([]);
+        _chatRepository.Setup(r => r.CountSinceAsync(1, ChatRole.User, It.IsAny<DateTime>(), It.IsAny<ChatChannel?>())).ReturnsAsync(0);
+        _chatRepository.Setup(r => r.ListRecentAsync(1, It.IsAny<int>(), It.IsAny<ChatChannel?>())).ReturnsAsync([]);
         _toolProvider.Setup(t => t.BuildContextAsync(1, It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(Context());
         _imageStorage.Setup(s => s.SaveAsync(1, It.IsAny<string>(), It.IsAny<Stream>()))
             .ReturnsAsync("/uploads/copilot/receipt_1_abc.png");
@@ -198,7 +198,7 @@ public class CopilotServiceTests
     [Fact]
     public async Task Cota_diaria_atingida_lanca_429()
     {
-        _chatRepository.Setup(r => r.CountSinceAsync(1, ChatRole.User, It.IsAny<DateTime>())).ReturnsAsync(2);
+        _chatRepository.Setup(r => r.CountSinceAsync(1, ChatRole.User, It.IsAny<DateTime>(), It.IsAny<ChatChannel?>())).ReturnsAsync(2);
 
         var act = () => _service.SendMessageAsync(1, "mais uma mensagem");
 
@@ -347,5 +347,47 @@ public class CopilotServiceTests
 
         var exception = await act.Should().ThrowAsync<AppException>();
         exception.Which.StatusCode.Should().Be(404);
+    }
+
+    [Fact]
+    public async Task Enviar_mensagem_no_canal_whatsapp_persiste_com_canal_whatsapp()
+    {
+        _chatRepository.Setup(r => r.CountSinceAsync(1, ChatRole.User, It.IsAny<DateTime>(), ChatChannel.WhatsApp)).ReturnsAsync(0);
+        _chatRepository.Setup(r => r.ListRecentAsync(1, It.IsAny<int>(), ChatChannel.WhatsApp)).ReturnsAsync([]);
+        _toolProvider.Setup(t => t.BuildContextAsync(1, It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(Context());
+        _aiClient.Setup(c => c.ReplyAsync(It.IsAny<CopilotAgentRequest>()))
+            .ReturnsAsync(new CopilotReply("Resposta WhatsApp", []));
+
+        var exchange = await _service.SendMessageAsync(1, "oi do whatsapp", channel: ChatChannel.WhatsApp);
+
+        exchange.UserMessage.Content.Should().Be("oi do whatsapp");
+        exchange.AssistantMessage.Content.Should().Be("Resposta WhatsApp");
+        _chatRepository.Verify(r => r.AddAsync(It.Is<ChatMessage>(m =>
+            m.Channel == ChatChannel.WhatsApp && m.Role == ChatRole.User && m.Content == "oi do whatsapp")), Times.Once);
+        _chatRepository.Verify(r => r.AddAsync(It.Is<ChatMessage>(m =>
+            m.Channel == ChatChannel.WhatsApp && m.Role == ChatRole.Assistant && m.Content == "Resposta WhatsApp")), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetHistory_filtra_por_canal_solicitado()
+    {
+        _chatRepository.Setup(r => r.ListRecentAsync(1, 50, ChatChannel.Web))
+            .ReturnsAsync([new ChatMessage { Id = 1, UserId = 1, Role = ChatRole.User, Content = "Web turn", Channel = ChatChannel.Web }]);
+        _chatRepository.Setup(r => r.ListRecentAsync(1, 50, ChatChannel.WhatsApp))
+            .ReturnsAsync([new ChatMessage { Id = 2, UserId = 1, Role = ChatRole.User, Content = "WhatsApp turn", Channel = ChatChannel.WhatsApp }]);
+
+        var webHistory = await _service.GetHistoryAsync(1, ChatChannel.Web);
+        var zapHistory = await _service.GetHistoryAsync(1, ChatChannel.WhatsApp);
+
+        webHistory.Items.Should().ContainSingle().Which.Content.Should().Be("Web turn");
+        zapHistory.Items.Should().ContainSingle().Which.Content.Should().Be("WhatsApp turn");
+    }
+
+    [Fact]
+    public async Task ClearHistory_limpa_apenas_o_canal_solicitado()
+    {
+        await _service.ClearHistoryAsync(1, ChatChannel.Web);
+        _chatRepository.Verify(r => r.ClearAsync(1, ChatChannel.Web), Times.Once);
+        _chatRepository.Verify(r => r.ClearAsync(1, ChatChannel.WhatsApp), Times.Never);
     }
 }

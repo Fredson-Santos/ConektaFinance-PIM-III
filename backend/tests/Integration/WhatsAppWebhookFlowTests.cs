@@ -4,10 +4,13 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using PIM_III_Backend.Application.Dtos;
 using PIM_III_Backend.Application.Services;
+using PIM_III_Backend.Domain.Enums;
+using PIM_III_Backend.Infrastructure.Persistence;
 using Xunit;
 
 namespace PIM_III_Backend.Tests.Integration;
@@ -274,7 +277,16 @@ public class WhatsAppWebhookFlowTests : IClassFixture<WhatsAppWebhookFactory>
 
         var history = await (await client.GetAsync("/api/v1/copilot/history")).Content
             .ReadFromJsonAsync<CopilotHistoryResponse>(Json);
-        history!.Items.Should().Contain(m => m.ImageUrl != null);
+        history!.Items.Should().BeEmpty(); // Isolamento: mensagens do WhatsApp nao aparecem no chat Web
+
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var zapMessages = await db.ChatMessages
+                .Where(m => m.Channel == ChatChannel.WhatsApp)
+                .ToListAsync();
+            zapMessages.Should().Contain(m => m.ImageUrl != null);
+        }
 
         var confirm = await PostWebhookAsync(TextPayload("confirmar", phone));
         confirm.StatusCode.Should().Be(HttpStatusCode.OK);
