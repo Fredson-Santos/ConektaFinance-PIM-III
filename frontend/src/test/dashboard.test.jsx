@@ -138,11 +138,12 @@ describe('DashboardScreen', () => {
     expect(screen.getByText('R$ 1.800,00 / R$ 2.000,00')).toBeInTheDocument()
   })
 
-  it('exibe estado vazio quando nao ha medidores de orcamento cadastrados', async () => {
+  it('exibe estado vazio e botao para adicionar categoria quando nao ha medidores de orcamento', async () => {
     dashboardService.budgetMeters.mockResolvedValue([])
     renderDashboard()
 
     expect(await screen.findByText('Nenhum orçamento configurado')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /adicionar categoria/i })).toBeInTheDocument()
     expect(screen.queryByText('Moradia')).not.toBeInTheDocument()
   })
 })

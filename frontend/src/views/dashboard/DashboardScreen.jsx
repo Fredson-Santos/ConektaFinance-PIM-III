@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, Sparkles } from 'lucide-react'
+import { ArrowRight, Plus, Sparkles } from 'lucide-react'
 import { dashboardService, insightService } from '../../services'
 import { useAsync } from '../../hooks/useAsync'
 import { useAuth } from '../../context/AuthContext'
@@ -159,8 +159,17 @@ function MobileDashboard() {
         </div>
         <div className="card cats" id="mobileCatList">
           {meterItems.length === 0 ? (
-            <div style={{ padding: '20px 0', textAlign: 'center', color: 'var(--ds-foreground-muted)', fontSize: 13 }}>
-              Nenhum orçamento configurado
+            <div style={{ padding: '20px 0', textAlign: 'center', color: 'var(--ds-foreground-muted)', fontSize: 13, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+              <span>Nenhum orçamento configurado</span>
+              <button
+                type="button"
+                className="btn"
+                style={{ fontSize: 12.5, height: 32, padding: '0 12px' }}
+                onClick={() => navigate('/categorias')}
+              >
+                <Plus size={14} style={{ marginRight: 6 }} />
+                Adicionar categoria
+              </button>
             </div>
           ) : (
             meterItems.map((item) => (
@@ -408,8 +417,17 @@ function DesktopDashboard() {
 
           <div className="cat-meter-list">
             {meterItems.length === 0 ? (
-              <div style={{ padding: '24px 0', textAlign: 'center', color: 'var(--ds-foreground-muted)', fontSize: 13 }}>
-                Nenhum orçamento configurado
+              <div style={{ padding: '24px 0', textAlign: 'center', color: 'var(--ds-foreground-muted)', fontSize: 13, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                <span>Nenhum orçamento configurado</span>
+                <button
+                  type="button"
+                  className="btn"
+                  style={{ fontSize: 12.5, height: 32, padding: '0 12px' }}
+                  onClick={() => navigate('/categorias')}
+                >
+                  <Plus size={14} style={{ marginRight: 6 }} />
+                  Adicionar categoria
+                </button>
               </div>
             ) : (
               meterItems.map((item) => (
