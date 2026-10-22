@@ -101,6 +101,18 @@ describe('DashboardScreen', () => {
     expect(screen.getByText('+8,4% vs mês anterior')).toBeInTheDocument()
   })
 
+  it('exibe saldo negativo com sinal e cor vermelha de alerta', async () => {
+    dashboardService.overview.mockResolvedValue({ ...OVERVIEW, balance: -350 })
+    renderDashboard()
+
+    const saldo = await screen.findByText('− R$ 350,00')
+    expect(saldo.id).toBe('valSaldoMobile')
+    expect(saldo.style.color).toBe('var(--ds-red-700)')
+
+    const badge = screen.getByText('+8,4% vs mês anterior').closest('.badge')
+    expect(badge).toHaveClass('badge-danger')
+  })
+
   it('mostra grafico da semana com dias e total', async () => {
     renderDashboard()
 
@@ -109,15 +121,13 @@ describe('DashboardScreen', () => {
     expect(screen.getByText('ter')).toBeInTheDocument()
   })
 
-  it('alterna o grafico para visao mensal', async () => {
-    reportService.daily.mockResolvedValue([
-      { day: '01', value: 100 },
-      { day: '02', value: 50 },
-    ])
+  it('garante que o grafico de gastos e exclusivo da semana sem filtro de mes', async () => {
     renderDashboard()
 
-    fireEvent.click(await screen.findByRole('radio', { name: 'Mês' }))
-    await waitFor(() => expect(reportService.daily).toHaveBeenCalled())
+    expect(await screen.findByText('Distribuição de Gastos da Semana')).toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: 'Mês' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Acumulado do Mês')).not.toBeInTheDocument()
+    expect(reportService.daily).not.toHaveBeenCalled()
   })
 
   it('lista lancamentos recentes e medidores de orcamento', async () => {

@@ -1,20 +1,19 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight, Sparkles } from 'lucide-react'
-import { dashboardService, reportService, insightService } from '../../services'
+import { dashboardService, insightService } from '../../services'
 import { useAsync } from '../../hooks/useAsync'
 import { useAuth } from '../../context/AuthContext'
 import { useUi } from '../../context/UiContext'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { Badge } from '../../components/common/Badge'
 import { Button } from '../../components/common/Button'
-import { SegmentedControl } from '../../components/common/SegmentedControl'
 import { SkeletonCard, SkeletonRows } from '../../components/common/Skeleton'
 import { ErrorState } from '../../components/common/ErrorState'
 import { TransactionRow } from '../../components/transactions/TransactionRow'
 import { MoneyText } from '../../components/common/MoneyText'
 import { formatCurrency, formatPercent } from '../../utils/format'
-import { monthPeriod, formatDayLabel } from '../../utils/dates'
+import { formatDayLabel } from '../../utils/dates'
 import { Icon } from '../../components/common/Icon'
 
 export function DashboardScreen() {
@@ -44,6 +43,7 @@ function MobileDashboard() {
   const recentList = recent.data || []
   const currentMonthName = new Date().toLocaleDateString('pt-BR', { month: 'long' })
   const previousMonthName = new Date(new Date().setMonth(new Date().getMonth() - 1)).toLocaleDateString('pt-BR', { month: 'long' })
+  const negativeBalance = (overview.data?.balance ?? 0) < 0
 
   const defaultMeters = [
     { name: 'Moradia', spent: 1800, limit: 2000, percentage: 90, color: '#0070f3' },
@@ -66,17 +66,22 @@ function MobileDashboard() {
       <p className="hello" id="mobileGreeting">Olá, {firstName}</p>
 
       {/* Saldo Oficial Mobile */}
-      <section className="balance" aria-label="Saldo em conta">
+      <section className="balance" aria-label="Saldo do mês">
         <div className="label">Saldo em {currentMonthName}</div>
         <div className="value">
           {overview.loading ? (
             <span id="valSaldoMobile">—</span>
           ) : (
-            <span id="valSaldoMobile">{formatCurrency(overview.data.balance)}</span>
+            <span
+              id="valSaldoMobile"
+              style={negativeBalance ? { color: 'var(--ds-red-700)' } : undefined}
+            >
+              {formatCurrency(overview.data.balance, { signed: true })}
+            </span>
           )}
         </div>
         <div className="delta">
-          <span className={`badge ${(overview.data?.incomeChangePct || 0) >= 0 ? 'badge-success' : 'badge-danger'}`}>
+          <span className={`badge ${(overview.data?.incomeChangePct || 0) >= 0 && !negativeBalance ? 'badge-success' : 'badge-danger'}`}>
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 19V5M5 12l7-7 7 7" />
             </svg>
@@ -120,7 +125,7 @@ function MobileDashboard() {
         </div>
       </section>
 
-      {/* Gráfico de Gastos com Abas Semana / Mês */}
+      {/* Gráfico de Gastos da Semana */}
       <WeekChart week={week} isMobile />
 
       {/* Assistente IA Copilot */}
@@ -248,6 +253,7 @@ function DesktopDashboard() {
   if (overview.error) return <ErrorState message={overview.error.message} onRetry={overview.refetch} />
 
   const recentList = recent.data || []
+  const negativeBalance = (overview.data?.balance ?? 0) < 0
   const weekDays = (week.data?.days || []).map((d) => ({
     label: (d.weekday || '').toUpperCase(),
     rawLabel: d.weekday,
@@ -278,7 +284,7 @@ function DesktopDashboard() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* 3 KPI Cards */}
       <div className="stat-grid">
-        {/* Saldo em Conta */}
+        {/* Saldo do Mês */}
         <div className="card stat-card">
           <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -291,19 +297,19 @@ function DesktopDashboard() {
                   <line x1="2" y1="10" x2="22" y2="10" />
                 </svg>
               </i>
-              <span className="stat-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>Saldo em Conta</span>
+              <span className="stat-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>Saldo do Mês</span>
             </div>
-            <span className="badge">
-              <span className="badge-dot" style={{ background: 'var(--ds-green-700)' }} />
+            <span className={`badge ${negativeBalance ? 'badge-danger' : ''}`}>
+              <span className="badge-dot" style={{ background: negativeBalance ? 'var(--ds-red-700)' : 'var(--ds-green-700)' }} />
               {overview.data?.incomeChangePct != null
                 ? `${formatPercent(overview.data.incomeChangePct, { signed: true, decimals: 1 })} mês`
                 : '+14.2% mês'}
             </span>
           </div>
-          <p className="stat-value num">
-            <MoneyText value={overview.data?.balance} />
+          <p className="stat-value num" style={negativeBalance ? { color: 'var(--ds-red-700)' } : undefined}>
+            <MoneyText value={overview.data?.balance} signed />
           </p>
-          <p className="stat-foot">Atualizado agora</p>
+          <p className="stat-foot">Disponível restante no mês</p>
         </div>
 
         {/* Entradas */}
@@ -503,24 +509,31 @@ function DesktopDashboard() {
 }
 
 function WeekChart({ week, isMobile }) {
-  const [range, setRange] = useState('week')
-  const now = new Date()
-  const month = useAsync(
-    () => reportService.daily(monthPeriod(now.getMonth() + 1, now.getFullYear()).start, monthPeriod(now.getMonth() + 1, now.getFullYear()).end),
-    [],
-  )
-
+  const [activeDay, setActiveDay] = useState(null)
   const days = useMemo(() => {
-    if (range === 'week') {
-      return (week.data?.days || []).map((day) => ({ label: day.weekday, value: day.value, pct: day.percentage }))
+    const raw = week.data?.days || []
+    if (raw.length > 0) {
+      return raw.map((day) => ({
+        label: day.weekday,
+        value: day.value,
+        pct: day.percentage,
+      }))
     }
-    const items = (month.data || []).slice(0, new Date().getDate())
-    const max = Math.max(...items.map((item) => item.value), 1)
-    return items.map((item) => ({ label: item.day, value: item.value, pct: Math.round((item.value / max) * 100) }))
-  }, [range, week.data, month.data])
+    return [
+      { label: 'seg', pct: 45, value: 140 },
+      { label: 'ter', pct: 30, value: 95 },
+      { label: 'qua', pct: 65, value: 210 },
+      { label: 'qui', pct: 40, value: 130 },
+      { label: 'sex', pct: 90, value: 290 },
+      { label: 'sab', pct: 75, value: 240 },
+      { label: 'dom', pct: 32, value: 105 },
+    ]
+  }, [week.data])
 
-  const total = days.reduce((sum, day) => sum + day.value, 0)
-  const todayLabel = range === 'week' ? ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'][((new Date().getDay() + 6) % 7)] : String(new Date().getDate()).padStart(2, '0')
+  const total = days.reduce((sum, day) => sum + day.value, 0) || (week.data?.total ?? 994)
+  const dailyAverage = week.data?.dailyAverage ?? (days.length ? total / days.length : 142)
+  const todayIndex = (new Date().getDay() + 6) % 7
+  const todayLabel = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'][todayIndex]
 
   if (isMobile) {
     return (
@@ -528,24 +541,31 @@ function WeekChart({ week, isMobile }) {
         <div className="card">
           <div className="chart-foot">
             <div>
-              <div className="sub">{range === 'week' ? 'Distribuição de Gastos da Semana' : 'Acumulado do Mês'}</div>
+              <div className="sub">Distribuição de Gastos da Semana</div>
               <div className="big" id="dashWeekTotalMobile">{formatCurrency(total)}</div>
             </div>
-            <SegmentedControl
-              name="Período"
-              value={range}
-              onChange={setRange}
-              options={[
-                { value: 'week', label: 'Semana' },
-                { value: 'month', label: 'Mês' },
-              ]}
-            />
+            <span className="sub" style={{ fontSize: 12, margin: 0 }}>
+              Média {formatCurrency(dailyAverage)}/dia
+            </span>
           </div>
           <div className="chart" role="img" aria-label={`Distribuição de Gastos da Semana: Total ${formatCurrency(total)}`}>
             {days.map((day) => {
-              const isNow = day.label === todayLabel
+              const isNow = day.label?.toLowerCase() === todayLabel
+              const isActive = activeDay === day.label?.toLowerCase()
               return (
-                <div key={day.label} className={`bar ${isNow ? 'now' : ''}`}>
+                <div
+                  key={day.label}
+                  className={`bar ${isNow ? 'now' : ''} ${isActive ? 'active' : ''}`}
+                  onClick={() => setActiveDay((prev) => (prev === day.label?.toLowerCase() ? null : day.label?.toLowerCase()))}
+                  onMouseEnter={() => setActiveDay(day.label?.toLowerCase())}
+                  onMouseLeave={() => setActiveDay(null)}
+                  style={{ position: 'relative', cursor: 'pointer' }}
+                >
+                  {isActive && (
+                    <div className="chart-bar-tooltip">
+                      {formatCurrency(day.value)}
+                    </div>
+                  )}
                   <span style={{ height: `${Math.max(6, day.pct)}%` }} />
                   <em>{day.label}</em>
                 </div>
@@ -563,26 +583,33 @@ function WeekChart({ week, isMobile }) {
         <div>
           <div className="stat-value num" style={{ fontSize: 20 }}>{formatCurrency(total)}</div>
           <div className="stat-foot">
-            {range === 'week' ? 'Total da semana' : 'Acumulado do mês'} · média {formatCurrency(days.length ? total / days.length : 0)}
+            Total da semana · média {formatCurrency(dailyAverage)}/dia
           </div>
         </div>
-        <SegmentedControl
-          name="Período do gráfico"
-          value={range}
-          onChange={setRange}
-          options={[
-            { value: 'week', label: 'Semana' },
-            { value: 'month', label: 'Mês' },
-          ]}
-        />
       </div>
-      <div className="week-bars" role="img" aria-label="Gráfico de gastos do período">
-        {days.map((day) => (
-          <div key={day.label} className={`week-bar-col ${day.label === todayLabel ? 'now' : ''}`}>
-            <div className="week-bar" style={{ height: `${Math.max(4, day.pct)}%` }} title={formatCurrency(day.value)} />
-            <span className="week-day-label">{day.label}</span>
-          </div>
-        ))}
+      <div className="week-bars" role="img" aria-label="Gráfico de gastos da semana">
+        {days.map((day) => {
+          const isNow = day.label.toLowerCase() === todayLabel
+          const isActive = activeDay === day.label.toLowerCase()
+          return (
+            <div
+              key={day.label}
+              className={`week-bar-col ${isNow ? 'now' : ''} ${isActive ? 'active' : ''}`}
+              onMouseEnter={() => setActiveDay(day.label.toLowerCase())}
+              onMouseLeave={() => setActiveDay(null)}
+              onClick={() => setActiveDay((prev) => (prev === day.label.toLowerCase() ? null : day.label.toLowerCase()))}
+              style={{ position: 'relative', cursor: 'pointer' }}
+            >
+              {isActive && (
+                <div className="chart-bar-tooltip">
+                  {formatCurrency(day.value)}
+                </div>
+              )}
+              <div className="week-bar" style={{ height: `${Math.max(4, day.pct)}%` }} title={formatCurrency(day.value)} />
+              <span className="week-day-label">{day.label}</span>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
