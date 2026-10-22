@@ -288,4 +288,64 @@ public class CopilotServiceTests
         var exception = await act.Should().ThrowAsync<AppException>();
         exception.Which.StatusCode.Should().Be(409);
     }
+
+    [Fact]
+    public async Task Cancelar_rascunho_marca_como_cancelado_sem_gravar_transacao()
+    {
+        var message = new ChatMessage
+        {
+            Id = 5,
+            UserId = 1,
+            Role = ChatRole.Assistant,
+            Content = "Confirma?",
+            ActionPayload = """
+                [{"Tool":"draft_transaction","Args":{"type":"expense","value":45.9,"description":"Ifood"},"Status":"pending"}]
+                """
+        };
+        _chatRepository.Setup(r => r.GetByIdAndUserAsync(5, 1)).ReturnsAsync(message);
+
+        var cancellation = await _service.CancelDraftAsync(1, 5);
+
+        cancellation.Content.Should().Contain("cancelado");
+        _toolProvider.Verify(t => t.ExecuteAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<JsonElement>()),
+            Times.Never);
+        _chatRepository.Verify(r => r.UpdateAsync(It.Is<ChatMessage>(m =>
+            m.ActionPayload!.Contains("cancelled"))), Times.Once);
+        _chatRepository.Verify(r => r.AddAsync(It.Is<ChatMessage>(m =>
+            m.Role == ChatRole.Assistant && m.Content.Contains("cancelado"))), Times.Once);
+    }
+
+    [Fact]
+    public async Task Confirmar_apos_cancelar_retorna_409()
+    {
+        var message = new ChatMessage
+        {
+            Id = 5,
+            UserId = 1,
+            Role = ChatRole.Assistant,
+            Content = "Confirma?",
+            ActionPayload = """
+                [{"Tool":"draft_transaction","Args":{"type":"expense","value":45.9,"description":"Ifood"},"Status":"cancelled"}]
+                """
+        };
+        _chatRepository.Setup(r => r.GetByIdAndUserAsync(5, 1)).ReturnsAsync(message);
+
+        var act = () => _service.ConfirmDraftAsync(1, 5);
+
+        var exception = await act.Should().ThrowAsync<AppException>();
+        exception.Which.StatusCode.Should().Be(409);
+        _toolProvider.Verify(t => t.ExecuteAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<JsonElement>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task Cancelar_rascunho_inexistente_retorna_404()
+    {
+        _chatRepository.Setup(r => r.GetByIdAndUserAsync(99, 1)).ReturnsAsync((ChatMessage?)null);
+
+        var act = () => _service.CancelDraftAsync(1, 99);
+
+        var exception = await act.Should().ThrowAsync<AppException>();
+        exception.Which.StatusCode.Should().Be(404);
+    }
 }

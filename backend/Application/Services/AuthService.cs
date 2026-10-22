@@ -23,7 +23,7 @@ public class AuthService(
         {
             FullName = request.FullName.Trim(),
             Email = email,
-            Phone = request.Phone?.Trim(),
+            Phone = WhatsAppNumbers.NormalizePhone(request.Phone),
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
             MonthlyCeiling = request.MonthlyCeiling ?? 0m
         };

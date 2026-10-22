@@ -141,6 +141,14 @@ builder.Services.AddRateLimiter(options =>
         RateLimitPartition.GetFixedWindowLimiter(
             $"otp:{context.Connection.RemoteIpAddress?.ToString() ?? "anonimo"}",
             _ => new FixedWindowRateLimiterOptions { PermitLimit = 3, Window = TimeSpan.FromSeconds(45) }));
+    options.AddPolicy("webhook", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.Connection.RemoteIpAddress?.ToString() ?? "anonimo",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = builder.Configuration.GetValue("RateLimit:WebhookPermitLimit", 100),
+                Window = TimeSpan.FromSeconds(builder.Configuration.GetValue("RateLimit:WebhookWindowSeconds", 60))
+            }));
 });
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -194,6 +202,7 @@ builder.Services.AddMemoryCache();
 // acionado pelo webhook publico /api/v1/webhooks/whatsapp.
 builder.Services.AddScoped<EvolutionClient>();
 builder.Services.AddScoped<IEvolutionClient>(sp => sp.GetRequiredService<EvolutionClient>());
+builder.Services.AddScoped<IWhatsAppChannelService, WhatsAppChannelService>();
 
 builder.Services.AddScoped<IOtpSender>(sp =>
 {

@@ -94,13 +94,11 @@ public class CopilotService(
             throw AppException.Conflict("Mensagem invalida", "Apenas respostas do assistente podem ser confirmadas.");
 
         var actions = ParseActions(message.ActionPayload);
-        var draft = actions?.FirstOrDefault(a =>
-            string.Equals(a.Tool, "draft_transaction", StringComparison.OrdinalIgnoreCase) &&
-            !string.Equals(a.Status, "consumed", StringComparison.OrdinalIgnoreCase));
+        var draft = actions?.FirstOrDefault(IsPendingDraftAction);
 
         if (draft?.Args is null)
             throw AppException.Conflict("Rascunho indisponivel",
-                "Nao ha rascunho pendente nesta mensagem (talvez ja tenha sido confirmado).");
+                "Nao ha rascunho pendente nesta mensagem (talvez ja tenha sido confirmado ou cancelado).");
 
         var resultJson = await toolProvider.ExecuteAsync(userId, "create_transaction",
             JsonSerializer.SerializeToElement(draft.Args));
@@ -146,6 +144,36 @@ public class CopilotService(
         return Map(confirmation);
     }
 
+    public async Task<CopilotMessageDto> CancelDraftAsync(int userId, int messageId)
+    {
+        var message = await chatRepository.GetByIdAndUserAsync(messageId, userId)
+            ?? throw AppException.NotFound("Mensagem nao encontrada", "O rascunho que voce tentou cancelar nao existe mais.");
+
+        if (message.Role != ChatRole.Assistant)
+            throw AppException.Conflict("Mensagem invalida", "Apenas respostas do assistente podem ser canceladas.");
+
+        var actions = ParseActions(message.ActionPayload);
+        var draft = actions?.FirstOrDefault(IsPendingDraftAction);
+        if (draft?.Args is null)
+            throw AppException.Conflict("Rascunho indisponivel",
+                "Nao ha rascunho pendente nesta mensagem (talvez ja tenha sido confirmado ou cancelado).");
+
+        var index = actions!.IndexOf(draft);
+        actions[index] = draft with { Status = "cancelled" };
+        message.ActionPayload = JsonSerializer.Serialize(actions);
+        await chatRepository.UpdateAsync(message);
+
+        var cancellation = new ChatMessage
+        {
+            UserId = userId,
+            Role = ChatRole.Assistant,
+            Content = "Lancamento cancelado. Nada foi gravado. Se quiser, envie os dados novamente."
+        };
+        await chatRepository.AddAsync(cancellation);
+
+        return Map(cancellation);
+    }
+
     public Task ClearHistoryAsync(int userId) =>
         chatRepository.ClearAsync(userId);
 
@@ -161,6 +189,12 @@ public class CopilotService(
         string.IsNullOrWhiteSpace(payload)
             ? null
             : JsonSerializer.Deserialize<List<CopilotActionDto>>(payload);
+
+    /// <summary>Acao de rascunho ainda aguardando confirmacao ou cancelamento do usuario.</summary>
+    internal static bool IsPendingDraftAction(CopilotActionDto action) =>
+        string.Equals(action.Tool, "draft_transaction", StringComparison.OrdinalIgnoreCase) &&
+        !string.Equals(action.Status, "consumed", StringComparison.OrdinalIgnoreCase) &&
+        !string.Equals(action.Status, "cancelled", StringComparison.OrdinalIgnoreCase);
 
     private static readonly string[] PromptLeakMarkers =
     [

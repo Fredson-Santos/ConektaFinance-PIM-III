@@ -29,7 +29,7 @@ public class UserService(
         if (request.DisplayName is not null)
             user.DisplayName = string.IsNullOrWhiteSpace(request.DisplayName) ? null : request.DisplayName.Trim();
         if (request.Phone is not null)
-            user.Phone = string.IsNullOrWhiteSpace(request.Phone) ? null : request.Phone.Trim();
+            user.Phone = WhatsAppNumbers.NormalizePhone(request.Phone);
         if (request.Cpf is not null)
             user.Cpf = string.IsNullOrWhiteSpace(request.Cpf) ? null : request.Cpf.Trim();
         if (request.Occupation is not null)

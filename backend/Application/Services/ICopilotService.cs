@@ -7,5 +7,6 @@ public interface ICopilotService
     Task<CopilotHistoryResponse> GetHistoryAsync(int userId);
     Task<CopilotExchangeResponse> SendMessageAsync(int userId, string content, string? imageBase64 = null);
     Task<CopilotMessageDto> ConfirmDraftAsync(int userId, int messageId);
+    Task<CopilotMessageDto> CancelDraftAsync(int userId, int messageId);
     Task ClearHistoryAsync(int userId);
 }

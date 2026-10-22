@@ -19,6 +19,7 @@ public interface IChatMessageRepository
 {
     Task<List<ChatMessage>> ListRecentAsync(int userId, int take = 50);
     Task<ChatMessage?> GetByIdAndUserAsync(int id, int userId);
+    Task<List<ChatMessage>> ListRecentWithActionsAsync(int userId, int take = 10);
     Task<int> CountSinceAsync(int userId, ChatRole role, DateTime since);
     Task AddAsync(ChatMessage message);
     Task UpdateAsync(ChatMessage message);

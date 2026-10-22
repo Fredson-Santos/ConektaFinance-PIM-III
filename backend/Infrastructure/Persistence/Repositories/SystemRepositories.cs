@@ -65,6 +65,13 @@ public class ChatMessageRepository(AppDbContext context) : IChatMessageRepositor
     public Task<ChatMessage?> GetByIdAndUserAsync(int id, int userId) =>
         context.ChatMessages.FirstOrDefaultAsync(m => m.Id == id && m.UserId == userId);
 
+    public Task<List<ChatMessage>> ListRecentWithActionsAsync(int userId, int take = 10) =>
+        context.ChatMessages.AsNoTracking()
+            .Where(m => m.UserId == userId && m.Role == ChatRole.Assistant && m.ActionPayload != null)
+            .OrderByDescending(m => m.Id)
+            .Take(take)
+            .ToListAsync();
+
     public Task<int> CountSinceAsync(int userId, ChatRole role, DateTime since) =>
         context.ChatMessages.CountAsync(m => m.UserId == userId && m.Role == role && m.CreatedAt >= since);
 
