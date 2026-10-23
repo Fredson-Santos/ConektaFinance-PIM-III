@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Receipt, Target, BarChart3, Plus, Sun, Moon, LogOut, Settings } from 'lucide-react'
+import { LayoutDashboard, Receipt, Target, BarChart3, Sun, Moon, LogOut, Settings } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
 import { useUi } from '../../context/UiContext'
@@ -91,11 +91,6 @@ export function Sidebar() {
           </NavLink>
         ))}
       </nav>
-
-      <button type="button" className="side-cta" onClick={() => openOverlay('transaction')}>
-        <Plus size={14} />
-        Novo lançamento
-      </button>
 
       <div className="sidebar-footer">
         <div className="user-menu-wrap" id="userMenuWrap">

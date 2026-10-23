@@ -37,8 +37,8 @@ export function Topbar() {
       <div className="topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <button type="button" className="search-trigger desktop-only" onClick={() => openOverlay('cmdk')}>
           <Search size={14} />
-          <span className="desktop-only">Buscar ou executar</span>
-          <kbd className="kbd desktop-only">/</kbd>
+          <span>Buscar ou executar</span>
+          <kbd className="kbd">/</kbd>
         </button>
         <button
           type="button"

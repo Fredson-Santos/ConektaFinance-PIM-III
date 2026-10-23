@@ -7,6 +7,10 @@ export function PwaInstallBanner() {
   const [iosSuggestion, setIosSuggestion] = useState(false)
 
   useEffect(() => {
+    // Only show install prompt on mobile devices (web dashboard must not show install banner)
+    const isMobileDevice = window.innerWidth <= 880 || /android|iphone|ipad|ipod/i.test(navigator.userAgent)
+    if (!isMobileDevice) return
+
     const standalone = window.matchMedia('(display-mode: standalone)').matches
     const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent)
     if (standalone) return
@@ -46,6 +50,7 @@ export function PwaInstallBanner() {
   return (
     <div
       role="alert"
+      className="mobile-only"
       style={{
         display: 'flex',
         alignItems: 'center',
