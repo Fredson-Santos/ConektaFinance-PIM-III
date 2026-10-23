@@ -9,6 +9,7 @@ services:
       - .env
     environment:
       ASPNETCORE_URLS: http://+:8080
+      Evolution__Instance: conekta
     volumes:
       - sqlite_data:/app/data
       - uploads_data:/app/wwwroot/uploads
