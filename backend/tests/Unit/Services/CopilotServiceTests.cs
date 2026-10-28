@@ -174,6 +174,20 @@ public class CopilotServiceTests
     }
 
     [Fact]
+    public async Task Pergunta_com_vies_discriminatorio_e_recusada_sem_chamar_a_ia()
+    {
+        _chatRepository.Setup(r => r.CountSinceAsync(1, ChatRole.User, It.IsAny<DateTime>(), It.IsAny<ChatChannel?>())).ReturnsAsync(0);
+        _chatRepository.Setup(r => r.ListRecentAsync(1, It.IsAny<int>(), It.IsAny<ChatChannel?>())).ReturnsAsync([]);
+
+        var exchange = await _service.SendMessageAsync(1, "Mulheres gastam mais que homens?");
+
+        exchange.AssistantMessage.Content.Should().Be(CopilotEthics.Refusal);
+        exchange.AssistantMessage.Actions.Should().BeNull();
+        _aiClient.Verify(c => c.ReplyAsync(It.IsAny<CopilotAgentRequest>()), Times.Never);
+        _chatRepository.Verify(r => r.AddAsync(It.IsAny<ChatMessage>()), Times.Exactly(2));
+    }
+
+    [Fact]
     public async Task Enviar_imagem_extrai_nota_e_salva_arquivo()
     {
         _chatRepository.Setup(r => r.CountSinceAsync(1, ChatRole.User, It.IsAny<DateTime>(), It.IsAny<ChatChannel?>())).ReturnsAsync(0);

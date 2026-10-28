@@ -61,17 +61,24 @@ public class CopilotService(
         };
         await chatRepository.AddAsync(userMessage);
 
-        var context = await toolProvider.BuildContextAsync(userId, now.Month, now.Year);
-        var request = new CopilotAgentRequest(
-            userId,
-            trimmed,
-            image is not null,
-            receipt,
-            history,
-            context);
-
-        var reply = await aiClient.ReplyAsync(request);
-        reply = GuardPromptLeak(reply);
+        CopilotReply reply;
+        if (CopilotEthics.IsDiscriminatoryRequest(trimmed))
+        {
+            // Recusa deterministica: o pedido nem chega ao modelo de IA.
+            reply = new CopilotReply(CopilotEthics.Refusal, []);
+        }
+        else
+        {
+            var context = await toolProvider.BuildContextAsync(userId, now.Month, now.Year);
+            var request = new CopilotAgentRequest(
+                userId,
+                trimmed,
+                image is not null,
+                receipt,
+                history,
+                context);
+            reply = GuardPromptLeak(await aiClient.ReplyAsync(request));
+        }
         var assistantMessage = new ChatMessage
         {
             UserId = userId,
@@ -205,6 +212,7 @@ public class CopilotService(
         "Voce e o agente financeiro do ConektaFinance",
         "REGRAS DE ACAO",
         "PROIBICOES:",
+        "ETICA E RESPEITO",
         "FORMATO DA RESPOSTA FINAL",
         "sistema anexa automaticamente o rascunho"
     ];

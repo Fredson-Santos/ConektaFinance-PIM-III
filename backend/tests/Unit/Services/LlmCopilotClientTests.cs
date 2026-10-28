@@ -209,6 +209,8 @@ public class LlmCopilotClientTests
 
         var systemMessage = _handler.RequestBodies[0];
         systemMessage.Should().Contain("PROIBICOES");
+        systemMessage.Should().Contain("ETICA E RESPEITO");
+        systemMessage.Should().Contain("nao recomende credito");
         systemMessage.Should().NotContainAny(
             "monthlyCeiling", "monthlyIncome", "monthlyExpense",
             "overBudgetCategories", "Contexto financeiro atual do usuario");
