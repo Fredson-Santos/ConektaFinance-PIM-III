@@ -85,6 +85,7 @@ public class OtpService(
             await userRepository.AddAsync(user);
             await categoryRepository.AddRangeAsync(CategoryTemplates.CloneForUser(user.Id));
         }
+        AuthService.EnsureActive(user);
 
         return new AuthResponse(tokenService.GenerateToken(user), AuthService.MapUser(user));
     }

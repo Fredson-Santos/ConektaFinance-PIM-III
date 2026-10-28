@@ -297,3 +297,16 @@ VALUES ('20261028200052_AdicionaRestricoesDeDominio', '10.0.7');
 
 COMMIT;
 
+START TRANSACTION;
+COMMENT ON COLUMN users.account_type IS 'Perfil de acesso: Standard (usuario) ou Admin (painel administrativo).';
+
+ALTER TABLE users ADD is_active boolean NOT NULL DEFAULT TRUE;
+COMMENT ON COLUMN users.is_active IS 'Contas desativadas pelo administrador nao conseguem autenticar.';
+
+ALTER TABLE users ADD CONSTRAINT ck_users_account_type CHECK (account_type IN ('Standard', 'Admin'));
+
+INSERT INTO "__EFMigrationsHistory" (migration_id, product_version)
+VALUES ('20261028201900_AdicionaPerfilAdministrador', '10.0.7');
+
+COMMIT;
+

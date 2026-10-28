@@ -97,6 +97,13 @@ public class WhatsAppChannelService(
                     break;
             }
 
+            if (user is { IsActive: false })
+            {
+                logger.LogInformation("Mensagem WhatsApp de conta desativada ignorada ({Phone})",
+                    WhatsAppNumbers.MaskPhone(phone));
+                return;
+            }
+
             if (user is null)
             {
                 // Silencio absoluto para numeros nao vinculados: reduz risco de

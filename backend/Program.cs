@@ -77,6 +77,8 @@ builder.Services
     {
         options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
         options.SaveToken = true;
+        // Mantem os nomes curtos das claims (sub, role) usados em NameClaimType/RoleClaimType.
+        options.MapInboundClaims = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
@@ -160,6 +162,7 @@ builder.Services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
 builder.Services.AddScoped<IOtpRepository, OtpRepository>();
 builder.Services.AddScoped<IImportBatchRepository, ImportBatchRepository>();
 builder.Services.AddScoped<IMonthlyClosingRepository, MonthlyClosingRepository>();
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOtpService, OtpService>();
@@ -192,6 +195,7 @@ else
 }
 builder.Services.AddScoped<ICopilotService, CopilotService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAvatarStorage, LocalAvatarStorage>();
 builder.Services.AddScoped<IStatementParser, StatementParser>();
@@ -228,6 +232,7 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     SeedData.Initialize(context);
+    SeedData.EnsureAdmin(context, app.Configuration);
 }
 
 if (app.Environment.IsDevelopment())

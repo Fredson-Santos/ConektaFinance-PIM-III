@@ -23,6 +23,7 @@ public class TokenService(IConfiguration configuration) : ITokenService
             new(JwtRegisteredClaimNames.Email, user.Email),
             new("name", user.DisplayName ?? user.FullName),
             new("accountType", user.AccountType),
+            new("role", user.AccountType),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

@@ -8,6 +8,38 @@ namespace PIM_III_Backend.Infrastructure.Persistence;
 
 public static class SeedData
 {
+    // Administrador definido por variaveis de ambiente (Admin__Email / Admin__Password).
+    // Sem configuracao nenhum admin e criado; a senha nunca fica versionada.
+    public static void EnsureAdmin(AppDbContext context, IConfiguration configuration)
+    {
+        var email = configuration["Admin:Email"]?.Trim().ToLowerInvariant();
+        var password = configuration["Admin:Password"];
+        if (string.IsNullOrWhiteSpace(email))
+            return;
+
+        var admin = context.Users.FirstOrDefault(u => u.Email == email);
+        if (admin is null)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+                return;
+            admin = new User
+            {
+                FullName = "Administrador ConektaFinance",
+                DisplayName = "Admin",
+                Email = email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+                OnboardingCompletedAt = DateTime.UtcNow
+            };
+            context.Users.Add(admin);
+            context.SaveChanges();
+            context.Categories.AddRange(CategoryTemplates.CloneForUser(admin.Id));
+        }
+
+        admin.AccountType = AccountTypes.Admin;
+        admin.IsActive = true;
+        context.SaveChanges();
+    }
+
     public static void Initialize(AppDbContext context)
     {
         context.Database.Migrate();

@@ -39,6 +39,7 @@ public class AuthService(
         var user = await userRepository.GetByEmailAsync(request.Email.Trim().ToLowerInvariant());
         if (user is null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             throw AppException.Unauthorized("Credenciais invalidas", "E-mail ou senha incorretos.");
+        EnsureActive(user);
 
         return new AuthResponse(tokenService.GenerateToken(user), MapUser(user));
     }
@@ -49,7 +50,15 @@ public class AuthService(
         var user = await userRepository.GetByEmailAsync(demoEmail)
             ?? throw AppException.NotFound("Demonstracao indisponivel",
                 "A conta de demonstracao nao esta configurada neste ambiente.");
+        EnsureActive(user);
         return new AuthResponse(tokenService.GenerateToken(user), MapUser(user));
+    }
+
+    internal static void EnsureActive(User user)
+    {
+        if (!user.IsActive)
+            throw AppException.Forbidden("Conta desativada",
+                "Esta conta foi desativada pelo administrador. Entre em contato com o suporte.");
     }
 
     internal static UserResponse MapUser(User user) => new(

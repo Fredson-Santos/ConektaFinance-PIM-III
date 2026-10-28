@@ -571,7 +571,8 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
                         .HasDefaultValue("Standard")
-                        .HasColumnName("account_type");
+                        .HasColumnName("account_type")
+                        .HasComment("Perfil de acesso: Standard (usuario) ou Admin (painel administrativo).");
 
                     b.Property<string>("AvatarUrl")
                         .HasMaxLength(500)
@@ -621,6 +622,13 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("full_name");
 
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active")
+                        .HasComment("Contas desativadas pelo administrador nao conseguem autenticar.");
+
                     b.Property<decimal>("MonthlyCeiling")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)")
@@ -663,6 +671,8 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.ToTable("users", null, t =>
                         {
                             t.HasComment("Contas de acesso da plataforma (web, PWA e WhatsApp).");
+
+                            t.HasCheckConstraint("ck_users_account_type", "account_type IN ('Standard', 'Admin')");
 
                             t.HasCheckConstraint("ck_users_currency", "char_length(currency) = 3");
 

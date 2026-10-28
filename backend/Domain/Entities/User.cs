@@ -12,6 +12,7 @@ public class User
     public string? AvatarUrl { get; set; }
     public string PasswordHash { get; set; } = string.Empty;
     public string AccountType { get; set; } = "Standard";
+    public bool IsActive { get; set; } = true;
     public decimal MonthlyCeiling { get; set; }
     public string Currency { get; set; } = "BRL";
     public int CycleStartDay { get; set; } = 1;

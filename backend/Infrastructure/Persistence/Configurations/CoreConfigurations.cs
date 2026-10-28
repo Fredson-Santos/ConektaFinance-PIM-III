@@ -16,6 +16,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             t.HasCheckConstraint("ck_users_monthly_ceiling", "monthly_ceiling >= 0");
             t.HasCheckConstraint("ck_users_cycle_start_day", "cycle_start_day BETWEEN 1 AND 28");
             t.HasCheckConstraint("ck_users_currency", "char_length(currency) = 3");
+            t.HasCheckConstraint("ck_users_account_type", "account_type IN ('Standard', 'Admin')");
         });
         builder.Property(u => u.MonthlyCeiling).HasComment("Teto global de gastos do mes definido no onboarding (R$).");
         builder.Property(u => u.CycleStartDay).HasComment("Dia do mes em que o ciclo financeiro do usuario comeca (1 a 28).");
@@ -28,7 +29,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Cpf).HasMaxLength(14);
         builder.Property(u => u.Occupation).HasMaxLength(120);
         builder.Property(u => u.AvatarUrl).HasMaxLength(500);
-        builder.Property(u => u.AccountType).IsRequired().HasMaxLength(20).HasDefaultValue("Standard");
+        builder.Property(u => u.AccountType).IsRequired().HasMaxLength(20).HasDefaultValue("Standard")
+            .HasComment("Perfil de acesso: Standard (usuario) ou Admin (painel administrativo).");
+        builder.Property(u => u.IsActive).HasDefaultValue(true)
+            .HasComment("Contas desativadas pelo administrador nao conseguem autenticar.");
         builder.Property(u => u.MonthlyCeiling).HasPrecision(18, 2);
         builder.Property(u => u.Currency).IsRequired().HasMaxLength(3).HasDefaultValue("BRL");
         builder.Property(u => u.CycleStartDay).HasDefaultValue(1);
