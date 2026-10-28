@@ -7,7 +7,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      injectRegister: 'inline',
+      // Registro feito em main.jsx via virtual:pwa-register, que recarrega a aba quando sai versão nova.
+      injectRegister: false,
       devOptions: {
         enabled: true,
         type: 'module'
