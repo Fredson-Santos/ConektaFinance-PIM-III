@@ -10,4 +10,5 @@ public interface IReportService
     Task<List<TrendReportResponse>> GetTrendAsync(int userId, int months);
     Task<List<DailyExpenseReportResponse>> GetDailyAsync(int userId, DateTime? start, DateTime? end);
     Task<PeriodExportResponse> GetExportAsync(int userId, DateTime? start, DateTime? end);
+    Task<MonthlyClosingResponse> CloseMonthAsync(int userId, int year, int month);
 }

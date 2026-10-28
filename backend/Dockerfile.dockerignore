@@ -1,0 +1,9 @@
+# Contexto e a raiz do repositorio: envia apenas o backend e os scripts do banco
+**
+!backend/**
+!database/**
+backend/**/bin/
+backend/**/obj/
+backend/tests/
+backend/*.log
+backend/wwwroot/uploads/

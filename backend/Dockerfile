@@ -1,13 +1,15 @@
+# Contexto de build: raiz do repositorio (o backend embute os scripts de database/)
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copiar arquivo de projeto e restaurar dependências
-COPY PIM-III-Backend.csproj ./
-RUN dotnet restore PIM-III-Backend.csproj
+COPY backend/PIM-III-Backend.csproj backend/
+RUN dotnet restore backend/PIM-III-Backend.csproj
 
-# Copiar todo o restante e buildar o projeto
-COPY . ./
-RUN dotnet publish PIM-III-Backend.csproj -c Release -o /app/publish
+# Copiar o código e os scripts SQL (procedures/triggers) e publicar
+COPY backend/ backend/
+COPY database/ database/
+RUN dotnet publish backend/PIM-III-Backend.csproj -c Release -o /app/publish
 
 # Estágio final de execução
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final

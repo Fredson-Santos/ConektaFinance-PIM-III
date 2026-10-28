@@ -11,6 +11,7 @@ public static class SeedData
     public static void Initialize(AppDbContext context)
     {
         context.Database.Migrate();
+        DatabaseProgrammability.Apply(context);
         if (context.Users.Any())
             return;
 

@@ -61,6 +61,45 @@ public class ReportsFlowTests(CustomWebApplicationFactory factory) : IClassFixtu
     }
 
     [Fact]
+    public async Task Fechamento_mensal_consolida_o_mes_pela_procedure_do_banco()
+    {
+        var client = await CreateUserClientAsync();
+        var categories = await (await client.GetAsync("/api/v1/categories")).Content
+            .ReadFromJsonAsync<List<CategoryResponse>>(Json);
+        var salario = categories!.First(c => c.Kind == Domain.Enums.CategoryKind.Income).Id;
+        var moradia = categories.First(c => c.Name == "Moradia").Id;
+        var lazer = categories.First(c => c.Name == "Lazer").Id;
+        var now = DateTime.UtcNow;
+        var month = new DateTime(now.Year, now.Month, 1).AddMonths(-1);
+        await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("income", salario, "Salario", 4000m, month.AddDays(4)));
+        await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("expense", moradia, "Aluguel", 1500m, month.AddDays(7)));
+        await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("expense", lazer, "Cinema", 120m, month.AddDays(9)));
+
+        var response = await client.PostAsync($"/api/v1/reports/monthly-closing?year={month.Year}&month={month.Month}", null);
+        var again = await client.PostAsync($"/api/v1/reports/monthly-closing?year={month.Year}&month={month.Month}", null);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        again.StatusCode.Should().Be(HttpStatusCode.OK);
+        var closing = await again.Content.ReadFromJsonAsync<MonthlyClosingResponse>(Json);
+        closing!.TotalIncome.Should().Be(4000m);
+        closing.TotalExpense.Should().Be(1620m);
+        closing.Balance.Should().Be(2380m);
+        closing.TransactionCount.Should().Be(3);
+        closing.TopCategory!.Name.Should().Be("Moradia");
+        closing.TopCategory.Total.Should().Be(1500m);
+    }
+
+    [Fact]
+    public async Task Fechamento_mensal_com_mes_invalido_retorna_400()
+    {
+        var client = await CreateUserClientAsync();
+
+        var response = await client.PostAsync("/api/v1/reports/monthly-closing?year=2026&month=13", null);
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
     public async Task Por_categoria_ordena_por_total_e_calcula_percentual()
     {
         var client = await CreateUserClientAsync();

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PIM_III_Backend.Domain.Entities;
 using PIM_III_Backend.Domain.Enums;
 using PIM_III_Backend.Domain.Interfaces;
+using PIM_III_Backend.Domain.Models;
 using PIM_III_Backend.Infrastructure.Persistence;
 
 namespace PIM_III_Backend.Infrastructure.Persistence.Repositories;
@@ -144,5 +145,20 @@ public class ImportBatchRepository(AppDbContext context) : IImportBatchRepositor
     {
         context.ImportBatches.Update(batch);
         await context.SaveChangesAsync();
+    }
+}
+
+public class MonthlyClosingRepository(AppDbContext context) : IMonthlyClosingRepository
+{
+    public async Task<MonthlyClosing> CloseAsync(int userId, int year, int month)
+    {
+        await context.Database.ExecuteSqlInterpolatedAsync($"CALL sp_fechamento_mensal({userId}, {year}, {month})");
+        return await context.Database.SqlQuery<MonthlyClosing>($"""
+            SELECT period_year, period_month, total_income, total_expense, balance,
+                   monthly_ceiling, ceiling_percentage, top_category_id, top_category_total,
+                   transaction_count, closed_at
+              FROM monthly_closings
+             WHERE user_id = {userId} AND period_year = {year} AND period_month = {month}
+            """).SingleAsync();
     }
 }

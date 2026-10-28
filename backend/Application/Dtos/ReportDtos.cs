@@ -26,3 +26,17 @@ public record CategoryReportResponse(
 public record TrendReportResponse(string Period, decimal Income, decimal Expense, decimal Saved);
 
 public record DailyExpenseReportResponse(string Day, decimal Value);
+
+public record MonthlyClosingCategoryDto(int Id, string Name, decimal Total);
+
+public record MonthlyClosingResponse(
+    int Year,
+    int Month,
+    decimal TotalIncome,
+    decimal TotalExpense,
+    decimal Balance,
+    decimal MonthlyCeiling,
+    decimal? CeilingPercentage,
+    MonthlyClosingCategoryDto? TopCategory,
+    int TransactionCount,
+    DateTime ClosedAt);

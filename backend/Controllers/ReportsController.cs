@@ -34,6 +34,10 @@ public class ReportsController(IReportService reportService) : BaseApiController
         [FromQuery] DateTime? start, [FromQuery] DateTime? end) =>
         Ok(await reportService.GetDailyAsync(CurrentUserId, start, end));
 
+    [HttpPost("monthly-closing")]
+    public async Task<ActionResult<MonthlyClosingResponse>> CloseMonth([FromQuery] int year, [FromQuery] int month) =>
+        Ok(await reportService.CloseMonthAsync(CurrentUserId, year, month));
+
     [HttpGet("export.csv")]
     public async Task<IActionResult> ExportCsv([FromQuery] DateTime? start, [FromQuery] DateTime? end)
     {

@@ -28,6 +28,11 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.3.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Procedures e triggers do PostgreSQL aplicadas no startup (DatabaseProgrammability) -->
+    <EmbeddedResource Include="..\database\02_procedures.sql" LogicalName="Conekta.Sql.02_procedures.sql" />
+  </ItemGroup>
+
   <PropertyGroup>
     <DefaultItemExcludes>$(DefaultItemExcludes);tests\**</DefaultItemExcludes>
   </PropertyGroup>

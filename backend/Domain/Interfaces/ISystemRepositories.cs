@@ -1,5 +1,6 @@
 using PIM_III_Backend.Domain.Entities;
 using PIM_III_Backend.Domain.Enums;
+using PIM_III_Backend.Domain.Models;
 
 namespace PIM_III_Backend.Domain.Interfaces;
 
@@ -38,4 +39,9 @@ public interface IImportBatchRepository
     Task<ImportBatch?> GetByIdAndUserAsync(int id, int userId);
     Task AddAsync(ImportBatch batch);
     Task UpdateAsync(ImportBatch batch);
+}
+
+public interface IMonthlyClosingRepository
+{
+    Task<MonthlyClosing> CloseAsync(int userId, int year, int month);
 }

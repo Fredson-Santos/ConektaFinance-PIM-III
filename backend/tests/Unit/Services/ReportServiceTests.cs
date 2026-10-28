@@ -14,7 +14,8 @@ public class ReportServiceTests
     private readonly ReportService _service;
 
     public ReportServiceTests() =>
-        _service = new ReportService(_transactionRepository.Object, _categoryRepository.Object);
+        _service = new ReportService(_transactionRepository.Object, _categoryRepository.Object,
+            new Mock<IMonthlyClosingRepository>().Object);
 
     private void SetupSums(decimal income, decimal expense)
     {

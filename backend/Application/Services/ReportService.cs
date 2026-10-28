@@ -7,8 +7,34 @@ namespace PIM_III_Backend.Application.Services;
 
 public class ReportService(
     ITransactionRepository transactionRepository,
-    ICategoryRepository categoryRepository) : IReportService
+    ICategoryRepository categoryRepository,
+    IMonthlyClosingRepository monthlyClosingRepository) : IReportService
 {
+    // O consolidado e calculado pela procedure sp_fechamento_mensal no PostgreSQL.
+    public async Task<MonthlyClosingResponse> CloseMonthAsync(int userId, int year, int month)
+    {
+        if (month is < 1 or > 12 || year is < 2000 or > 2100)
+            throw AppException.BadRequest("Periodo invalido", "Informe um mes entre 1 e 12 e um ano valido.");
+
+        var closing = await monthlyClosingRepository.CloseAsync(userId, year, month);
+        MonthlyClosingCategoryDto? topCategory = null;
+        if (closing.TopCategoryId is int categoryId &&
+            await categoryRepository.GetByIdAndUserAsync(categoryId, userId) is { } category)
+            topCategory = new MonthlyClosingCategoryDto(category.Id, category.Name, closing.TopCategoryTotal);
+
+        return new MonthlyClosingResponse(
+            closing.PeriodYear,
+            closing.PeriodMonth,
+            closing.TotalIncome,
+            closing.TotalExpense,
+            closing.Balance,
+            closing.MonthlyCeiling,
+            closing.CeilingPercentage,
+            topCategory,
+            closing.TransactionCount,
+            closing.ClosedAt);
+    }
+
     public async Task<ReportSummaryResponse> GetSummaryAsync(int userId, DateTime? start, DateTime? end)
     {
         var (periodStart, periodEnd) = NormalizePeriod(start, end);
