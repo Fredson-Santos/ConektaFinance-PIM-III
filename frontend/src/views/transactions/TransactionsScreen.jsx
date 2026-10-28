@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Search, BarChart3, Import } from 'lucide-react'
-import { transactionService, categoryService, budgetService, reportService } from '../../services'
+import { transactionService, categoryService, dashboardService, reportService } from '../../services'
 import { useAsync } from '../../hooks/useAsync'
 import { useUi } from '../../context/UiContext'
 import { useToast } from '../../context/ToastContext'
@@ -10,7 +10,7 @@ import { TransactionRow } from '../../components/transactions/TransactionRow'
 import { SkeletonRows } from '../../components/common/Skeleton'
 import { ErrorState } from '../../components/common/ErrorState'
 import { EmptyState } from '../../components/common/EmptyState'
-import { Meter } from '../../components/common/Meter'
+import { CeilingCard } from '../../components/dashboard/CeilingCard'
 import { Button } from '../../components/common/Button'
 import { formatCurrency } from '../../utils/format'
 import { formatDayLabel, monthLabel, addMonths, monthPeriod } from '../../utils/dates'
@@ -20,7 +20,7 @@ export function TransactionsScreen() {
   const [period, setPeriod] = useState({ month: now.getMonth() + 1, year: now.getFullYear() })
   const [search, setSearch] = useState('')
   const [categoryId, setCategoryId] = useCategoryIdFromUrl()
-  const { openTransactionSheet, openOverlay } = useUi()
+  const { openTransactionSheet, openOverlay, dataVersion } = useUi()
   const toast = useToast()
   const navigate = useNavigate()
 
@@ -37,19 +37,19 @@ export function TransactionsScreen() {
       })
       return { items: data.items, meta: data.meta, totalSum: Number(headers.get('X-Total-Sum') || 0) }
     },
-    [period.month, period.year, categoryId, search],
+    [period.month, period.year, categoryId, search, dataVersion],
   )
 
-  const budgetsState = useAsync(
-    () => budgetService.list(period.month, period.year),
-    [period.month, period.year],
+  const monthOverview = useAsync(
+    () => dashboardService.overview({ month: period.month, year: period.year }),
+    [period.month, period.year, dataVersion],
   )
   const topCategoriesState = useAsync(
     async () => {
       const p = monthPeriod(period.month, period.year)
       return reportService.byCategory(p.start, p.end)
     },
-    [period.month, period.year],
+    [period.month, period.year, dataVersion],
   )
 
   const groups = useMemo(() => {
@@ -76,11 +76,7 @@ export function TransactionsScreen() {
     openTransactionSheet({ editing: transaction })
   }
 
-  const budgets = budgetsState.data || []
-  const totalLimit = budgets.reduce((sum, b) => sum + (b.limitValue || 0), 0)
-  const sideCardSpent = budgets.reduce((sum, b) => sum + (b.spent || 0), 0)
   const totalSpent = listState.data?.totalSum != null ? Math.abs(listState.data.totalSum) : 0
-  const percentage = totalLimit > 0 ? Math.round((sideCardSpent / totalLimit) * 100) : 0
 
   const rawTop = topCategoriesState.data || []
   const topCategoriesTotal = rawTop.reduce((sum, item) => sum + (item.total || 0), 0)
@@ -242,48 +238,12 @@ export function TransactionsScreen() {
         {/* COLUNA LATERAL DESKTOP: Painéis de Inteligência e Resumo Financeiro */}
         <aside className="gastos-side-col desktop-only" aria-label="Resumo e Ações de Gastos">
           {/* Card: Consumo do Limite */}
-          <div className="card" style={{ padding: '18px 20px', marginBottom: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--ds-foreground)' }}>Consumo do Limite</span>
-              <span
-                className="badge b-ok"
-                style={{
-                  fontSize: 11,
-                  background: totalLimit === 0 ? 'var(--ds-gray-alpha-200)' : percentage > 100 ? 'rgba(229, 72, 77, 0.15)' : 'rgba(0, 204, 136, 0.15)',
-                  color: totalLimit === 0 ? 'var(--ds-foreground-muted)' : percentage > 100 ? 'var(--ds-red-700)' : 'var(--ds-green-700)',
-                  border: `1px solid ${totalLimit === 0 ? 'var(--ds-border-subtle)' : percentage > 100 ? 'rgba(229, 72, 77, 0.3)' : 'rgba(0, 204, 136, 0.3)'}`,
-                  borderRadius: 9999,
-                  padding: '2px 8px',
-                  fontWeight: 500,
-                }}
-              >
-                {totalLimit === 0 ? 'Sem teto' : percentage > 100 ? 'Estourado' : percentage >= 80 ? 'Atenção' : 'Sob controle'}
-              </span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-              <span id="gastosDesktopTotalVal" style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--ds-foreground)' }}>
-                {formatCurrency(sideCardSpent)}
-              </span>
-              <span style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>
-                {totalLimit > 0 ? `Meta: ${formatCurrency(totalLimit)}` : 'Meta: Não definida'}
-              </span>
-            </div>
-            <div className="cat-track" style={{ height: 7, background: 'var(--ds-gray-alpha-200)', borderRadius: 99, overflow: 'hidden', marginBottom: 10 }}>
-              <div
-                className="cat-fill"
-                style={{
-                  width: `${Math.min(100, percentage)}%`,
-                  height: '100%',
-                  background: 'linear-gradient(90deg, #f5a623, #e93d82)',
-                  borderRadius: 99,
-                }}
-              />
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, color: 'var(--ds-foreground-muted)' }}>
-              <span>{percentage}% do limite mensal utilizado</span>
-              <span>Média: {formatCurrency(sideCardSpent / 30)}/dia</span>
-            </div>
-          </div>
+          <CeilingCard
+            className="gastos-ceiling-card"
+            spent={monthOverview.data?.expense}
+            loading={monthOverview.loading}
+            caption={`Despesas de ${monthLabel(period.month, period.year)}`}
+          />
 
           {/* Card: Maiores Categorias */}
           <div className="card" style={{ padding: '18px 20px', marginBottom: 16 }}>

@@ -13,6 +13,12 @@ export function UiProvider({ children }) {
   })
   const [discreet, setDiscreet] = useState(() => localStorage.getItem('conekta_discreet') === 'true')
   const [transactionPrefill, setTransactionPrefill] = useState(null)
+  // Incrementado sempre que lançamentos mudam, para telas recarregarem seus indicadores.
+  const [dataVersion, setDataVersion] = useState(0)
+
+  const notifyDataChanged = useCallback(() => {
+    setDataVersion((current) => current + 1)
+  }, [])
 
   const openOverlay = useCallback((key) => {
     setOverlays((current) => ({ ...current, [key]: true }))
@@ -63,8 +69,10 @@ export function UiProvider({ children }) {
       transactionPrefill,
       discreet,
       toggleDiscreet,
+      dataVersion,
+      notifyDataChanged,
     }),
-    [overlays, openOverlay, closeOverlay, closeAllOverlays, toggleOverlay, openTransactionSheet, consumeTransactionPrefill, transactionPrefill, discreet, toggleDiscreet],
+    [overlays, openOverlay, closeOverlay, closeAllOverlays, toggleOverlay, openTransactionSheet, consumeTransactionPrefill, transactionPrefill, discreet, toggleDiscreet, dataVersion, notifyDataChanged],
   )
 
   return <UiContext.Provider value={value}>{children}</UiContext.Provider>

@@ -12,7 +12,7 @@ import { parseMoneyInput } from '../../utils/money'
 import { toIsoDate } from '../../utils/dates'
 
 export function TransactionSheet() {
-  const { overlays, closeOverlay, transactionPrefill, consumeTransactionPrefill, openOverlay } = useUi()
+  const { overlays, closeOverlay, transactionPrefill, consumeTransactionPrefill, openOverlay, notifyDataChanged } = useUi()
   const editing = transactionPrefill?.editing || null
 
   return (
@@ -26,6 +26,7 @@ export function TransactionSheet() {
         editing={editing}
         prefill={transactionPrefill}
         afterSubmit={() => {
+          notifyDataChanged()
           if (editing?.viaDetail) openOverlay('transaction')
           closeOverlay('transaction')
           consumeTransactionPrefill()

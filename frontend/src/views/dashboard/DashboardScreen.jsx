@@ -16,6 +16,7 @@ import { MoneyText } from '../../components/common/MoneyText'
 import { formatCurrency, formatPercent } from '../../utils/format'
 import { formatDayLabel } from '../../utils/dates'
 import { Icon } from '../../components/common/Icon'
+import { CeilingCard } from '../../components/dashboard/CeilingCard'
 
 export function DashboardScreen() {
   const isMobile = useMediaQuery('(max-width: 880px)')
@@ -23,10 +24,11 @@ export function DashboardScreen() {
 }
 
 function useDashboardData() {
-  const overview = useAsync(() => dashboardService.overview(), [])
-  const week = useAsync(() => dashboardService.weeklyExpenses(), [])
-  const recent = useAsync(() => dashboardService.recentTransactions(5), [])
-  const meters = useAsync(() => dashboardService.budgetMeters(), [])
+  const { dataVersion } = useUi()
+  const overview = useAsync(() => dashboardService.overview(), [dataVersion])
+  const week = useAsync(() => dashboardService.weeklyExpenses(), [dataVersion])
+  const recent = useAsync(() => dashboardService.recentTransactions(5), [dataVersion])
+  const meters = useAsync(() => dashboardService.budgetMeters(), [dataVersion])
   const insights = useAsync(() => insightService.list(), [])
   return { overview, week, recent, meters, insights }
 }
@@ -117,6 +119,8 @@ function MobileDashboard() {
           </div>
         </div>
       </section>
+
+      <CeilingCard spent={overview.data?.expense} loading={overview.loading} />
 
       {/* Gráfico de Gastos da Semana */}
       <WeekChart week={week} isMobile />
@@ -422,47 +426,51 @@ function DesktopDashboard() {
           </div>
         </div>
 
-        {/* Orçamento por Categoria */}
-        <div className="card">
-          <div className="card-head" style={{ marginBottom: 16 }}>
-            <div>
-              <p className="card-title">Orçamento por Categoria</p>
-              <span className="stat-foot">Acompanhamento de consumo</span>
-            </div>
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <CeilingCard spent={overview.data?.expense} loading={overview.loading} />
 
-          <div className="cat-meter-list">
-            {meterItems.length === 0 ? (
-              <div style={{ padding: '24px 0', textAlign: 'center', color: 'var(--ds-foreground-muted)', fontSize: 13, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                <span>Nenhum orçamento configurado</span>
-                <button
-                  type="button"
-                  className="btn"
-                  style={{ fontSize: 12.5, height: 32, padding: '0 12px' }}
-                  onClick={() => navigate('/categorias')}
-                >
-                  <Plus size={14} style={{ marginRight: 6 }} />
-                  Adicionar categoria
-                </button>
+          {/* Orçamento por Categoria */}
+          <div className="card">
+            <div className="card-head" style={{ marginBottom: 16 }}>
+              <div>
+                <p className="card-title">Orçamento por Categoria</p>
+                <span className="stat-foot">Acompanhamento de consumo</span>
               </div>
-            ) : (
-              meterItems.map((item) => (
-                <div className="cat-meter-item" key={item.name}>
-                  <div className="cat-meter-head">
-                    <span className="cat-meter-label">
-                      <span className="cat-meter-dot" style={{ background: item.color }} />
-                      {item.name}
-                    </span>
-                    <span className="cat-meter-val num">
-                      {formatCurrency(item.spent)} / {formatCurrency(item.limit)}
-                    </span>
-                  </div>
-                  <div className="cat-track">
-                    <div className="cat-fill" style={{ width: `${Math.min(100, item.percentage)}%`, background: item.color }} />
-                  </div>
+            </div>
+
+            <div className="cat-meter-list">
+              {meterItems.length === 0 ? (
+                <div style={{ padding: '24px 0', textAlign: 'center', color: 'var(--ds-foreground-muted)', fontSize: 13, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                  <span>Nenhum orçamento configurado</span>
+                  <button
+                    type="button"
+                    className="btn"
+                    style={{ fontSize: 12.5, height: 32, padding: '0 12px' }}
+                    onClick={() => navigate('/categorias')}
+                  >
+                    <Plus size={14} style={{ marginRight: 6 }} />
+                    Adicionar categoria
+                  </button>
                 </div>
-              ))
-            )}
+              ) : (
+                meterItems.map((item) => (
+                  <div className="cat-meter-item" key={item.name}>
+                    <div className="cat-meter-head">
+                      <span className="cat-meter-label">
+                        <span className="cat-meter-dot" style={{ background: item.color }} />
+                        {item.name}
+                      </span>
+                      <span className="cat-meter-val num">
+                        {formatCurrency(item.spent)} / {formatCurrency(item.limit)}
+                      </span>
+                    </div>
+                    <div className="cat-track">
+                      <div className="cat-fill" style={{ width: `${Math.min(100, item.percentage)}%`, background: item.color }} />
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       </div>

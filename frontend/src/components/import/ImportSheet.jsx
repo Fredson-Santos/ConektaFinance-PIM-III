@@ -20,6 +20,7 @@ export function ImportSheet() {
 
 function ImportForm({ onClose }) {
   const toast = useToast()
+  const { notifyDataChanged } = useUi()
   const inputRef = useRef(null)
   const [file, setFile] = useState(null)
   const [preview, setPreview] = useState(null)
@@ -53,6 +54,7 @@ function ImportForm({ onClose }) {
         autoCategorize,
         ignoreDuplicates,
       })
+      notifyDataChanged()
       toast.push(
         `${result.importedCount} lançamento(s) importado(s)${result.skippedDuplicates > 0 ? ` · ${result.skippedDuplicates} duplicado(s) ignorado(s)` : ''}.`,
       )

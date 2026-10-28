@@ -3,9 +3,10 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { BudgetsScreen } from '../views/budgets/BudgetsScreen'
 import { TransactionsScreen } from '../views/transactions/TransactionsScreen'
-import { categoryService, budgetService, transactionService, reportService } from '../services'
+import { categoryService, budgetService, transactionService, reportService, dashboardService } from '../services'
 import { UiProvider } from '../context/UiContext'
 import { ToastProvider } from '../context/ToastContext'
+import { AuthProvider } from '../context/AuthContext'
 
 vi.mock('../services', async (importOriginal) => {
   const original = await importOriginal()
@@ -34,6 +35,10 @@ vi.mock('../services', async (importOriginal) => {
       ...original.reportService,
       byCategory: vi.fn(),
     },
+    dashboardService: {
+      ...original.dashboardService,
+      overview: vi.fn(),
+    },
   }
 })
 
@@ -46,11 +51,13 @@ const EXPENSE_CATEGORIES = [
 function renderScreen(Screen) {
   return render(
     <MemoryRouter>
-      <UiProvider>
-        <ToastProvider>
-          <Screen />
-        </ToastProvider>
-      </UiProvider>
+      <AuthProvider>
+        <UiProvider>
+          <ToastProvider>
+            <Screen />
+          </ToastProvider>
+        </UiProvider>
+      </AuthProvider>
     </MemoryRouter>,
   )
 }
@@ -142,6 +149,7 @@ describe('TransactionsScreen', () => {
     categoryService.list.mockResolvedValue(EXPENSE_CATEGORIES)
     budgetService.list.mockResolvedValue([])
     reportService.byCategory.mockResolvedValue([])
+    dashboardService.overview.mockResolvedValue({ income: 5200, expense: 186.4, balance: 5013.6 })
   })
 
   it('agrupa lancamentos por dia com soma e total do cabecalho', async () => {
@@ -165,6 +173,15 @@ describe('TransactionsScreen', () => {
     )
   })
 
+  it('consulta as despesas do mes selecionado para o card de consumo do limite', async () => {
+    renderScreen(TransactionsScreen)
+
+    await waitFor(() => expect(dashboardService.overview).toHaveBeenCalledWith(
+      expect.objectContaining({ month: new Date().getMonth() + 1, year: new Date().getFullYear() }),
+    ))
+    expect(await screen.findByLabelText('Consumo do Limite')).toBeInTheDocument()
+  })
+
   it('mostra estado vazio quando nao ha lancamentos', async () => {
     transactionService.list.mockResolvedValue({
       data: { items: [], meta: { totalItems: 0, totalPages: 0, page: 1, pageSize: 100 } },
@@ -181,7 +198,7 @@ describe('TransactionsScreen', () => {
     renderScreen(TransactionsScreen)
 
     expect(await screen.findByText('Sem teto')).toBeInTheDocument()
-    expect(screen.getByText('Meta: Não definida')).toBeInTheDocument()
+    expect(screen.getByText('Teto não definido')).toBeInTheDocument()
     expect(screen.getByText('Sem gastos registrados no período')).toBeInTheDocument()
   })
 })
