@@ -17,10 +17,37 @@ using PIM_III_Backend.Infrastructure.Messaging;
 using PIM_III_Backend.Infrastructure.Copilot;
 using PIM_III_Backend.Infrastructure.Files;
 using PIM_III_Backend.Infrastructure.Importing;
+using PIM_III_Backend.Infrastructure.Health;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Serilog;
+using Serilog.Formatting.Compact;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Logs estruturados em JSON no console (coletados pelo Docker/Dokploy). Em
+// desenvolvimento, saida legivel. Nunca registrar senhas, tokens, codigos OTP
+// ou conteudo de mensagens.
+builder.Services.AddSerilog((services, logger) =>
+{
+    logger
+        .ReadFrom.Configuration(builder.Configuration)
+        .MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.EntityFrameworkCore", Serilog.Events.LogEventLevel.Warning)
+        .Enrich.FromLogContext()
+        .Enrich.WithProperty("Application", "ConektaFinance.Api");
+    if (builder.Environment.IsDevelopment())
+        logger.WriteTo.Console();
+    else
+        logger.WriteTo.Console(new RenderedCompactJsonFormatter());
+});
+
+builder.Services.AddHttpClient(nameof(EvolutionHealthCheck));
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<AppDbContext>("database", tags: ["ready"])
+    .AddCheck<EvolutionHealthCheck>("whatsapp", tags: ["ready"]);
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -229,6 +256,9 @@ var app = builder.Build();
 if (string.IsNullOrWhiteSpace(app.Configuration["JWT_SECRET"]) && app.Environment.IsDevelopment())
     app.Logger.LogWarning("JWT_SECRET ausente: usando chave efemera valida apenas para desenvolvimento.");
 
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseSerilogRequestLogging(options =>
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} respondeu {StatusCode} em {Elapsed:0.0} ms");
 app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 if (!app.Environment.IsDevelopment())
@@ -254,9 +284,22 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.MapGet("/health", () => Results.Ok(new { status = "ok", timestamp = DateTime.UtcNow }))
-    .WithTags("Saúde")
-    .WithSummary("Verificação simples de disponibilidade da API.");
+// Monitoramento: /health/live (processo de pe) e /health/ready (banco + WhatsApp).
+// /health permanece como alias de /health/live para quem ja consome a rota.
+var liveOptions = new HealthCheckOptions { Predicate = _ => false, ResponseWriter = HealthResponseWriter.WriteAsync };
+app.MapHealthChecks("/health", liveOptions);
+app.MapHealthChecks("/health/live", liveOptions);
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready"),
+    ResponseWriter = HealthResponseWriter.WriteAsync,
+    ResultStatusCodes =
+    {
+        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+        [HealthStatus.Degraded] = StatusCodes.Status200OK,
+        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+    }
+});
 app.Run();
 
 public partial class Program { }

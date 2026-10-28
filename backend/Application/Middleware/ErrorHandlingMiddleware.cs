@@ -58,6 +58,7 @@ public class ErrorHandlingMiddleware(
             Detail = detail,
             Instance = context.Request.Path
         };
+        problem.Extensions["correlationId"] = context.TraceIdentifier;
         if (errors is { Count: > 0 })
             problem.Extensions["errors"] = errors;
         await context.Response.WriteAsync(JsonSerializer.Serialize(problem));

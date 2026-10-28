@@ -34,7 +34,7 @@ public class SwaggerDocumentationTests(CustomWebApplicationFactory factory) : IC
                 problemas.Add($"{id}: sem respostas de erro");
         }
 
-        total.Should().BeGreaterThan(50);
+        total.Should().BeGreaterThanOrEqualTo(50);
         problemas.Should().BeEmpty();
     }
 
