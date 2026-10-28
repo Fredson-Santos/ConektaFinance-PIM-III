@@ -147,4 +147,14 @@ describe('ReportsScreen', () => {
     const radioGroups = await screen.findAllByRole('radiogroup', { name: 'Período' })
     expect(radioGroups).toHaveLength(1)
   })
+
+  it('no mobile exibe o grafico de entradas e saidas com legenda e saldo do mes', async () => {
+    window.matchMedia = vi.fn().mockReturnValue({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })
+    renderReports()
+
+    expect(await screen.findByRole('heading', { name: 'Entradas e saídas' })).toBeInTheDocument()
+    expect(await screen.findByText(/saldo de jun/i)).toHaveTextContent('+ R$ 3.550,00')
+    fireEvent.mouseEnter(screen.getByRole('button', { name: /maio de 2026/i }))
+    expect(screen.getByRole('tooltip')).toHaveTextContent('+ R$ 3.400,00')
+  })
 })

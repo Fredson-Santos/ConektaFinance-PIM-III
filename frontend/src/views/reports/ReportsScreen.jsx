@@ -14,6 +14,7 @@ import { EmptyState } from '../../components/common/EmptyState'
 import { formatCurrency, formatPercent, formatCompact } from '../../utils/format'
 import { monthPeriod, addMonths } from '../../utils/dates'
 import { exportMonthlyPdf } from './pdf'
+import { InOutChart } from '../../components/charts/InOutChart'
 
 const PERIODS = [
   { value: 'month', label: 'Mês' },
@@ -152,28 +153,6 @@ function MobileReports({ summary, byCategory, trend, insights, period, setPeriod
     return items.reduce((sum, item) => sum + item.saved, 0) / items.length
   }, [trend.data])
 
-  const [activePair, setActivePair] = useState(null)
-  const trendPairs = useMemo(() => {
-    const list = trend.data || []
-    if (list.length === 0) return []
-    const maxVal = Math.max(...list.flatMap((t) => [t.income, t.expense]), 1)
-    return list.map((item, idx) => {
-      const [m, y] = (item.period || '').split('/')
-      const date = m && y ? new Date(Number(y), Number(m) - 1, 1) : null
-      const monthName = date
-        ? date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')
-        : (m || '')
-      return {
-        period: item.period,
-        monthLabel: monthName,
-        income: item.income,
-        expense: item.expense,
-        inPct: Math.min(100, Math.round((item.income / maxVal) * 100)),
-        outPct: Math.min(100, Math.round((item.expense / maxVal) * 100)),
-        isLast: idx === list.length - 1,
-      }
-    })
-  }, [trend.data])
 
   const donutColors = ['#0070f3', '#f5a623', '#8e4ec6', '#e93d82', '#00cc88', '#666666']
   const activeCategories = useMemo(() => {
@@ -287,45 +266,7 @@ function MobileReports({ summary, byCategory, trend, insights, period, setPeriod
       <section className="sec">
         <h2>Entradas e saídas</h2>
         <div className="card">
-          <div className="leg">
-            <span><i style={{ background: 'var(--ds-green-500, #00cc88)' }} />Entradas</span>
-            <span><i style={{ background: 'var(--ds-gray-alpha-400)' }} />Saídas</span>
-          </div>
-          <div className="pairs" role="img" aria-label="Entradas e saídas">
-            {trendPairs.length > 0 ? (
-              trendPairs.map((p) => {
-                const isActive = activePair === p.period
-                return (
-                  <div
-                    key={p.period}
-                    className={`pair ${p.isLast ? 'now' : ''} ${isActive ? 'active' : ''}`}
-                    onClick={() => setActivePair((prev) => (prev === p.period ? null : p.period))}
-                    onMouseEnter={() => setActivePair(p.period)}
-                    onMouseLeave={() => setActivePair(null)}
-                    style={{ position: 'relative', cursor: 'pointer' }}
-                  >
-                    {isActive && (
-                      <div className="chart-bar-tooltip" style={{ minWidth: 110, textAlign: 'left', lineHeight: 1.4 }}>
-                        <div style={{ color: 'var(--ds-green-500, #00cc88)', fontSize: 11 }}>
-                          In: {formatCurrency(p.income)}
-                        </div>
-                        <div style={{ color: 'var(--ds-foreground-muted)', fontSize: 11 }}>
-                          Out: {formatCurrency(p.expense)}
-                        </div>
-                      </div>
-                    )}
-                    <div className="bars">
-                      <span className="in" style={{ height: `${Math.max(6, p.inPct)}%` }} />
-                      <span className="out" style={{ height: `${Math.max(6, p.outPct)}%` }} />
-                    </div>
-                    <em>{p.monthLabel}</em>
-                  </div>
-                )
-              })
-            ) : (
-              <p style={{ color: 'var(--ds-foreground-muted)', fontSize: 12 }}>Nenhum dado no período.</p>
-            )}
-          </div>
+          <InOutChart items={trend.data || []} />
         </div>
       </section>
 

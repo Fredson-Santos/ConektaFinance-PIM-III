@@ -963,6 +963,267 @@
   margin-bottom: 16px;
 }
 
+/* ==========================================================================
+   ENTRADAS x SAÍDAS (comparativo mensal)
+   ========================================================================== */
+.io-chart {
+  --io-in: var(--ds-green-700);
+  --io-out: var(--ds-red-700);
+  --io-axis-w: 46px;
+  --io-height: 148px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.io-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.io-legend {
+  display: flex;
+  gap: 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ds-foreground);
+}
+
+.io-legend span,
+.io-tip-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.io-legend i,
+.io-tip-row i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.io-chart i.in {
+  background: var(--io-in);
+}
+
+.io-chart i.out {
+  background: var(--io-out);
+}
+
+.io-last {
+  font-size: 11.5px;
+  color: var(--ds-foreground-muted);
+}
+
+.io-net {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.io-net.pos {
+  color: var(--ds-green-700);
+}
+
+.io-net.neg {
+  color: var(--ds-red-700);
+}
+
+.io-plot {
+  display: flex;
+  height: var(--io-height);
+}
+
+.io-axis {
+  width: var(--io-axis-w);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-right: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ds-foreground-faint);
+  text-align: right;
+}
+
+.io-axis span {
+  line-height: 1;
+}
+
+.io-area {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.io-grid {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.io-grid i {
+  height: 1px;
+  background: var(--ds-gray-alpha-200);
+}
+
+.io-grid i:last-child {
+  background: var(--ds-border);
+}
+
+.io-bars {
+  position: relative;
+  height: 100%;
+  display: flex;
+  gap: 6px;
+}
+
+.io-pair {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--ds-duration-fast) var(--ds-ease);
+}
+
+.io-pair:hover,
+.io-pair.active {
+  background: var(--ds-gray-alpha-100);
+}
+
+.io-pair:focus-visible {
+  outline: none;
+  box-shadow: var(--ds-focus-ring);
+}
+
+.io-pair-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  width: 100%;
+  max-width: 34px;
+  height: 100%;
+}
+
+.io-pair-bars span {
+  flex: 1;
+  min-height: 2px;
+  border-radius: 3px 3px 0 0;
+  transition: height 0.4s var(--ds-ease), opacity var(--ds-duration-fast) var(--ds-ease);
+}
+
+.io-pair-bars .in {
+  background: var(--io-in);
+}
+
+.io-pair-bars .out {
+  background: var(--io-out);
+}
+
+.io-bars:hover .io-pair:not(:hover):not(.active) .io-pair-bars span {
+  opacity: 0.45;
+}
+
+.io-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  z-index: 5;
+  transform: translateX(-50%);
+  min-width: 176px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--ds-background-surface);
+  border: 1px solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-lg);
+  box-shadow: var(--ds-shadow-medium);
+  color: var(--ds-foreground);
+  text-align: left;
+  pointer-events: none;
+}
+
+.io-tooltip.align-start {
+  left: 0;
+  transform: none;
+}
+
+.io-tooltip.align-end {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+.io-tooltip strong {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.io-tooltip hr {
+  margin: 2px 0;
+  border: none;
+  border-top: 1px solid var(--ds-border);
+}
+
+.io-tip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 11.5px;
+  color: var(--ds-foreground-muted);
+}
+
+.io-tip-row b {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--ds-foreground);
+}
+
+.io-labels {
+  display: flex;
+  gap: 6px;
+  margin-left: var(--io-axis-w);
+}
+
+.io-labels span {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font-size: 11px;
+  color: var(--ds-foreground-faint);
+  text-transform: capitalize;
+}
+
+.io-labels span.now {
+  color: var(--ds-foreground);
+  font-weight: 600;
+}
+
+.io-hint,
+.io-empty {
+  font-size: 11.5px;
+  color: var(--ds-foreground-faint);
+}
+
 .pwd-meter {
   display: flex;
   gap: 6px;
