@@ -1185,7 +1185,11 @@
     }
 
     .spend-col:hover .spend-bar-fill {
-      background: var(--ds-foreground);
+      background: var(--ds-gray-700);
+    }
+
+    .spend-col.active:hover .spend-bar-fill {
+      background: var(--ds-blue-700);
     }
 
     .spend-day {
@@ -1195,7 +1199,7 @@
     }
 
     .spend-col.active .spend-day {
-      color: var(--ds-foreground);
+      color: var(--ds-blue-700);
       font-weight: 600;
     }
 
@@ -3799,7 +3803,7 @@
     }
 
     .mobile-dash-content .bar.now span {
-      background: var(--ds-foreground);
+      background: var(--ds-blue-600);
     }
 
     .mobile-dash-content .bar em {
@@ -3809,7 +3813,7 @@
     }
 
     .mobile-dash-content .bar.now em {
-      color: var(--ds-foreground);
+      color: var(--ds-blue-700);
       font-weight: 600;
     }
 

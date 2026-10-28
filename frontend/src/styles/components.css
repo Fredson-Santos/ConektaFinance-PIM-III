@@ -1938,7 +1938,7 @@
 }
 
 .week-bar-col.now .week-bar {
-  background: linear-gradient(180deg, var(--ds-teal-700), rgba(18, 181, 203, 0.4));
+  background: var(--ds-blue-600);
 }
 
 .week-bar-col:hover .week-bar {
@@ -1973,6 +1973,19 @@
   transform: translateX(-50%);
   border: 4px solid transparent;
   border-top-color: var(--ds-border-strong);
+}
+
+.chart-bar-tooltip-tag {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--ds-blue-600);
+  color: #ffffff;
+  font-family: var(--font-sans, inherit);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .week-day-label {

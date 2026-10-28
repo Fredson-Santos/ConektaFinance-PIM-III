@@ -1,11 +1,12 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { act, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { DashboardScreen } from '../views/dashboard/DashboardScreen'
 import { dashboardService, reportService, insightService, userService } from '../services'
 import { UiProvider } from '../context/UiContext'
 import { ToastProvider } from '../context/ToastContext'
 import { AuthProvider } from '../context/AuthContext'
+import { isSameWeekday, useToday } from '../hooks/useToday'
 
 vi.mock('../services', async (importOriginal) => {
   const original = await importOriginal()
@@ -71,6 +72,10 @@ const RECENT = [
 ]
 
 describe('DashboardScreen', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   beforeEach(() => {
     vi.clearAllMocks()
     window.matchMedia = vi.fn().mockReturnValue({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })
@@ -145,5 +150,57 @@ describe('DashboardScreen', () => {
     expect(await screen.findByText('Nenhum orçamento configurado')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /adicionar categoria/i })).toBeInTheDocument()
     expect(screen.queryByText('Moradia')).not.toBeInTheDocument()
+  })
+
+  it('destaca em azul apenas a barra do dia atual com indicacao de hoje', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date(2026, 9, 27, 10, 0, 0)) // terça-feira
+    renderDashboard()
+
+    const today = await screen.findByLabelText('Hoje, ter: R$ 90,00')
+    expect(today).toHaveClass('now')
+    expect(screen.getByLabelText('seg: R$ 45,00')).not.toHaveClass('now')
+    expect(document.querySelectorAll('[data-today]')).toHaveLength(1)
+
+    fireEvent.mouseEnter(today)
+    expect(screen.getByRole('tooltip')).toHaveTextContent('Hoje')
+    expect(screen.getByRole('tooltip')).toHaveTextContent('R$ 90,00')
+  })
+
+  it('destaca o dia atual tambem no grafico desktop', async () => {
+    window.matchMedia = vi.fn().mockReturnValue({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date(2026, 9, 26, 10, 0, 0)) // segunda-feira
+    renderDashboard()
+
+    const today = await screen.findByLabelText('Hoje, SEG: R$ 45,00')
+    expect(today).toHaveClass('spend-col', 'active')
+    expect(document.querySelectorAll('.spend-col.active')).toHaveLength(1)
+  })
+})
+
+describe('useToday', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('atualiza o dia automaticamente na virada da meia-noite', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 9, 27, 23, 59, 0))
+    const { result } = renderHook(() => useToday())
+    expect(isSameWeekday('ter', result.current)).toBe(true)
+
+    act(() => {
+      vi.advanceTimersByTime(2 * 60 * 1000)
+    })
+
+    expect(isSameWeekday('qua', result.current)).toBe(true)
+  })
+
+  it('normaliza rotulos com acento e caixa alta', () => {
+    const saturday = new Date(2026, 9, 31)
+    expect(isSameWeekday('SÁB', saturday)).toBe(true)
+    expect(isSameWeekday('sab', saturday)).toBe(true)
+    expect(isSameWeekday('dom', saturday)).toBe(false)
   })
 })

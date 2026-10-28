@@ -6,6 +6,7 @@ import { useAsync } from '../../hooks/useAsync'
 import { useAuth } from '../../context/AuthContext'
 import { useUi } from '../../context/UiContext'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { WEEKDAY_KEYS, isSameWeekday, useToday } from '../../hooks/useToday'
 import { Badge } from '../../components/common/Badge'
 import { Button } from '../../components/common/Button'
 import { SkeletonCard, SkeletonRows } from '../../components/common/Skeleton'
@@ -256,6 +257,8 @@ function DesktopDashboard() {
   const navigate = useNavigate()
   const { openTransactionSheet } = useUi()
   const { overview, week, recent, meters } = useDashboardData()
+  const today = useToday()
+  const [hoveredDay, setHoveredDay] = useState(null)
 
   if (overview.error) return <ErrorState message={overview.error.message} onRetry={overview.refetch} />
 
@@ -267,9 +270,7 @@ function DesktopDashboard() {
     pct: d.percentage || 0,
     value: d.value || 0,
   }))
-  const todayWeekdayIndex = (new Date().getDay() + 6) % 7
   const weekdayNames = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM']
-  const todayWeekday = weekdayNames[todayWeekdayIndex]
 
   const meterItems = (meters.data || []).map((m) => ({
     name: m.name,
@@ -387,19 +388,34 @@ function DesktopDashboard() {
           </div>
 
           <div className="spend-chart-container" id="spendChart">
-            {(weekDays.length > 0 ? weekDays : weekdayNames.map((w) => ({
+            {(weekDays.length > 0 ? weekDays : weekdayNames.map((w, index) => ({
               label: w,
-              rawLabel: w.toLowerCase(),
+              rawLabel: WEEKDAY_KEYS[index],
               pct: 0,
               value: 0,
             }))).map((day) => {
-              const isToday = day.label === todayWeekday || day.rawLabel === 'dom'
+              const isToday = isSameWeekday(day.rawLabel, today)
+              const isHovered = hoveredDay === day.label
               return (
-                <div key={day.label} className={`spend-col ${isToday ? 'active' : ''}`}>
+                <div
+                  key={day.label}
+                  className={`spend-col ${isToday ? 'active' : ''}`}
+                  data-today={isToday || undefined}
+                  aria-label={`${isToday ? 'Hoje, ' : ''}${day.label}: ${formatCurrency(day.value)}`}
+                  onMouseEnter={() => setHoveredDay(day.label)}
+                  onMouseLeave={() => setHoveredDay(null)}
+                  style={{ position: 'relative' }}
+                >
+                  {isHovered ? (
+                    <div className="chart-bar-tooltip" role="tooltip">
+                      {isToday ? <span className="chart-bar-tooltip-tag">Hoje</span> : null}
+                      {formatCurrency(day.value)}
+                    </div>
+                  ) : null}
                   <div className="spend-bar-track">
                     <div className="spend-bar-fill" style={{ height: `${day.pct > 0 ? Math.max(8, day.pct) : 0}%` }} />
                   </div>
-                  <span className="spend-day">{day.label}</span>
+                  <span className="spend-day">{isToday ? 'HOJE' : day.label}</span>
                 </div>
               )
             })}
@@ -547,8 +563,7 @@ function WeekChart({ week, isMobile }) {
   const sumDays = days.reduce((sum, day) => sum + (day.value || 0), 0)
   const total = sumDays > 0 ? sumDays : (week.data?.total ?? 0)
   const dailyAverage = week.data?.dailyAverage ?? (days.length && total > 0 ? total / days.length : 0)
-  const todayIndex = (new Date().getDay() + 6) % 7
-  const todayLabel = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'][todayIndex]
+  const today = useToday()
 
   if (isMobile) {
     return (
@@ -565,24 +580,27 @@ function WeekChart({ week, isMobile }) {
           </div>
           <div className="chart" role="img" aria-label={`Distribuição de Gastos da Semana: Total ${formatCurrency(total)}`}>
             {days.map((day) => {
-              const isNow = day.label?.toLowerCase() === todayLabel
+              const isNow = isSameWeekday(day.label, today)
               const isActive = activeDay === day.label?.toLowerCase()
               return (
                 <div
                   key={day.label}
                   className={`bar ${isNow ? 'now' : ''} ${isActive ? 'active' : ''}`}
+                  data-today={isNow || undefined}
+                  aria-label={`${isNow ? 'Hoje, ' : ''}${day.label}: ${formatCurrency(day.value)}`}
                   onClick={() => setActiveDay((prev) => (prev === day.label?.toLowerCase() ? null : day.label?.toLowerCase()))}
                   onMouseEnter={() => setActiveDay(day.label?.toLowerCase())}
                   onMouseLeave={() => setActiveDay(null)}
                   style={{ position: 'relative', cursor: 'pointer' }}
                 >
                   {isActive && (
-                    <div className="chart-bar-tooltip">
+                    <div className="chart-bar-tooltip" role="tooltip">
+                      {isNow ? <span className="chart-bar-tooltip-tag">Hoje</span> : null}
                       {formatCurrency(day.value)}
                     </div>
                   )}
                   <span style={{ height: `${day.pct > 0 ? Math.max(6, day.pct) : 0}%` }} />
-                  <em>{day.label}</em>
+                  <em>{isNow ? 'hoje' : day.label}</em>
                 </div>
               )
             })}
@@ -604,7 +622,7 @@ function WeekChart({ week, isMobile }) {
       </div>
       <div className="week-bars" role="img" aria-label="Gráfico de gastos da semana">
         {days.map((day) => {
-          const isNow = day.label.toLowerCase() === todayLabel
+          const isNow = isSameWeekday(day.label, today)
           const isActive = activeDay === day.label.toLowerCase()
           return (
             <div
@@ -616,7 +634,8 @@ function WeekChart({ week, isMobile }) {
               style={{ position: 'relative', cursor: 'pointer' }}
             >
               {isActive && (
-                <div className="chart-bar-tooltip">
+                <div className="chart-bar-tooltip" role="tooltip">
+                  {isNow ? <span className="chart-bar-tooltip-tag">Hoje</span> : null}
                   {formatCurrency(day.value)}
                 </div>
               )}
