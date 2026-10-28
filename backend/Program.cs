@@ -226,7 +226,10 @@ var app = builder.Build();
 if (string.IsNullOrWhiteSpace(app.Configuration["JWT_SECRET"]) && app.Environment.IsDevelopment())
     app.Logger.LogWarning("JWT_SECRET ausente: usando chave efemera valida apenas para desenvolvimento.");
 
+app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseMiddleware<ErrorHandlingMiddleware>();
+if (!app.Environment.IsDevelopment())
+    app.UseHsts();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -235,7 +238,8 @@ using (var scope = app.Services.CreateScope())
     SeedData.EnsureAdmin(context, app.Configuration);
 }
 
-if (app.Environment.IsDevelopment())
+// Fora de Development o Swagger so abre com Swagger__Enabled=true (demonstracao para a banca).
+if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Swagger:Enabled"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();
