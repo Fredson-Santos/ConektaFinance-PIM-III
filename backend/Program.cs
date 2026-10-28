@@ -39,6 +39,9 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "API da plataforma ConektaFinance de gestao financeira pessoal."
     });
+    var xmlDocs = Path.Combine(AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml");
+    if (File.Exists(xmlDocs))
+        options.IncludeXmlComments(xmlDocs);
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -251,7 +254,9 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.MapGet("/health", () => Results.Ok(new { status = "ok", timestamp = DateTime.UtcNow }));
+app.MapGet("/health", () => Results.Ok(new { status = "ok", timestamp = DateTime.UtcNow }))
+    .WithTags("Saúde")
+    .WithSummary("Verificação simples de disponibilidade da API.");
 app.Run();
 
 public partial class Program { }

@@ -6,6 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>PIM_III_Backend</RootNamespace>
     <UserSecretsId>13b030e5-4dc4-4461-9bea-e96110042a3b</UserSecretsId>
+    <!-- XML dos comentarios /// para o Swagger; so os controllers sao documentados -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

@@ -8,8 +8,16 @@ using PIM_III_Backend.Domain.Models;
 
 namespace PIM_III_Backend.Controllers;
 
+/// <summary>
+/// Receitas e despesas do usuário.
+/// </summary>
+[Tags("Lançamentos")]
 public class TransactionsController(ITransactionService transactionService) : BaseApiController
 {
+    /// <summary>Lista paginada com filtros por tipo, categoria, período e texto; soma no cabeçalho X-Total-Sum.</summary>
+    [ProducesResponseType<TransactionListResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     public async Task<ActionResult<TransactionListResponse>> List(
         [FromQuery] string? type,
@@ -31,10 +39,19 @@ public class TransactionsController(ITransactionService transactionService) : Ba
         return Ok(result);
     }
 
+    /// <summary>Detalha um lançamento.</summary>
+    [ProducesResponseType<TransactionResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [HttpGet("{id:int}")]
     public async Task<ActionResult<TransactionResponse>> GetById(int id) =>
         Ok(await transactionService.GetByIdAsync(CurrentUserId, id));
 
+    /// <summary>Registra uma receita ou despesa (dispara a verificação de teto da categoria).</summary>
+    [ProducesResponseType<TransactionResponse>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [HttpPost]
     public async Task<ActionResult<TransactionResponse>> Create(CreateTransactionRequest request)
     {
@@ -42,10 +59,19 @@ public class TransactionsController(ITransactionService transactionService) : Ba
         return Created($"/api/v1/transactions/{response.Id}", response);
     }
 
+    /// <summary>Altera um lançamento existente.</summary>
+    [ProducesResponseType<TransactionResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [HttpPut("{id:int}")]
     public async Task<ActionResult<TransactionResponse>> Update(int id, UpdateTransactionRequest request) =>
         Ok(await transactionService.UpdateAsync(CurrentUserId, id, request));
 
+    /// <summary>Exclui um lançamento.</summary>
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> Delete(int id)
     {

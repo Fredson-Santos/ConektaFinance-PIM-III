@@ -11,12 +11,20 @@ namespace PIM_III_Backend.Controllers;
 /// (Evolution API) autentica com a chave configurada em Evolution:WebhookToken;
 /// sem a chave o endpoint e recusado antes de qualquer processamento.
 /// </summary>
+/// <summary>
+/// Webhook da Evolution API para o canal WhatsApp do assistente.
+/// </summary>
+[Tags("WhatsApp")]
 [ApiController]
 [Route("api/v1/webhooks")]
 public class WebhooksController(
     IWhatsAppChannelService channel,
     IConfiguration configuration) : ControllerBase
 {
+    /// <summary>Recebe eventos de mensagens do WhatsApp (autenticado pelo token do webhook).</summary>
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status429TooManyRequests)]
     [HttpPost("whatsapp")]
     [AllowAnonymous]
     [EnableRateLimiting("webhook")]
