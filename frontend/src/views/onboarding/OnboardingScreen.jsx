@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
-import { categoryService } from '../../services'
+import { budgetService, categoryService } from '../../services'
 import { ApiError } from '../../services/api'
 import { useAsync } from '../../hooks/useAsync'
 import { Button } from '../../components/common/Button'
@@ -11,7 +11,7 @@ import { Icon } from '../../components/common/Icon'
 import { formatCurrency } from '../../utils/format'
 import { maskMoney, moneyToMask, parseMoneyInput } from '../../utils/money'
 
-const STEPS = ['Identificação', 'Meta mensal', 'Boas-vindas']
+const STEPS = ['Identificação', 'Meta mensal', 'Categorias', 'Boas-vindas']
 const CEILING_SUGGESTIONS = [2000, 3500, 5000]
 // Contas criadas via WhatsApp recebem um nome provisório até o onboarding.
 const PLACEHOLDER_NAME = /^Contato \d+$/
@@ -27,12 +27,18 @@ export function OnboardingScreen() {
   const [displayName, setDisplayName] = useState(user?.displayName || '')
   const [ceilingText, setCeilingText] = useState(() => (user?.monthlyCeiling > 0 ? moneyToMask(user.monthlyCeiling) : ''))
   const [custom, setCustom] = useState(() => user?.monthlyCeiling > 0 && !CEILING_SUGGESTIONS.includes(user.monthlyCeiling))
+  const [limits, setLimits] = useState({})
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
   const categories = useAsync(() => categoryService.list({ kind: 'expense' }), [])
 
   const ceiling = parseMoneyInput(ceilingText)
   const preferredName = (displayName.trim() || fullName.trim()).split(' ')[0]
+  const categoryLimits = (categories.data || [])
+    .map((category) => ({ category, value: parseMoneyInput(limits[category.id]) }))
+    .filter((item) => item.value)
+  const distributed = categoryLimits.reduce((sum, item) => sum + item.value, 0)
+  const overDistributed = Boolean(ceiling) && distributed > ceiling
 
   const validateIdentity = () => {
     const name = fullName.trim()
@@ -49,7 +55,7 @@ export function OnboardingScreen() {
 
   const next = (event) => {
     event?.preventDefault()
-    const found = step === 0 ? validateIdentity() : validateCeiling()
+    const found = step === 0 ? validateIdentity() : step === 1 ? validateCeiling() : {}
     setErrors(found)
     if (Object.keys(found).length === 0) setStep((current) => current + 1)
   }
@@ -64,6 +70,18 @@ export function OnboardingScreen() {
     setSaving(true)
     setErrors({})
     try {
+      // Limites primeiro: se falharem, o usuário continua no onboarding e pode tentar de novo.
+      const now = new Date()
+      await Promise.all(
+        categoryLimits.map(({ category, value }) =>
+          budgetService.upsert({
+            categoryId: category.id,
+            limitValue: value,
+            month: now.getMonth() + 1,
+            year: now.getFullYear(),
+          }),
+        ),
+      )
       await completeOnboarding({
         fullName: fullName.trim(),
         displayName: displayName.trim() || null,
@@ -205,6 +223,60 @@ export function OnboardingScreen() {
         ) : null}
 
         {step === 2 ? (
+          <form key="limits" className="login-step" onSubmit={next} noValidate>
+            <header className="login-head">
+              <h1 id="onboarding-title" className="login-title">Quer definir limites por categoria?</h1>
+              <p className="login-sub">
+                Opcional. Defina quanto pretende gastar em cada categoria neste mês. Deixe em branco para pular.
+              </p>
+            </header>
+            <ul className="onboarding-limits">
+              {(categories.data || []).map((category) => (
+                <li key={category.id}>
+                  <label htmlFor={`onb-limit-${category.id}`} className="onboarding-limit-name">
+                    <span className="onboarding-limit-icon" style={{ color: category.colorCode || 'var(--ds-foreground-muted)' }}>
+                      <Icon name={category.icon || 'Tag'} size={14} />
+                    </span>
+                    {category.name}
+                  </label>
+                  <div className="onboarding-limit-input">
+                    <span aria-hidden="true">R$</span>
+                    <input
+                      id={`onb-limit-${category.id}`}
+                      inputMode="numeric"
+                      placeholder="0,00"
+                      aria-label={`Limite para ${category.name}`}
+                      value={limits[category.id] || ''}
+                      onChange={(event) =>
+                        setLimits((current) => ({ ...current, [category.id]: maskMoney(event.target.value) }))
+                      }
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className={`onboarding-distributed ${overDistributed ? 'is-over' : ''}`} aria-live="polite">
+              <span>
+                <b className="num">{formatCurrency(distributed)}</b> de <span className="num">{formatCurrency(ceiling)}</span> distribuídos
+              </span>
+              {overDistributed ? (
+                <span>A soma dos limites passa do seu teto mensal.</span>
+              ) : (
+                <span>Restam {formatCurrency(Math.max(0, (ceiling || 0) - distributed))} sem categoria.</span>
+              )}
+            </div>
+            <div className="onboarding-actions">
+              <Button variant="ghost" onClick={() => setStep(1)}>
+                <ArrowLeft size={16} /> Voltar
+              </Button>
+              <Button type="submit" className="login-primary">
+                {categoryLimits.length > 0 ? 'Continuar' : 'Pular por enquanto'} <ArrowRight size={16} />
+              </Button>
+            </div>
+          </form>
+        ) : null}
+
+        {step === 3 ? (
           <div key="welcome" className="login-step">
             <header className="login-head">
               <span className="onboarding-check" aria-hidden="true">
@@ -226,19 +298,23 @@ export function OnboardingScreen() {
             <div className="login-field">
               <span className="login-label">Categorias criadas para você</span>
               <ul className="onboarding-categories">
-                {(categories.data || []).map((category) => (
-                  <li key={category.id}>
-                    <span style={{ color: category.colorCode || 'var(--ds-foreground-muted)' }}>
-                      <Icon name={category.icon || 'Tag'} size={13} />
-                    </span>
-                    {category.name}
-                  </li>
-                ))}
+                {(categories.data || []).map((category) => {
+                  const limit = parseMoneyInput(limits[category.id])
+                  return (
+                    <li key={category.id}>
+                      <span style={{ color: category.colorCode || 'var(--ds-foreground-muted)' }}>
+                        <Icon name={category.icon || 'Tag'} size={13} />
+                      </span>
+                      {category.name}
+                      {limit ? <b className="num">{formatCurrency(limit)}</b> : null}
+                    </li>
+                  )
+                })}
               </ul>
             </div>
             {errors.submit ? <span className="login-error" role="alert">{errors.submit}</span> : null}
             <div className="onboarding-actions">
-              <Button variant="ghost" disabled={saving} onClick={() => setStep(1)}>
+              <Button variant="ghost" disabled={saving} onClick={() => setStep(2)}>
                 <ArrowLeft size={16} /> Voltar
               </Button>
               <Button className="login-primary" loading={saving} onClick={finish}>

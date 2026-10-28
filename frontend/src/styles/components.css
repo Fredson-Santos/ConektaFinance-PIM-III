@@ -629,7 +629,7 @@
 
 .onboarding-progress {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 6px;
   list-style: none;
   margin: 0;
@@ -807,6 +807,116 @@
   border-radius: 99px;
   font-size: 12.5px;
   color: var(--ds-foreground);
+}
+
+.onboarding-limits {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  margin: 0;
+  padding: 0 2px 0 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.onboarding-limits li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.onboarding-limit-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ds-foreground);
+}
+
+.onboarding-limit-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--ds-gray-alpha-100);
+}
+
+.onboarding-limit-input {
+  display: flex;
+  align-items: center;
+  width: 132px;
+  height: 40px;
+  flex-shrink: 0;
+  padding: 0 10px;
+  background: var(--login-field);
+  border: 1px solid var(--ds-border);
+  border-radius: 10px;
+  transition: border-color var(--ds-duration-fast) var(--ds-ease), box-shadow var(--ds-duration-fast) var(--ds-ease);
+}
+
+.onboarding-limit-input:focus-within {
+  border-color: var(--ds-blue-700);
+  box-shadow: 0 0 0 3px var(--ds-blue-alpha-200);
+}
+
+.onboarding-limit-input span {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ds-foreground-faint);
+}
+
+.onboarding-limit-input input {
+  flex: 1;
+  min-width: 0;
+  padding-left: 8px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--ds-foreground);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  text-align: right;
+}
+
+.onboarding-limit-input input::placeholder {
+  color: var(--ds-foreground-faint);
+}
+
+.onboarding-distributed {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--ds-gray-alpha-100);
+  font-size: 12.5px;
+  color: var(--ds-foreground-muted);
+}
+
+.onboarding-distributed b {
+  color: var(--ds-foreground);
+}
+
+.onboarding-distributed.is-over {
+  background: var(--ds-amber-alpha-200);
+}
+
+.onboarding-distributed.is-over span:last-child {
+  color: var(--ds-amber-700);
+  font-weight: 500;
+}
+
+.onboarding-categories li b {
+  margin-left: 2px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ds-foreground-muted);
 }
 
 /* ==========================================================================
