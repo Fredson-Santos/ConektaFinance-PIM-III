@@ -1,0 +1,216 @@
+@startuml modelo-fisico
+' ConektaFinance - Modelo Fisico (PostgreSQL 16)
+' Reflete database/01_schema.sql, 02_procedures.sql e 03_triggers.sql.
+
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 10
+skinparam shadowing false
+skinparam linetype ortho
+hide circle
+hide methods
+
+entity "users" as users {
+  id : integer <<PK, identity>>
+  --
+  full_name : varchar(255) NOT NULL
+  display_name : varchar(120)
+  email : varchar(255) NOT NULL <<UK>>
+  phone : varchar(20)
+  cpf : varchar(14)
+  occupation : varchar(120)
+  avatar_url : varchar(500)
+  password_hash : text NOT NULL
+  account_type : varchar(20) NOT NULL = 'Standard'
+  monthly_ceiling : numeric(18,2) NOT NULL
+  currency : varchar(3) NOT NULL = 'BRL'
+  cycle_start_day : integer NOT NULL = 1
+  onboarding_completed_at : timestamp
+  created_at : timestamp NOT NULL = now()
+  updated_at : timestamp NOT NULL = now()
+  ..
+  CHECK email = lower(email)
+  CHECK monthly_ceiling >= 0
+  CHECK cycle_start_day BETWEEN 1 AND 28
+}
+
+entity "categories" as categories {
+  id : integer <<PK, identity>>
+  --
+  user_id : integer NOT NULL <<FK>>
+  name : varchar(100) NOT NULL
+  description : varchar(300)
+  color_code : varchar(7) NOT NULL
+  icon : varchar(40) NOT NULL
+  kind : integer NOT NULL
+  is_system : boolean NOT NULL
+  sort_order : integer NOT NULL = 0
+  created_at / updated_at : timestamp
+  ..
+  UNIQUE (user_id, name)
+  CHECK kind IN (0, 1)
+  CHECK color_code ~ '^#[0-9A-Fa-f]{6}$'
+}
+
+entity "budgets" as budgets {
+  id : integer <<PK, identity>>
+  --
+  user_id : integer NOT NULL <<FK>>
+  category_id : integer NOT NULL <<FK>>
+  limit_value : numeric(18,2) NOT NULL
+  period_month : integer NOT NULL
+  period_year : integer NOT NULL
+  created_at / updated_at : timestamp
+  ..
+  UNIQUE (user_id, category_id, period_month, period_year)
+  CHECK limit_value >= 0
+  CHECK period_month BETWEEN 1 AND 12
+}
+
+entity "transactions" as transactions {
+  id : integer <<PK, identity>>
+  --
+  user_id : integer NOT NULL <<FK>>
+  category_id : integer NOT NULL <<FK>>
+  import_batch_id : integer <<FK>>
+  type : integer NOT NULL
+  description : varchar(255) NOT NULL
+  value : numeric(18,2) NOT NULL
+  transaction_date : timestamp NOT NULL
+  payment_method : integer
+  observation : varchar(500)
+  is_recurrent : boolean NOT NULL
+  status : integer NOT NULL
+  source : integer NOT NULL
+  external_id : varchar(100)
+  created_at / updated_at : timestamp
+  ..
+  INDEX (user_id, transaction_date)
+  UNIQUE (user_id, external_id)
+  CHECK value > 0
+  CHECK type IN (0, 1) / status IN (0, 1)
+  CHECK source IN (0, 1, 2)
+}
+
+entity "alerts" as alerts {
+  id : integer <<PK, identity>>
+  --
+  user_id : integer NOT NULL <<FK>>
+  category_id : integer <<FK>>
+  type : integer NOT NULL
+  title : varchar(120) NOT NULL
+  message : varchar(300) NOT NULL
+  is_read : boolean NOT NULL
+  dedup_key : varchar(60) NOT NULL
+  created_at / updated_at : timestamp
+  ..
+  UNIQUE (user_id, dedup_key)
+  CHECK type IN (0, 1, 2)
+}
+
+entity "chat_messages" as chat {
+  id : integer <<PK, identity>>
+  --
+  user_id : integer NOT NULL <<FK>>
+  role : integer NOT NULL
+  channel : integer NOT NULL = 0
+  content : varchar(4000) NOT NULL
+  action_payload : varchar(2000)
+  image_url : varchar(300)
+  created_at : timestamp NOT NULL
+  ..
+  INDEX (user_id, channel)
+}
+
+entity "import_batches" as imports {
+  id : integer <<PK, identity>>
+  --
+  user_id : integer NOT NULL <<FK>>
+  file_name : varchar(255) NOT NULL
+  detected_count : integer NOT NULL
+  imported_count : integer NOT NULL
+  skipped_duplicates : integer NOT NULL
+  auto_categorize : boolean NOT NULL
+  ignore_duplicates : boolean NOT NULL
+  status : integer NOT NULL
+  items_json : text NOT NULL
+  created_at : timestamp NOT NULL
+}
+
+entity "otp_codes" as otp {
+  id : integer <<PK, identity>>
+  --
+  user_id : integer <<FK>>
+  phone : varchar(20) NOT NULL
+  code_hash : text NOT NULL
+  expires_at : timestamp NOT NULL
+  consumed_at : timestamp
+  attempts : integer NOT NULL
+  purpose : integer NOT NULL
+  created_at : timestamp NOT NULL
+  ..
+  INDEX (phone, created_at)
+}
+
+entity "monthly_closings" as closings {
+  id : integer <<PK, identity>>
+  --
+  user_id : integer NOT NULL <<FK>>
+  top_category_id : integer <<FK>>
+  period_year : integer NOT NULL
+  period_month : integer NOT NULL
+  total_income : numeric(18,2) NOT NULL
+  total_expense : numeric(18,2) NOT NULL
+  balance : numeric(18,2) NOT NULL
+  monthly_ceiling : numeric(18,2) NOT NULL
+  ceiling_percentage : numeric(7,2)
+  top_category_total : numeric(18,2) NOT NULL
+  transaction_count : integer NOT NULL
+  closed_at : timestamp NOT NULL = now()
+  ..
+  UNIQUE (user_id, period_year, period_month)
+}
+
+entity "audit_log" as audit {
+  id : bigint <<PK, identity>>
+  --
+  table_name : varchar(63) NOT NULL
+  operation : varchar(6) NOT NULL
+  record_id : integer NOT NULL
+  user_id : integer
+  old_data : jsonb
+  new_data : jsonb
+  db_user : varchar(63) NOT NULL = current_user
+  executed_at : timestamp NOT NULL
+  ..
+  INDEX (table_name, record_id)
+  CHECK operation IN ('INSERT','UPDATE','DELETE')
+}
+
+users ||--o{ categories : "ON DELETE CASCADE"
+users ||--o{ budgets : "CASCADE"
+users ||--o{ transactions : "CASCADE"
+users ||--o{ alerts : "CASCADE"
+users ||--o{ chat : "CASCADE"
+users ||--o{ imports : "CASCADE"
+users |o--o{ otp
+users ||--o{ closings : "CASCADE"
+categories ||--o{ budgets : "CASCADE"
+categories ||--o{ transactions : "RESTRICT"
+categories |o--o{ alerts : "SET NULL"
+categories |o--o{ closings : "SET NULL"
+imports |o--o{ transactions : "SET NULL"
+
+note as programacao
+  <b>Programação do banco</b>
+  fn_status_orcamento(user, categoria, ano, mes)
+  sp_verificar_orcamento(user, categoria, ano, mes)
+  sp_fechamento_mensal(user, ano, mes) -> monthly_closings
+  ..
+  trg_*_updated_at (BEFORE UPDATE) -> fn_set_updated_at
+  trg_auditoria_transactions / budgets -> audit_log
+  trg_alerta_orcamento (AFTER INSERT/UPDATE em
+  transactions) -> sp_verificar_orcamento -> alerts
+end note
+
+@enduml

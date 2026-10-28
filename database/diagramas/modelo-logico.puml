@@ -1,0 +1,196 @@
+@startuml modelo-logico
+' ConektaFinance - Modelo Logico
+' Tabelas, chaves primarias (PK), estrangeiras (FK), atributos e cardinalidades.
+
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam shadowing false
+skinparam linetype ortho
+hide circle
+hide methods
+
+entity "users" as users {
+  * id <<PK>>
+  --
+  * full_name
+  display_name
+  * email <<UK>>
+  phone
+  cpf
+  occupation
+  avatar_url
+  * password_hash
+  * account_type
+  * monthly_ceiling
+  * currency
+  * cycle_start_day
+  onboarding_completed_at
+  * created_at
+  * updated_at
+}
+
+entity "categories" as categories {
+  * id <<PK>>
+  --
+  * user_id <<FK>>
+  * name
+  description
+  * color_code
+  * icon
+  * kind
+  * is_system
+  * sort_order
+  * created_at
+  * updated_at
+  ..
+  UK (user_id, name)
+}
+
+entity "budgets" as budgets {
+  * id <<PK>>
+  --
+  * user_id <<FK>>
+  * category_id <<FK>>
+  * limit_value
+  * period_month
+  * period_year
+  * created_at
+  * updated_at
+  ..
+  UK (user_id, category_id, period_month, period_year)
+}
+
+entity "transactions" as transactions {
+  * id <<PK>>
+  --
+  * user_id <<FK>>
+  * category_id <<FK>>
+  import_batch_id <<FK>>
+  * type
+  * description
+  * value
+  * transaction_date
+  payment_method
+  observation
+  * is_recurrent
+  * status
+  * source
+  external_id
+  * created_at
+  * updated_at
+  ..
+  UK (user_id, external_id)
+}
+
+entity "alerts" as alerts {
+  * id <<PK>>
+  --
+  * user_id <<FK>>
+  category_id <<FK>>
+  * type
+  * title
+  * message
+  * is_read
+  * dedup_key
+  * created_at
+  * updated_at
+  ..
+  UK (user_id, dedup_key)
+}
+
+entity "chat_messages" as chat {
+  * id <<PK>>
+  --
+  * user_id <<FK>>
+  * role
+  * channel
+  * content
+  action_payload
+  image_url
+  * created_at
+}
+
+entity "import_batches" as imports {
+  * id <<PK>>
+  --
+  * user_id <<FK>>
+  * file_name
+  * detected_count
+  * imported_count
+  * skipped_duplicates
+  * auto_categorize
+  * ignore_duplicates
+  * status
+  * items_json
+  * created_at
+}
+
+entity "otp_codes" as otp {
+  * id <<PK>>
+  --
+  user_id <<FK>>
+  * phone
+  * code_hash
+  * expires_at
+  consumed_at
+  * attempts
+  * purpose
+  * created_at
+}
+
+entity "monthly_closings" as closings {
+  * id <<PK>>
+  --
+  * user_id <<FK>>
+  top_category_id <<FK>>
+  * period_year
+  * period_month
+  * total_income
+  * total_expense
+  * balance
+  * monthly_ceiling
+  ceiling_percentage
+  * top_category_total
+  * transaction_count
+  * closed_at
+  ..
+  UK (user_id, period_year, period_month)
+}
+
+entity "audit_log" as audit {
+  * id <<PK>>
+  --
+  * table_name
+  * operation
+  * record_id
+  user_id
+  old_data
+  new_data
+  * db_user
+  * executed_at
+}
+
+users ||--o{ categories
+users ||--o{ budgets
+users ||--o{ transactions
+users ||--o{ alerts
+users ||--o{ chat
+users ||--o{ imports
+users |o--o{ otp
+users ||--o{ closings
+categories ||--o{ budgets
+categories ||--o{ transactions
+categories |o--o{ alerts
+categories |o--o{ closings
+imports |o--o{ transactions
+transactions ||..o{ audit : "auditada por trigger"
+budgets ||..o{ audit : "auditado por trigger"
+
+legend right
+  * = atributo obrigatório (NOT NULL)
+  PK = chave primária, FK = chave estrangeira, UK = chave única
+  Linha tracejada = vínculo lógico sem FK (histórico preservado)
+endlegend
+
+@enduml

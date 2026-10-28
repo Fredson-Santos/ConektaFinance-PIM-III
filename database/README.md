@@ -10,6 +10,7 @@ Scripts do banco usado pela API, pela aplicação web e pelo PWA.
 | `04_seed.sql` | Conta demo, 13 categorias padrão, tetos e lançamentos de exemplo | Manual |
 | `conektafinance.sql` | Script completo (`01` → `04`) pronto para execução | **Gerado** por `build.sh` |
 | `tests/*.sql` | Testes com `ASSERT` das procedures e triggers | Manual |
+| `diagramas/` | MER (`mer`), modelo lógico (`modelo-logico`) e modelo físico (`modelo-fisico`) em PlantUML + PNG | Manual |
 
 ## Como a API usa estes scripts
 
@@ -53,4 +54,10 @@ SELECT operation, old_data, new_data, executed_at
   FROM audit_log
  WHERE table_name = 'transactions' AND record_id = 42
  ORDER BY id;
+```
+
+## Regenerar os diagramas
+
+```bash
+docker run --rm -v "$PWD/database/diagramas:/data" -w /data plantuml/plantuml:1.2025.4 -tpng -charset UTF-8 *.puml
 ```
