@@ -16,6 +16,18 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    # A imagem aspnet nao tem curl/wget: o teste usa o /dev/tcp do bash.
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /health/live HTTP/1.0\r\n\r\n' >&3 && grep -q '200 OK' <&3"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
 
   # Banco da aplicacao (API, web e PWA). Porta publicada apenas no localhost
   # para desenvolvimento local (dotnet run) e administracao via psql.
@@ -36,6 +48,44 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  # Backup diario do banco da aplicacao (pg_dump em formato custom), mantendo os
+  # ultimos BACKUP_RETENTION arquivos. Restauracao: ver database/README.md.
+  postgres-backup:
+    image: postgres:16-alpine
+    container_name: conektafinance-postgres-backup
+    restart: always
+    environment:
+      PGHOST: postgres
+      PGUSER: ${CONEKTA_POSTGRES_USER}
+      PGPASSWORD: ${CONEKTA_POSTGRES_PASSWORD}
+      PGDATABASE: ${CONEKTA_POSTGRES_DB}
+      BACKUP_INTERVAL_SECONDS: "86400"
+      BACKUP_RETENTION: "7"
+    volumes:
+      - postgres_backups:/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        while true; do
+          file="/backups/conektafinance-$$(date -u +%Y%m%d-%H%M%S).dump"
+          if pg_dump -Fc -f "$$file"; then echo "Backup gerado: $$file"; else echo "Falha no backup"; fi
+          ls -1t /backups/*.dump 2>/dev/null | tail -n +$$((BACKUP_RETENTION + 1)) | xargs -r rm -f
+          sleep "$$BACKUP_INTERVAL_SECONDS"
+        done
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128M
 
   frontend:
     build:
@@ -51,7 +101,18 @@ services:
       - default
       - dokploy-network
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
 
   # Canal WhatsApp (Evolution API v2 sobre Baileys) + dependencias obrigatorias
   # (PostgreSQL e Redis). O webhook trafega pela rede interna do compose:
@@ -79,6 +140,11 @@ services:
     depends_on:
       - evolution-postgres
       - evolution-redis
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
 
   evolution-postgres:
     image: postgres:16-alpine
@@ -90,6 +156,11 @@ services:
       POSTGRES_PASSWORD: ${EVOLUTION_POSTGRES_PASSWORD}
     volumes:
       - evolution_postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
 
   evolution-redis:
     image: redis:7-alpine
@@ -98,9 +169,16 @@ services:
     command: redis-server --appendonly yes
     volumes:
       - evolution_redis_data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128M
 
 volumes:
   postgres_data:
+    driver: local
+  postgres_backups:
     driver: local
   uploads_data:
     driver: local

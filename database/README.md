@@ -40,6 +40,24 @@ Depois de alterar entidades ou configurações do EF Core (e criar a migration),
 
 O CI (job `database`) regenera os scripts e falha se `01_schema.sql` ou `conektafinance.sql` estiverem desatualizados no commit.
 
+## Backup e restauração (Docker Compose)
+
+O serviço `postgres-backup` gera um `pg_dump` (formato custom) por dia no volume `postgres_backups` e mantém os 7 arquivos mais recentes.
+
+```bash
+# Listar os backups
+docker compose exec postgres-backup ls -lh /backups
+
+# Gerar um backup na hora
+docker compose exec postgres-backup sh -c 'pg_dump -Fc -f /backups/manual-$(date -u +%Y%m%d-%H%M%S).dump'
+
+# Restaurar em um banco novo (para conferir) ou sobre o banco atual (--clean)
+docker compose exec postgres-backup sh -c 'createdb restore_check && pg_restore --no-owner -d restore_check /backups/<arquivo>.dump'
+docker compose exec postgres-backup sh -c 'pg_restore --clean --if-exists --no-owner -d "$PGDATABASE" /backups/<arquivo>.dump'
+```
+
+O dump inclui procedures, functions, triggers e as tabelas `monthly_closings` e `audit_log`.
+
 ## Exemplos de uso
 
 ```sql
