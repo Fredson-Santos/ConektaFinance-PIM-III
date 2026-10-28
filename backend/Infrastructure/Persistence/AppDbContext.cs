@@ -18,5 +18,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+        // Datas de auditoria tambem tem default no banco, para inserts feitos fora da API
+        // (scripts SQL, procedures e seed manual).
+        foreach (var property in modelBuilder.Model.GetEntityTypes()
+                     .SelectMany(entity => entity.GetProperties())
+                     .Where(property => property.Name is "CreatedAt" or "UpdatedAt"))
+            property.SetDefaultValueSql("now()");
     }
 }

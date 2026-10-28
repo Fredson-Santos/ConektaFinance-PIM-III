@@ -36,14 +36,17 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasColumnName("category_id");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<string>("DedupKey")
                         .IsRequired()
                         .HasMaxLength(60)
                         .HasColumnType("character varying(60)")
-                        .HasColumnName("dedup_key");
+                        .HasColumnName("dedup_key")
+                        .HasComment("Chave unica por usuario que impede alertas duplicados (cat:{id}:{ano}-{mes}:{tipo}).");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("boolean")
@@ -63,11 +66,14 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("Type")
                         .HasColumnType("integer")
-                        .HasColumnName("type");
+                        .HasColumnName("type")
+                        .HasComment("0 = Teto excedido, 1 = Limite de atencao (80%), 2 = Gasto elevado.");
 
                     b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer")
@@ -83,7 +89,12 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_alerts_user_id_dedup_key");
 
-                    b.ToTable("alerts", (string)null);
+                    b.ToTable("alerts", null, t =>
+                        {
+                            t.HasComment("Alertas de orcamento exibidos na central de notificacoes.");
+
+                            t.HasCheckConstraint("ck_alerts_type", "type IN (0, 1, 2)");
+                        });
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Budget", b =>
@@ -100,13 +111,16 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasColumnName("category_id");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<decimal>("LimitValue")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)")
-                        .HasColumnName("limit_value");
+                        .HasColumnName("limit_value")
+                        .HasComment("Valor maximo planejado para a categoria no periodo (R$).");
 
                     b.Property<int>("PeriodMonth")
                         .HasColumnType("integer")
@@ -117,8 +131,10 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasColumnName("period_year");
 
                     b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer")
@@ -134,7 +150,16 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_budgets_user_id_category_id_period_month_period_year");
 
-                    b.ToTable("budgets", (string)null);
+                    b.ToTable("budgets", null, t =>
+                        {
+                            t.HasComment("Teto de gastos por categoria em um mes/ano.");
+
+                            t.HasCheckConstraint("ck_budgets_limit_value", "limit_value >= 0");
+
+                            t.HasCheckConstraint("ck_budgets_period_month", "period_month BETWEEN 1 AND 12");
+
+                            t.HasCheckConstraint("ck_budgets_period_year", "period_year BETWEEN 2000 AND 2100");
+                        });
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Category", b =>
@@ -153,8 +178,10 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasColumnName("color_code");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<string>("Description")
                         .HasMaxLength(300)
@@ -169,11 +196,13 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
 
                     b.Property<bool>("IsSystem")
                         .HasColumnType("boolean")
-                        .HasColumnName("is_system");
+                        .HasColumnName("is_system")
+                        .HasComment("Categoria clonada do modelo padrao no cadastro.");
 
                     b.Property<int>("Kind")
                         .HasColumnType("integer")
-                        .HasColumnName("kind");
+                        .HasColumnName("kind")
+                        .HasComment("0 = Despesa, 1 = Receita.");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -188,8 +217,10 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasColumnName("sort_order");
 
                     b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer")
@@ -202,7 +233,14 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_categories_user_id_name");
 
-                    b.ToTable("categories", (string)null);
+                    b.ToTable("categories", null, t =>
+                        {
+                            t.HasComment("Categorias de receitas e despesas, isoladas por usuario.");
+
+                            t.HasCheckConstraint("ck_categories_color_code", "color_code ~ '^#[0-9A-Fa-f]{6}$'");
+
+                            t.HasCheckConstraint("ck_categories_kind", "kind IN (0, 1)");
+                        });
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.ChatMessage", b =>
@@ -223,7 +261,8 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasDefaultValue(0)
-                        .HasColumnName("channel");
+                        .HasColumnName("channel")
+                        .HasComment("0 = Web/PWA, 1 = WhatsApp.");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -232,8 +271,10 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasColumnName("content");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(300)
@@ -242,7 +283,8 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("Role")
                         .HasColumnType("integer")
-                        .HasColumnName("role");
+                        .HasColumnName("role")
+                        .HasComment("0 = Usuario, 1 = Assistente.");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer")
@@ -257,7 +299,14 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.HasIndex("UserId", "Channel")
                         .HasDatabaseName("ix_chat_messages_user_id_channel");
 
-                    b.ToTable("chat_messages", (string)null);
+                    b.ToTable("chat_messages", null, t =>
+                        {
+                            t.HasComment("Historico de conversas com o assistente de IA.");
+
+                            t.HasCheckConstraint("ck_chat_messages_channel", "channel IN (0, 1)");
+
+                            t.HasCheckConstraint("ck_chat_messages_role", "role IN (0, 1)");
+                        });
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.ImportBatch", b =>
@@ -274,8 +323,10 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasColumnName("auto_categorize");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<int>("DetectedCount")
                         .HasColumnType("integer")
@@ -306,7 +357,8 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("integer")
-                        .HasColumnName("status");
+                        .HasColumnName("status")
+                        .HasComment("0 = Pendente, 1 = Confirmado, 2 = Falhou.");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer")
@@ -318,7 +370,12 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_import_batches_user_id");
 
-                    b.ToTable("import_batches", (string)null);
+                    b.ToTable("import_batches", null, t =>
+                        {
+                            t.HasComment("Lotes de importacao de extratos bancarios (OFX, CSV, XLSX).");
+
+                            t.HasCheckConstraint("ck_import_batches_status", "status IN (0, 1, 2)");
+                        });
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.OtpCode", b =>
@@ -344,8 +401,10 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasColumnName("consumed_at");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("timestamp without time zone")
@@ -374,7 +433,12 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.HasIndex("Phone", "CreatedAt")
                         .HasDatabaseName("ix_otp_codes_phone_created_at");
 
-                    b.ToTable("otp_codes", (string)null);
+                    b.ToTable("otp_codes", null, t =>
+                        {
+                            t.HasComment("Codigos de verificacao enviados por WhatsApp (armazenados como hash).");
+
+                            t.HasCheckConstraint("ck_otp_codes_attempts", "attempts >= 0");
+                        });
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Transaction", b =>
@@ -391,8 +455,10 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasColumnName("category_id");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -403,7 +469,8 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.Property<string>("ExternalId")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("external_id");
+                        .HasColumnName("external_id")
+                        .HasComment("Identificador do lancamento no extrato importado (deduplicacao).");
 
                     b.Property<int?>("ImportBatchId")
                         .HasColumnType("integer")
@@ -420,15 +487,18 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
 
                     b.Property<int?>("PaymentMethod")
                         .HasColumnType("integer")
-                        .HasColumnName("payment_method");
+                        .HasColumnName("payment_method")
+                        .HasComment("0 = Cartao, 1 = Pix, 2 = Boleto, 3 = Debito, 4 = Dinheiro, 5 = Transferencia, 6 = Outro.");
 
                     b.Property<int>("Source")
                         .HasColumnType("integer")
-                        .HasColumnName("source");
+                        .HasColumnName("source")
+                        .HasComment("Origem: 0 = Manual, 1 = Importacao de extrato, 2 = Assistente de IA.");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer")
-                        .HasColumnName("status");
+                        .HasColumnName("status")
+                        .HasComment("0 = Ativa, 1 = Cancelada.");
 
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("timestamp without time zone")
@@ -436,11 +506,14 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("Type")
                         .HasColumnType("integer")
-                        .HasColumnName("type");
+                        .HasColumnName("type")
+                        .HasComment("0 = Despesa, 1 = Receita.");
 
                     b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer")
@@ -467,7 +540,20 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.HasIndex("UserId", "TransactionDate")
                         .HasDatabaseName("ix_transactions_user_id_transaction_date");
 
-                    b.ToTable("transactions", (string)null);
+                    b.ToTable("transactions", null, t =>
+                        {
+                            t.HasComment("Lancamentos financeiros unificados (receitas e despesas).");
+
+                            t.HasCheckConstraint("ck_transactions_payment_method", "payment_method IS NULL OR payment_method BETWEEN 0 AND 6");
+
+                            t.HasCheckConstraint("ck_transactions_source", "source IN (0, 1, 2)");
+
+                            t.HasCheckConstraint("ck_transactions_status", "status IN (0, 1)");
+
+                            t.HasCheckConstraint("ck_transactions_type", "type IN (0, 1)");
+
+                            t.HasCheckConstraint("ck_transactions_value", "value > 0");
+                        });
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.User", b =>
@@ -498,8 +584,10 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasColumnName("cpf");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<string>("Currency")
                         .IsRequired()
@@ -513,7 +601,8 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasDefaultValue(1)
-                        .HasColumnName("cycle_start_day");
+                        .HasColumnName("cycle_start_day")
+                        .HasComment("Dia do mes em que o ciclo financeiro do usuario comeca (1 a 28).");
 
                     b.Property<string>("DisplayName")
                         .HasMaxLength(120)
@@ -535,7 +624,8 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("MonthlyCeiling")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)")
-                        .HasColumnName("monthly_ceiling");
+                        .HasColumnName("monthly_ceiling")
+                        .HasComment("Teto global de gastos do mes definido no onboarding (R$).");
 
                     b.Property<string>("Occupation")
                         .HasMaxLength(120)
@@ -544,7 +634,8 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTime?>("OnboardingCompletedAt")
                         .HasColumnType("timestamp without time zone")
-                        .HasColumnName("onboarding_completed_at");
+                        .HasColumnName("onboarding_completed_at")
+                        .HasComment("Conclusao do fluxo de primeiro acesso; nulo enquanto pendente.");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -557,8 +648,10 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .HasColumnName("phone");
 
                     b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("now()");
 
                     b.HasKey("Id")
                         .HasName("pk_users");
@@ -567,7 +660,18 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_users_email");
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("users", null, t =>
+                        {
+                            t.HasComment("Contas de acesso da plataforma (web, PWA e WhatsApp).");
+
+                            t.HasCheckConstraint("ck_users_currency", "char_length(currency) = 3");
+
+                            t.HasCheckConstraint("ck_users_cycle_start_day", "cycle_start_day BETWEEN 1 AND 28");
+
+                            t.HasCheckConstraint("ck_users_email_minusculo", "email = lower(email)");
+
+                            t.HasCheckConstraint("ck_users_monthly_ceiling", "monthly_ceiling >= 0");
+                        });
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Alert", b =>
