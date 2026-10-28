@@ -8,9 +8,10 @@ import { Placeholder } from '../views/Placeholder'
 import { DashboardScreen } from '../views/dashboard/DashboardScreen'
 import { ReportsScreen } from '../views/reports/ReportsScreen'
 import { SettingsScreen } from '../views/settings/SettingsScreen'
+import { OnboardingScreen } from '../views/onboarding/OnboardingScreen'
 
-function RequireAuth({ children }) {
-  const { isAuthenticated, initialized } = useAuth()
+function RequireAuth({ children, onboarding = false }) {
+  const { isAuthenticated, initialized, needsOnboarding } = useAuth()
   if (!initialized) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
@@ -23,6 +24,8 @@ function RequireAuth({ children }) {
     )
   }
   if (!isAuthenticated) return <Navigate to="/login" replace />
+  if (needsOnboarding && !onboarding) return <Navigate to="/boas-vindas" replace />
+  if (!needsOnboarding && onboarding) return <Navigate to="/dashboard" replace />
   return children
 }
 
@@ -32,6 +35,14 @@ export function AppRoutes() {
       <Route
         path="/login"
         element={<AuthScreen />}
+      />
+      <Route
+        path="/boas-vindas"
+        element={(
+          <RequireAuth onboarding>
+            <OnboardingScreen />
+          </RequireAuth>
+        )}
       />
       <Route
         element={(

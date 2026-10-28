@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { formatCurrency, formatPercent } from '../utils/format'
-import { parseMoneyInput, passwordStrength } from '../utils/money'
+import { maskMoney, moneyToMask, parseMoneyInput, passwordStrength } from '../utils/money'
 import { maskPhone, unmaskPhone } from '../utils/phone'
 import { formatDayLabel, monthLabel, monthPeriod, addMonths, toIsoDate } from '../utils/dates'
 
@@ -26,6 +26,19 @@ describe('formatPercent', () => {
 
   it('adiciona sinal positivo quando signed', () => {
     expect(formatPercent(8.4, { signed: true, decimals: 1 })).toBe('+8,4%')
+  })
+})
+
+describe('maskMoney', () => {
+  it('formata digitos como centavos em pt-BR', () => {
+    expect(maskMoney('350000')).toBe('3.500,00')
+    expect(maskMoney('5')).toBe('0,05')
+    expect(maskMoney('abc')).toBe('')
+  })
+
+  it('converte numero para mascara reversivel com parseMoneyInput', () => {
+    expect(moneyToMask(2000)).toBe('2.000,00')
+    expect(parseMoneyInput(moneyToMask(1234.56))).toBe(1234.56)
   })
 })
 

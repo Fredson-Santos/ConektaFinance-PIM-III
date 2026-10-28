@@ -11,6 +11,7 @@ export const authService = {
 export const userService = {
   profile: () => get('/users/me'),
   updateProfile: (payload) => put('/users/me', payload),
+  completeOnboarding: (payload) => put('/users/me/onboarding', payload),
   changePassword: (currentPassword, newPassword) =>
     put('/users/me/password', { currentPassword, newPassword }),
   preferences: () => get('/users/me/preferences'),

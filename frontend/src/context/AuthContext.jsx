@@ -51,6 +51,12 @@ export function AuthProvider({ children }) {
     return profile
   }, [])
 
+  const completeOnboarding = useCallback(async (payload) => {
+    const profile = await userService.completeOnboarding(payload)
+    setUser(profile)
+    return profile
+  }, [])
+
   const login = useCallback(
     async (email, password) => {
       const auth = await authService.login(email, password)
@@ -99,8 +105,10 @@ export function AuthProvider({ children }) {
       logout,
       refreshUser,
       startSession,
+      completeOnboarding,
+      needsOnboarding: user?.onboardingCompleted === false,
     }),
-    [user, initialized, login, loginByOtp, demoLogin, register, logout, refreshUser, startSession],
+    [user, initialized, login, loginByOtp, demoLogin, register, logout, refreshUser, startSession, completeOnboarding],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

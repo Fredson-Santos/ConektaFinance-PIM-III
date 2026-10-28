@@ -9,6 +9,20 @@ export function parseMoneyInput(raw) {
   return Number.isFinite(value) && value > 0 ? value : null
 }
 
+// Máscara monetária por centavos: "350000" -> "3.500,00".
+export function maskMoney(raw) {
+  const digits = String(raw ?? '').replace(/\D/g, '').replace(/^0+/, '').slice(0, 11)
+  if (!digits) return ''
+  const cents = digits.padStart(3, '0')
+  const integer = cents.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  return `${integer},${cents.slice(-2)}`
+}
+
+export function moneyToMask(value) {
+  if (value == null || !Number.isFinite(Number(value))) return ''
+  return maskMoney(Math.round(Number(value) * 100))
+}
+
 export function passwordStrength(password) {
   if (!password) return 0
   let score = 0
