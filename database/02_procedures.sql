@@ -172,8 +172,8 @@ CREATE OR REPLACE PROCEDURE sp_fechamento_mensal(
 LANGUAGE plpgsql
 AS $$
 DECLARE
-    v_inicio       timestamp := make_date(p_ano, p_mes, 1);
-    v_fim          timestamp := make_date(p_ano, p_mes, 1) + interval '1 month';
+    v_inicio       timestamp;
+    v_fim          timestamp;
     v_receitas     numeric(18,2);
     v_despesas     numeric(18,2);
     v_quantidade   integer;
@@ -184,6 +184,9 @@ BEGIN
     IF p_mes NOT BETWEEN 1 AND 12 THEN
         RAISE EXCEPTION 'Mes invalido: % (use 1 a 12)', p_mes;
     END IF;
+
+    v_inicio := make_date(p_ano, p_mes, 1);
+    v_fim    := v_inicio + interval '1 month';
 
     SELECT u.monthly_ceiling INTO v_teto FROM users u WHERE u.id = p_user_id;
     IF NOT FOUND THEN

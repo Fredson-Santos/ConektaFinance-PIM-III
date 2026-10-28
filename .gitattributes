@@ -1,0 +1,3 @@
+# Scripts executados em Linux (CI e containers) precisam de LF
+*.sh text eol=lf
+database/**/*.sql text eol=lf
