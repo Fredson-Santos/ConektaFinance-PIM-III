@@ -16,6 +16,16 @@ public class UpdateProfileValidator : AbstractValidator<UpdateProfileRequest>
     }
 }
 
+public class CompleteOnboardingValidator : AbstractValidator<CompleteOnboardingRequest>
+{
+    public CompleteOnboardingValidator()
+    {
+        RuleFor(x => x.FullName).NotEmpty().MinimumLength(2).MaximumLength(255);
+        RuleFor(x => x.DisplayName).MaximumLength(120);
+        RuleFor(x => x.MonthlyCeiling).GreaterThan(0).LessThanOrEqualTo(10_000_000);
+    }
+}
+
 public class ChangePasswordValidator : AbstractValidator<ChangePasswordRequest>
 {
     public ChangePasswordValidator()

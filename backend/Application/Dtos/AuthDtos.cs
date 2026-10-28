@@ -12,7 +12,8 @@ public record UserResponse(
     string AccountType,
     decimal MonthlyCeiling,
     string Currency,
-    int CycleStartDay);
+    int CycleStartDay,
+    bool OnboardingCompleted);
 
 public record AuthResponse(string Token, UserResponse User);
 

@@ -15,6 +15,7 @@ public class User
     public decimal MonthlyCeiling { get; set; }
     public string Currency { get; set; } = "BRL";
     public int CycleStartDay { get; set; } = 1;
+    public DateTime? OnboardingCompletedAt { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 

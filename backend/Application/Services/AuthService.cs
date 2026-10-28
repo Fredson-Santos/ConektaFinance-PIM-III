@@ -25,7 +25,8 @@ public class AuthService(
             Email = email,
             Phone = WhatsAppNumbers.NormalizePhone(request.Phone),
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-            MonthlyCeiling = request.MonthlyCeiling ?? 0m
+            MonthlyCeiling = request.MonthlyCeiling ?? 0m,
+            OnboardingCompletedAt = request.MonthlyCeiling > 0 ? DateTime.UtcNow : null
         };
         await userRepository.AddAsync(user);
         await categoryRepository.AddRangeAsync(CategoryTemplates.CloneForUser(user.Id));
@@ -63,5 +64,6 @@ public class AuthService(
         user.AccountType,
         user.MonthlyCeiling,
         user.Currency,
-        user.CycleStartDay);
+        user.CycleStartDay,
+        user.OnboardingCompletedAt.HasValue);
 }

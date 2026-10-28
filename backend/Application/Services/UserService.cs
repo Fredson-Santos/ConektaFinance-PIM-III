@@ -65,6 +65,17 @@ public class UserService(
         await userRepository.UpdateAsync(user);
     }
 
+    public async Task<UserResponse> CompleteOnboardingAsync(int userId, CompleteOnboardingRequest request)
+    {
+        var user = await GetRequiredUserAsync(userId);
+        user.FullName = request.FullName.Trim();
+        user.DisplayName = string.IsNullOrWhiteSpace(request.DisplayName) ? null : request.DisplayName.Trim();
+        user.MonthlyCeiling = request.MonthlyCeiling;
+        user.OnboardingCompletedAt ??= DateTime.UtcNow;
+        await userRepository.UpdateAsync(user);
+        return AuthService.MapUser(user);
+    }
+
     public async Task<PreferencesResponse> GetPreferencesAsync(int userId)
     {
         var user = await GetRequiredUserAsync(userId);

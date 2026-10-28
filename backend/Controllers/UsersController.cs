@@ -29,6 +29,10 @@ public class UsersController(IUserService userService) : BaseApiController
         return NoContent();
     }
 
+    [HttpPut("me/onboarding")]
+    public async Task<ActionResult<UserResponse>> CompleteOnboarding(CompleteOnboardingRequest request) =>
+        Ok(await userService.CompleteOnboardingAsync(CurrentUserId, request));
+
     [HttpGet("me/preferences")]
     public async Task<ActionResult<PreferencesResponse>> GetPreferences() =>
         Ok(await userService.GetPreferencesAsync(CurrentUserId));

@@ -8,4 +8,6 @@ public record PreferencesResponse(decimal MonthlyCeiling, string Currency, int C
 
 public record UpdatePreferencesRequest(decimal? MonthlyCeiling, string? Currency, int? CycleStartDay);
 
+public record CompleteOnboardingRequest(string FullName, string? DisplayName, decimal MonthlyCeiling);
+
 public record AvatarResponse(string AvatarUrl);

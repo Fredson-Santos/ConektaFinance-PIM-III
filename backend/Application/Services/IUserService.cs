@@ -8,6 +8,7 @@ public interface IUserService
     Task<UserResponse> UpdateProfileAsync(int userId, UpdateProfileRequest request);
     Task<AvatarResponse> UpdateAvatarAsync(int userId, Stream content, string contentType, long length);
     Task ChangePasswordAsync(int userId, ChangePasswordRequest request);
+    Task<UserResponse> CompleteOnboardingAsync(int userId, CompleteOnboardingRequest request);
     Task<PreferencesResponse> GetPreferencesAsync(int userId);
     Task<PreferencesResponse> UpdatePreferencesAsync(int userId, UpdatePreferencesRequest request);
     Task ResetFinancialDataAsync(int userId);

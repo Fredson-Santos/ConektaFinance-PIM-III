@@ -28,6 +28,7 @@ public static class SeedData
             MonthlyCeiling = 6350m,
             Currency = "BRL",
             CycleStartDay = 1,
+            OnboardingCompletedAt = now.AddDays(-200),
             CreatedAt = now.AddDays(-200),
             UpdatedAt = now
         };

@@ -42,6 +42,54 @@ public class UsersFlowTests(CustomWebApplicationFactory factory) : IClassFixture
     }
 
     [Fact]
+    public async Task Novo_usuario_por_otp_inicia_com_onboarding_pendente_e_conclui_pela_api()
+    {
+        var phone = $"00{Random.Shared.Next(100000000, 999999999)}";
+        var otp = await (await _client.PostAsJsonAsync("/api/v1/auth/otp/request", new { phone })).Content
+            .ReadFromJsonAsync<OtpRequestResponse>(Json);
+        var auth = await (await _client.PostAsJsonAsync("/api/v1/auth/otp/verify", new { phone, code = otp!.DevCode }))
+            .Content.ReadFromJsonAsync<AuthResponse>(Json);
+        auth!.User.OnboardingCompleted.Should().BeFalse();
+
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", auth.Token);
+        var response = await client.PutAsJsonAsync("/api/v1/users/me/onboarding",
+            new CompleteOnboardingRequest("Maria Oliveira", "Maria", 3500m));
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var profile = await (await client.GetAsync("/api/v1/users/me")).Content
+            .ReadFromJsonAsync<UserResponse>(Json);
+        profile!.OnboardingCompleted.Should().BeTrue();
+        profile.FullName.Should().Be("Maria Oliveira");
+        profile.DisplayName.Should().Be("Maria");
+        profile.MonthlyCeiling.Should().Be(3500m);
+    }
+
+    [Fact]
+    public async Task Onboarding_com_teto_zerado_ou_nome_vazio_retorna_400()
+    {
+        var client = await CreateUserClientAsync();
+
+        var semTeto = await client.PutAsJsonAsync("/api/v1/users/me/onboarding",
+            new CompleteOnboardingRequest("Maria Oliveira", null, 0m));
+        var semNome = await client.PutAsJsonAsync("/api/v1/users/me/onboarding",
+            new CompleteOnboardingRequest(" ", null, 2000m));
+
+        semTeto.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        semNome.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Registro_com_teto_definido_dispensa_onboarding()
+    {
+        var register = await _client.PostAsJsonAsync("/api/v1/auth/register",
+            new RegisterRequest("Cadastro Completo", $"{Guid.NewGuid():N}@conekta.teste", "SenhaForte@123", null, 4000m));
+        var auth = await register.Content.ReadFromJsonAsync<AuthResponse>(Json);
+
+        auth!.User.OnboardingCompleted.Should().BeTrue();
+    }
+
+    [Fact]
     public async Task Troca_de_senha_permite_login_com_a_nova()
     {
         var email = $"{Guid.NewGuid():N}@conekta.teste";
