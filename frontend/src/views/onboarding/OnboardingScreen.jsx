@@ -7,14 +7,18 @@ import { budgetService, categoryService } from '../../services'
 import { ApiError } from '../../services/api'
 import { useAsync } from '../../hooks/useAsync'
 import { Button } from '../../components/common/Button'
+import { PasswordInput } from '../../components/common/Input'
 import { Icon } from '../../components/common/Icon'
 import { formatCurrency } from '../../utils/format'
-import { maskMoney, moneyToMask, parseMoneyInput } from '../../utils/money'
+import { maskMoney, moneyToMask, parseMoneyInput, passwordStrength } from '../../utils/money'
 
-const STEPS = ['Identificação', 'Meta mensal', 'Categorias', 'Boas-vindas']
+const STEPS = ['Identificação', 'Acesso', 'Meta mensal', 'Categorias', 'Boas-vindas']
 const CEILING_SUGGESTIONS = [2000, 3500, 5000]
 // Contas criadas via WhatsApp recebem um nome provisório até o onboarding.
 const PLACEHOLDER_NAME = /^Contato \d+$/
+// ...e um e-mail técnico, que o usuário substitui pelo e-mail real.
+const PLACEHOLDER_EMAIL = /@wa\.conektafinance\.com$/i
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export function OnboardingScreen() {
   const { user, completeOnboarding } = useAuth()
@@ -25,6 +29,11 @@ export function OnboardingScreen() {
     user?.fullName && !PLACEHOLDER_NAME.test(user.fullName) ? user.fullName : '',
   )
   const [displayName, setDisplayName] = useState(user?.displayName || '')
+  const [email, setEmail] = useState(() =>
+    user?.email && !PLACEHOLDER_EMAIL.test(user.email) ? user.email : '',
+  )
+  const [password, setPassword] = useState('')
+  const [passwordConfirm, setPasswordConfirm] = useState('')
   const [ceilingText, setCeilingText] = useState(() => (user?.monthlyCeiling > 0 ? moneyToMask(user.monthlyCeiling) : ''))
   const [custom, setCustom] = useState(() => user?.monthlyCeiling > 0 && !CEILING_SUGGESTIONS.includes(user.monthlyCeiling))
   const [limits, setLimits] = useState({})
@@ -47,6 +56,15 @@ export function OnboardingScreen() {
     return {}
   }
 
+  const validateAccess = () => {
+    if (!EMAIL_PATTERN.test(email.trim())) return { email: 'Informe um e-mail válido, como nome@exemplo.com.' }
+    if (email.trim().length > 255) return { email: 'O e-mail deve ter no máximo 255 caracteres.' }
+    if (password.length < 8) return { password: 'A senha deve ter no mínimo 8 caracteres.' }
+    if (password.length > 100) return { password: 'A senha deve ter no máximo 100 caracteres.' }
+    if (password !== passwordConfirm) return { passwordConfirm: 'A confirmação não confere com a senha.' }
+    return {}
+  }
+
   const validateCeiling = () => {
     if (!ceiling) return { ceiling: 'Defina um teto mensal maior que R$ 0,00.' }
     if (ceiling > 10_000_000) return { ceiling: 'Informe um valor de até R$ 10.000.000,00.' }
@@ -55,7 +73,8 @@ export function OnboardingScreen() {
 
   const next = (event) => {
     event?.preventDefault()
-    const found = step === 0 ? validateIdentity() : step === 1 ? validateCeiling() : {}
+    const validators = [validateIdentity, validateAccess, validateCeiling]
+    const found = validators[step]?.() ?? {}
     setErrors(found)
     if (Object.keys(found).length === 0) setStep((current) => current + 1)
   }
@@ -86,6 +105,8 @@ export function OnboardingScreen() {
         fullName: fullName.trim(),
         displayName: displayName.trim() || null,
         monthlyCeiling: ceiling,
+        email: email.trim(),
+        password,
       })
       toast.push('Tudo pronto! Seu painel já está configurado.')
       navigate('/dashboard', { replace: true })
@@ -152,6 +173,77 @@ export function OnboardingScreen() {
         ) : null}
 
         {step === 1 ? (
+          <form key="access" className="login-step" onSubmit={next} noValidate>
+            <header className="login-head">
+              <h1 id="onboarding-title" className="login-title">Crie seu acesso</h1>
+              <p className="login-sub">
+                Seu e-mail e sua senha protegem ações sensíveis da conta, como alterar dados de acesso ou excluí-la.
+              </p>
+            </header>
+            <div className="login-field">
+              <label className="login-label" htmlFor="onb-email">E-mail</label>
+              <input
+                id="onb-email"
+                type="email"
+                inputMode="email"
+                className={`onboarding-input ${errors.email ? 'is-invalid' : ''}`}
+                autoComplete="email"
+                placeholder="nome@exemplo.com"
+                value={email}
+                maxLength={255}
+                autoFocus
+                aria-invalid={Boolean(errors.email)}
+                onChange={(event) => setEmail(event.target.value)}
+              />
+              {errors.email ? <span className="login-error" role="alert">{errors.email}</span> : null}
+            </div>
+            <div className="login-field">
+              <label className="login-label" htmlFor="onb-password">Senha</label>
+              <PasswordInput
+                id="onb-password"
+                className={`onboarding-input ${errors.password ? 'is-invalid' : ''}`}
+                autoComplete="new-password"
+                value={password}
+                maxLength={100}
+                aria-invalid={Boolean(errors.password)}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+              <div className={`pwd-meter s${passwordStrength(password)}`} aria-hidden="true">
+                <i /><i /><i /><i />
+              </div>
+              {errors.password ? (
+                <span className="login-error" role="alert">{errors.password}</span>
+              ) : (
+                <span className="login-hint">Mínimo de 8 caracteres. Combine letras, números e símbolos.</span>
+              )}
+            </div>
+            <div className="login-field">
+              <label className="login-label" htmlFor="onb-password-confirm">Confirmar senha</label>
+              <PasswordInput
+                id="onb-password-confirm"
+                className={`onboarding-input ${errors.passwordConfirm ? 'is-invalid' : ''}`}
+                autoComplete="new-password"
+                value={passwordConfirm}
+                maxLength={100}
+                aria-invalid={Boolean(errors.passwordConfirm)}
+                onChange={(event) => setPasswordConfirm(event.target.value)}
+              />
+              {errors.passwordConfirm ? (
+                <span className="login-error" role="alert">{errors.passwordConfirm}</span>
+              ) : null}
+            </div>
+            <div className="onboarding-actions">
+              <Button variant="ghost" onClick={() => setStep(0)}>
+                <ArrowLeft size={16} /> Voltar
+              </Button>
+              <Button type="submit" className="login-primary">
+                Continuar <ArrowRight size={16} />
+              </Button>
+            </div>
+          </form>
+        ) : null}
+
+        {step === 2 ? (
           <form key="ceiling" className="login-step" onSubmit={next} noValidate>
             <header className="login-head">
               <h1 id="onboarding-title" className="login-title">Qual seu teto de gastos mensal?</h1>
@@ -212,7 +304,7 @@ export function OnboardingScreen() {
               )}
             </div>
             <div className="onboarding-actions">
-              <Button variant="ghost" onClick={() => setStep(0)}>
+              <Button variant="ghost" onClick={() => setStep(1)}>
                 <ArrowLeft size={16} /> Voltar
               </Button>
               <Button type="submit" className="login-primary">
@@ -222,7 +314,7 @@ export function OnboardingScreen() {
           </form>
         ) : null}
 
-        {step === 2 ? (
+        {step === 3 ? (
           <form key="limits" className="login-step" onSubmit={next} noValidate>
             <header className="login-head">
               <h1 id="onboarding-title" className="login-title">Quer definir limites por categoria?</h1>
@@ -266,7 +358,7 @@ export function OnboardingScreen() {
               )}
             </div>
             <div className="onboarding-actions">
-              <Button variant="ghost" onClick={() => setStep(1)}>
+              <Button variant="ghost" onClick={() => setStep(2)}>
                 <ArrowLeft size={16} /> Voltar
               </Button>
               <Button type="submit" className="login-primary">
@@ -276,7 +368,7 @@ export function OnboardingScreen() {
           </form>
         ) : null}
 
-        {step === 3 ? (
+        {step === 4 ? (
           <div key="welcome" className="login-step">
             <header className="login-head">
               <span className="onboarding-check" aria-hidden="true">
@@ -289,6 +381,10 @@ export function OnboardingScreen() {
               <div>
                 <dt>Nome</dt>
                 <dd>{fullName.trim()}</dd>
+              </div>
+              <div>
+                <dt>E-mail</dt>
+                <dd>{email.trim()}</dd>
               </div>
               <div>
                 <dt>Teto mensal</dt>
@@ -314,7 +410,7 @@ export function OnboardingScreen() {
             </div>
             {errors.submit ? <span className="login-error" role="alert">{errors.submit}</span> : null}
             <div className="onboarding-actions">
-              <Button variant="ghost" disabled={saving} onClick={() => setStep(2)}>
+              <Button variant="ghost" disabled={saving} onClick={() => setStep(3)}>
                 <ArrowLeft size={16} /> Voltar
               </Button>
               <Button className="login-primary" loading={saving} onClick={finish}>

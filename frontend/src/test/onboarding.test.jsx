@@ -26,7 +26,20 @@ vi.mock('../views/dashboard/DashboardScreen', () => ({
   DashboardScreen: () => <h1>Painel principal</h1>,
 }))
 
-const pendingUser = { id: 9, fullName: 'Contato 11987654321', monthlyCeiling: 0, onboardingCompleted: false }
+const pendingUser = {
+  id: 9,
+  fullName: 'Contato 11987654321',
+  email: '11987654321@wa.conektafinance.com',
+  monthlyCeiling: 0,
+  onboardingCompleted: false,
+}
+
+async function fillAccess(password = 'SenhaForte@123', email = 'maria@exemplo.com') {
+  fireEvent.change(await screen.findByLabelText('E-mail'), { target: { value: email } })
+  fireEvent.change(screen.getByLabelText('Senha'), { target: { value: password } })
+  fireEvent.change(screen.getByLabelText('Confirmar senha'), { target: { value: password } })
+  fireEvent.click(screen.getByRole('button', { name: /continuar/i }))
+}
 
 function renderApp(path = '/dashboard') {
   return render(
@@ -78,8 +91,31 @@ describe('Onboarding', () => {
 
     fireEvent.change(screen.getByLabelText('Nome completo'), { target: { value: 'Maria Oliveira' } })
     fireEvent.click(screen.getByRole('button', { name: /continuar/i }))
+    await fillAccess()
     fireEvent.click(await screen.findByRole('button', { name: /continuar/i }))
     expect(await screen.findByText(/defina um teto mensal/i)).toBeInTheDocument()
+  })
+
+  it('exige e-mail valido, senha com no minimo 8 caracteres e confirmacao igual', async () => {
+    userService.profile.mockResolvedValue(pendingUser)
+    renderApp()
+
+    fireEvent.change(await screen.findByLabelText('Nome completo'), { target: { value: 'Maria Oliveira' } })
+    fireEvent.click(screen.getByRole('button', { name: /continuar/i }))
+    expect(await screen.findByRole('heading', { name: /crie seu acesso/i })).toBeInTheDocument()
+    expect(screen.getByLabelText('E-mail')).toHaveValue('')
+
+    await fillAccess('SenhaForte@123', 'maria-sem-arroba')
+    expect(await screen.findByText(/informe um e-mail válido/i)).toBeInTheDocument()
+
+    await fillAccess('1234567')
+    expect(await screen.findByText(/no mínimo 8 caracteres/i)).toBeInTheDocument()
+
+    fireEvent.change(screen.getByLabelText('Senha'), { target: { value: 'SenhaForte@123' } })
+    fireEvent.change(screen.getByLabelText('Confirmar senha'), { target: { value: 'SenhaDiferente@123' } })
+    fireEvent.click(screen.getByRole('button', { name: /continuar/i }))
+    expect(await screen.findByText(/confirmação não confere/i)).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /teto de gastos/i })).not.toBeInTheDocument()
   })
 
   it('aplica mascara monetaria no valor personalizado', async () => {
@@ -88,6 +124,7 @@ describe('Onboarding', () => {
 
     fireEvent.change(await screen.findByLabelText('Nome completo'), { target: { value: 'Maria Oliveira' } })
     fireEvent.click(screen.getByRole('button', { name: /continuar/i }))
+    await fillAccess()
     fireEvent.change(await screen.findByLabelText('Teto mensal'), { target: { value: '425050' } })
 
     expect(screen.getByLabelText('Teto mensal')).toHaveValue('4.250,50')
@@ -107,6 +144,7 @@ describe('Onboarding', () => {
     fireEvent.change(await screen.findByLabelText('Nome completo'), { target: { value: 'Maria Oliveira' } })
     fireEvent.change(screen.getByLabelText(/nome de preferência/i), { target: { value: 'Mari' } })
     fireEvent.click(screen.getByRole('button', { name: /continuar/i }))
+    await fillAccess()
     fireEvent.click(await screen.findByRole('radio', { name: 'R$ 3.500' }))
     fireEvent.click(screen.getByRole('button', { name: /continuar/i }))
     fireEvent.click(await screen.findByRole('button', { name: /pular por enquanto/i }))
@@ -120,6 +158,8 @@ describe('Onboarding', () => {
         fullName: 'Maria Oliveira',
         displayName: 'Mari',
         monthlyCeiling: 3500,
+        email: 'maria@exemplo.com',
+        password: 'SenhaForte@123',
       }),
     )
     expect(await screen.findByRole('heading', { name: /painel principal/i })).toBeInTheDocument()
@@ -131,6 +171,7 @@ describe('Onboarding', () => {
     renderApp()
     fireEvent.change(await screen.findByLabelText('Nome completo'), { target: { value: 'Maria Oliveira' } })
     fireEvent.click(screen.getByRole('button', { name: /continuar/i }))
+    await fillAccess()
     fireEvent.click(await screen.findByRole('radio', { name: 'R$ 2.000' }))
     fireEvent.click(screen.getByRole('button', { name: /continuar/i }))
     await screen.findByRole('heading', { name: /limites por categoria/i })

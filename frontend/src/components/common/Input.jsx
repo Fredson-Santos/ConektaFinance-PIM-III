@@ -38,7 +38,9 @@ export function PasswordInput({ hasError, ...props }) {
         style={{
           position: 'absolute',
           right: 8,
-          top: 10,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          display: 'flex',
           background: 'none',
           border: 'none',
           color: 'var(--ds-foreground-muted)',
