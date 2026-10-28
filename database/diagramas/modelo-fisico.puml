@@ -22,6 +22,7 @@ entity "users" as users {
   avatar_url : varchar(500)
   password_hash : text NOT NULL
   account_type : varchar(20) NOT NULL = 'Standard'
+  is_active : boolean NOT NULL = true
   monthly_ceiling : numeric(18,2) NOT NULL
   currency : varchar(3) NOT NULL = 'BRL'
   cycle_start_day : integer NOT NULL = 1
@@ -32,6 +33,7 @@ entity "users" as users {
   CHECK email = lower(email)
   CHECK monthly_ceiling >= 0
   CHECK cycle_start_day BETWEEN 1 AND 28
+  CHECK account_type IN ('Standard','Admin')
 }
 
 entity "categories" as categories {

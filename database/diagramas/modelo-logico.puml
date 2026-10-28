@@ -22,6 +22,7 @@ entity "users" as users {
   avatar_url
   * password_hash
   * account_type
+  * is_active
   * monthly_ceiling
   * currency
   * cycle_start_day
