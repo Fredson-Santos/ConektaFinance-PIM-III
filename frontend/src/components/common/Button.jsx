@@ -29,7 +29,12 @@ export function Button({
       disabled={disabled || loading}
       {...props}
     >
-      {loading ? 'Aguarde…' : (
+      {loading ? (
+        <>
+          <span className="ds-spinner" aria-hidden="true" />
+          Aguarde…
+        </>
+      ) : (
         <>
           {Icon ? <Icon size={size || 16} /> : null}
           {children}

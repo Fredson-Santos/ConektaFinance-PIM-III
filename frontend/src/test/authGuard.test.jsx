@@ -41,6 +41,7 @@ describe('AuthProvider (guarda de sessão)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     localStorage.clear()
+    sessionStorage.clear()
   })
 
   it('mantem sessao quando o token e valido', async () => {
@@ -62,6 +63,15 @@ describe('AuthProvider (guarda de sessão)', () => {
     await waitFor(() => expect(getByTestId('initialized')).toHaveTextContent('true'))
     expect(getByTestId('authenticated')).toHaveTextContent('false')
     expect(localStorage.getItem('conekta_token')).toBeNull()
+  })
+
+  it('restaura sessao temporaria salva no sessionStorage', async () => {
+    sessionStorage.setItem('conekta_token', 'token-de-aba')
+    userService.profile.mockResolvedValue({ id: 8, email: 'temp@conektafinance.com' })
+
+    const { getByTestId } = renderWithProbe()
+
+    await waitFor(() => expect(getByTestId('authenticated')).toHaveTextContent('true'))
   })
 
   it('inicia desautenticado sem token armazenado', async () => {

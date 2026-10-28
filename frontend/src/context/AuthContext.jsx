@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { setToken, setUnauthorizedHandler } from '../services/api'
+import { getToken, setToken, setUnauthorizedHandler } from '../services/api'
 import { authService, userService } from '../services'
 
 const AuthContext = createContext(null)
@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     let cancelled = false
     const boot = async () => {
-      const token = localStorage.getItem('conekta_token')
+      const token = getToken()
       if (!token) {
         setInitialized(true)
         return
@@ -40,8 +40,8 @@ export function AuthProvider({ children }) {
     }
   }, [logout])
 
-  const startSession = useCallback((token, sessionUser) => {
-    setToken(token)
+  const startSession = useCallback((token, sessionUser, { remember = true } = {}) => {
+    setToken(token, { persist: remember })
     setUser(sessionUser)
   }, [])
 
@@ -70,19 +70,22 @@ export function AuthProvider({ children }) {
   )
 
   const loginByOtp = useCallback(
-    async (phone, code) => {
+    async (phone, code, options) => {
       const auth = await authService.verifyOtp(phone, code)
-      startSession(auth.token, auth.user)
+      startSession(auth.token, auth.user, options)
       return auth.user
     },
     [startSession],
   )
 
-  const demoLogin = useCallback(async () => {
-    const auth = await authService.demoLogin()
-    startSession(auth.token, auth.user)
-    return auth.user
-  }, [startSession])
+  const demoLogin = useCallback(
+    async (options) => {
+      const auth = await authService.demoLogin()
+      startSession(auth.token, auth.user, options)
+      return auth.user
+    },
+    [startSession],
+  )
 
   const value = useMemo(
     () => ({

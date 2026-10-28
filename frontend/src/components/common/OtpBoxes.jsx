@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-export function OtpBoxes({ length = 6, onComplete }) {
+export function OtpBoxes({ length = 6, onComplete, disabled = false, invalid = false }) {
   const refs = useRef([])
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export function OtpBoxes({ length = 6, onComplete }) {
   }
 
   return (
-    <div className="otp-boxes" aria-label="Código de verificação">
+    <div className={`otp-boxes ${invalid ? 'is-invalid' : ''}`} role="group" aria-label="Código de verificação">
       {Array.from({ length }).map((_, index) => (
         <input
           key={index}
@@ -45,6 +45,8 @@ export function OtpBoxes({ length = 6, onComplete }) {
           inputMode="numeric"
           autoComplete={index === 0 ? 'one-time-code' : 'off'}
           maxLength={1}
+          disabled={disabled}
+          aria-invalid={invalid || undefined}
           aria-label={`Dígito ${index + 1}`}
           onChange={(event) => setValue(index, event.target.value)}
           onKeyDown={(event) => handleKeyDown(event, index)}
