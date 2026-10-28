@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { formatCurrency, formatPercent } from '../utils/format'
-import { maskMoney, moneyToMask, parseMoneyInput, passwordStrength } from '../utils/money'
+import { maskMoney, moneyToMask, parseMoneyInput, passwordStrength, sumExpenses } from '../utils/money'
 import { maskPhone, unmaskPhone } from '../utils/phone'
 import { formatDayLabel, monthLabel, monthPeriod, addMonths, toIsoDate } from '../utils/dates'
 
@@ -39,6 +39,22 @@ describe('maskMoney', () => {
   it('converte numero para mascara reversivel com parseMoneyInput', () => {
     expect(moneyToMask(2000)).toBe('2.000,00')
     expect(parseMoneyInput(moneyToMask(1234.56))).toBe(1234.56)
+  })
+})
+
+describe('sumExpenses', () => {
+  it('soma somente lancamentos do tipo despesa', () => {
+    const items = [
+      { type: 'expense', value: 100.1 },
+      { type: 'income', value: 5000 },
+      { type: 'expense', value: 49.9 },
+    ]
+    expect(sumExpenses(items)).toBeCloseTo(150)
+  })
+
+  it('retorna zero sem lancamentos ou apenas receitas', () => {
+    expect(sumExpenses(undefined)).toBe(0)
+    expect(sumExpenses([{ type: 'income', value: 10 }])).toBe(0)
   })
 })
 

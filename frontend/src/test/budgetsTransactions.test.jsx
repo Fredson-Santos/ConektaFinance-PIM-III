@@ -158,8 +158,24 @@ describe('TransactionsScreen', () => {
     expect(await screen.findByText('Mercado Pão de Açúcar')).toBeInTheDocument()
     expect(screen.getByText('Hoje')).toBeInTheDocument()
     expect(screen.getByText('Salário')).toBeInTheDocument()
-    expect(screen.getByText('R$ 260,00')).toBeInTheDocument()
     expect(screen.getByText('2 lançamentos')).toBeInTheDocument()
+  })
+
+  it('totaliza exclusivamente as despesas do periodo, sem somar receitas', async () => {
+    renderScreen(TransactionsScreen)
+
+    await screen.findByText('Mercado Pão de Açúcar')
+    expect(screen.getByText('Total de Gastos no Período')).toBeInTheDocument()
+    expect(document.getElementById('sum-val')).toHaveTextContent('R$ 186,40')
+    expect(document.getElementById('sum-val')).not.toHaveTextContent('5.386,40')
+  })
+
+  it('usa rotulo de despesas da categoria quando filtrado por chip', async () => {
+    renderScreen(TransactionsScreen)
+
+    fireEvent.click(await screen.findByRole('button', { name: /alimentação/i }))
+
+    expect(await screen.findByText('Despesas em Alimentação')).toBeInTheDocument()
   })
 
   it('filtra por categoria ao clicar no chip', async () => {

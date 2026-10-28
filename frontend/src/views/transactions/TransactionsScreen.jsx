@@ -13,6 +13,7 @@ import { EmptyState } from '../../components/common/EmptyState'
 import { CeilingCard } from '../../components/dashboard/CeilingCard'
 import { Button } from '../../components/common/Button'
 import { formatCurrency } from '../../utils/format'
+import { sumExpenses } from '../../utils/money'
 import { formatDayLabel, monthLabel, addMonths, monthPeriod } from '../../utils/dates'
 
 export function TransactionsScreen() {
@@ -28,14 +29,14 @@ export function TransactionsScreen() {
 
   const listState = useAsync(
     async () => {
-      const { data, headers } = await transactionService.list({
+      const { data } = await transactionService.list({
         month: period.month,
         year: period.year,
         categoryId: categoryId || undefined,
         search: search || undefined,
         pageSize: 100,
       })
-      return { items: data.items, meta: data.meta, totalSum: Number(headers.get('X-Total-Sum') || 0) }
+      return { items: data.items, meta: data.meta }
     },
     [period.month, period.year, categoryId, search, dataVersion],
   )
@@ -70,13 +71,13 @@ export function TransactionsScreen() {
     setPeriod((current) => addMonths(current.month, current.year, delta))
   }
   const filteredByChip = categoryId && (categories || []).find((category) => category.id === Number(categoryId))
-  const summaryLabel = filteredByChip ? `Gastos em ${filteredByChip.name}` : 'Transações do período'
+  const summaryLabel = filteredByChip ? `Despesas em ${filteredByChip.name}` : 'Total de Gastos no Período'
 
   const openDetail = (transaction) => {
     openTransactionSheet({ editing: transaction })
   }
 
-  const totalSpent = listState.data?.totalSum != null ? Math.abs(listState.data.totalSum) : 0
+  const totalSpent = sumExpenses(listState.data?.items)
 
   const rawTop = topCategoriesState.data || []
   const topCategoriesTotal = rawTop.reduce((sum, item) => sum + (item.total || 0), 0)

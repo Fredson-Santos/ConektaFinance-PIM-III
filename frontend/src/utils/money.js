@@ -23,6 +23,13 @@ export function moneyToMask(value) {
   return maskMoney(Math.round(Number(value) * 100))
 }
 
+// Soma apenas despesas (receitas não entram no total de gastos).
+export function sumExpenses(transactions) {
+  return (transactions || [])
+    .filter((item) => item.type === 'expense')
+    .reduce((total, item) => total + Math.abs(Number(item.value) || 0), 0)
+}
+
 export function passwordStrength(password) {
   if (!password) return 0
   let score = 0
