@@ -31,6 +31,7 @@
   <ItemGroup>
     <!-- Procedures e triggers do PostgreSQL aplicadas no startup (DatabaseProgrammability) -->
     <EmbeddedResource Include="..\database\02_procedures.sql" LogicalName="Conekta.Sql.02_procedures.sql" />
+    <EmbeddedResource Include="..\database\03_triggers.sql" LogicalName="Conekta.Sql.03_triggers.sql" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -171,6 +171,10 @@ public static class SeedData
                 DedupKey = Dedup(cat["Lazer"], "exceeded"), CreatedAt = now.AddDays(-1), UpdatedAt = now.AddDays(-1)
             }
         };
+        // A trigger trg_alerta_orcamento ja gerou alertas para as despesas acima;
+        // o seed os substitui pelos alertas de demonstracao (mesmas chaves de dedup).
+        context.SaveChanges();
+        context.Alerts.Where(a => a.UserId == demo.Id).ExecuteDelete();
         context.Alerts.AddRange(alerts);
         context.SaveChanges();
     }
