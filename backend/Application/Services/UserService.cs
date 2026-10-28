@@ -68,9 +68,17 @@ public class UserService(
     public async Task<UserResponse> CompleteOnboardingAsync(int userId, CompleteOnboardingRequest request)
     {
         var user = await GetRequiredUserAsync(userId);
+        var email = request.Email.Trim().ToLowerInvariant();
+        var owner = await userRepository.GetByEmailAsync(email);
+        if (owner is not null && owner.Id != user.Id)
+            throw AppException.Conflict("E-mail ja cadastrado", "Este e-mail ja pertence a outra conta. Utilize outro e-mail.");
+
+        user.Email = email;
         user.FullName = request.FullName.Trim();
         user.DisplayName = string.IsNullOrWhiteSpace(request.DisplayName) ? null : request.DisplayName.Trim();
         user.MonthlyCeiling = request.MonthlyCeiling;
+        // Contas criadas via WhatsApp nascem com senha aleatoria; aqui o usuario define a dele.
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
         user.OnboardingCompletedAt ??= DateTime.UtcNow;
         await userRepository.UpdateAsync(user);
         return AuthService.MapUser(user);

@@ -54,7 +54,7 @@ public class UsersFlowTests(CustomWebApplicationFactory factory) : IClassFixture
         var client = factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", auth.Token);
         var response = await client.PutAsJsonAsync("/api/v1/users/me/onboarding",
-            new CompleteOnboardingRequest("Maria Oliveira", "Maria", 3500m));
+            new CompleteOnboardingRequest("Maria Oliveira", "Maria", 3500m, "maria.onboarding@conekta.teste", "SenhaNova@123"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var profile = await (await client.GetAsync("/api/v1/users/me")).Content
@@ -63,20 +63,49 @@ public class UsersFlowTests(CustomWebApplicationFactory factory) : IClassFixture
         profile.FullName.Should().Be("Maria Oliveira");
         profile.DisplayName.Should().Be("Maria");
         profile.MonthlyCeiling.Should().Be(3500m);
+        profile.Email.Should().Be("maria.onboarding@conekta.teste");
+
+        var login = await _client.PostAsJsonAsync("/api/v1/auth/login",
+            new LoginRequest("Maria.Onboarding@conekta.teste", "SenhaNova@123"));
+        login.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var troca = await client.PutAsJsonAsync("/api/v1/users/me/password",
+            new ChangePasswordRequest("SenhaNova@123", "OutraSenha@456"));
+        troca.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
-    public async Task Onboarding_com_teto_zerado_ou_nome_vazio_retorna_400()
+    public async Task Onboarding_com_dados_invalidos_retorna_400()
     {
         var client = await CreateUserClientAsync();
 
         var semTeto = await client.PutAsJsonAsync("/api/v1/users/me/onboarding",
-            new CompleteOnboardingRequest("Maria Oliveira", null, 0m));
+            new CompleteOnboardingRequest("Maria Oliveira", null, 0m, "maria@conekta.teste", "SenhaForte@123"));
         var semNome = await client.PutAsJsonAsync("/api/v1/users/me/onboarding",
-            new CompleteOnboardingRequest(" ", null, 2000m));
+            new CompleteOnboardingRequest(" ", null, 2000m, "maria@conekta.teste", "SenhaForte@123"));
+        var emailInvalido = await client.PutAsJsonAsync("/api/v1/users/me/onboarding",
+            new CompleteOnboardingRequest("Maria Oliveira", null, 2000m, "maria-sem-arroba", "SenhaForte@123"));
+        var senhaCurta = await client.PutAsJsonAsync("/api/v1/users/me/onboarding",
+            new CompleteOnboardingRequest("Maria Oliveira", null, 2000m, "maria@conekta.teste", "1234567"));
 
         semTeto.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         semNome.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        emailInvalido.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        senhaCurta.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Onboarding_com_email_de_outra_conta_retorna_409()
+    {
+        var emailOcupado = $"{Guid.NewGuid():N}@conekta.teste";
+        await _client.PostAsJsonAsync("/api/v1/auth/register",
+            new RegisterRequest("Dona do Email", emailOcupado, "SenhaForte@123", null, null));
+        var client = await CreateUserClientAsync();
+
+        var response = await client.PutAsJsonAsync("/api/v1/users/me/onboarding",
+            new CompleteOnboardingRequest("Maria Oliveira", null, 2000m, emailOcupado, "SenhaForte@123"));
+
+        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 
     [Fact]
