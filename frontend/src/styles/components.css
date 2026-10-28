@@ -955,10 +955,6 @@
   color: var(--ds-foreground-faint);
 }
 
-.mobile-dash-content .ceiling-card {
-  margin-top: 12px;
-}
-
 .gastos-ceiling-card {
   margin-bottom: 16px;
 }

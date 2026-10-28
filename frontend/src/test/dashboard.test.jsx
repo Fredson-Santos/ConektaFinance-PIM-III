@@ -102,8 +102,8 @@ describe('DashboardScreen', () => {
 
     expect(await screen.findByText('R$ 4.286,50')).toBeInTheDocument()
     expect(screen.getByText('R$ 7.850,00')).toBeInTheDocument()
-    expect(document.getElementById('valDespesasMobile')).toHaveTextContent('R$ 3.563,00')
-    expect(screen.getByTestId('ceiling-spent')).toHaveTextContent('R$ 3.563,00')
+    expect(screen.getByText('R$ 3.563,00')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Consumo do Limite')).not.toBeInTheDocument()
     expect(screen.getByText('+8,4% vs mês anterior')).toBeInTheDocument()
   })
 

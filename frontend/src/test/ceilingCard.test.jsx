@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { CeilingCard, ceilingStatus, ceilingUsage } from '../components/dashboard/CeilingCard'
-import { DashboardScreen } from '../views/dashboard/DashboardScreen'
-import { dashboardService, insightService, userService } from '../services'
+import { TransactionsScreen } from '../views/transactions/TransactionsScreen'
+import { categoryService, dashboardService, reportService, transactionService, userService } from '../services'
 import { AuthProvider } from '../context/AuthContext'
 import { UiProvider, useUi } from '../context/UiContext'
 import { ToastProvider } from '../context/ToastContext'
@@ -13,14 +13,10 @@ vi.mock('../services', async (importOriginal) => {
   return {
     ...original,
     userService: { ...original.userService, profile: vi.fn(), updatePreferences: vi.fn() },
-    dashboardService: {
-      ...original.dashboardService,
-      overview: vi.fn(),
-      weeklyExpenses: vi.fn(),
-      recentTransactions: vi.fn(),
-      budgetMeters: vi.fn(),
-    },
-    insightService: { ...original.insightService, list: vi.fn() },
+    dashboardService: { ...original.dashboardService, overview: vi.fn() },
+    transactionService: { ...original.transactionService, list: vi.fn() },
+    categoryService: { ...original.categoryService, list: vi.fn() },
+    reportService: { ...original.reportService, byCategory: vi.fn() },
   }
 })
 
@@ -101,17 +97,15 @@ describe('CeilingCard', () => {
     expect(screen.getByText('Saudável')).toBeInTheDocument()
   })
 
-  it('recarrega o consumo no dashboard quando um lancamento e registrado', async () => {
-    window.matchMedia = vi.fn().mockReturnValue({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })
+  it('recarrega o consumo na tela de gastos quando um lancamento e registrado', async () => {
     dashboardService.overview.mockResolvedValue({ income: 0, expense: 1750, balance: -1750 })
-    dashboardService.weeklyExpenses.mockResolvedValue({ total: 0, dailyAverage: 0, days: [] })
-    dashboardService.recentTransactions.mockResolvedValue([])
-    dashboardService.budgetMeters.mockResolvedValue([])
-    insightService.list.mockResolvedValue([])
+    transactionService.list.mockResolvedValue({ data: { items: [], meta: { totalItems: 0 } } })
+    categoryService.list.mockResolvedValue([])
+    reportService.byCategory.mockResolvedValue([])
     render(
       <Providers>
         <NotifyButton />
-        <DashboardScreen />
+        <TransactionsScreen />
       </Providers>,
     )
     expect(await screen.findByText('50% do teto utilizado')).toBeInTheDocument()
