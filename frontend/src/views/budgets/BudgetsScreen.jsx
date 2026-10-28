@@ -247,7 +247,8 @@ function CategoryCard({ category, onOpenExtrato, onSetLimit, onEdit }) {
           <span>Nenhum teto configurado</span>
           <button
             type="button"
-            style={{ color: 'var(--ds-blue-600)', fontWeight: 500, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            className="touch-target"
+            style={{ color: 'var(--ds-link)', fontWeight: 500, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
             onClick={(e) => {
               e.stopPropagation()
               onSetLimit()

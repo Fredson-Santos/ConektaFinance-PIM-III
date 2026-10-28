@@ -13,13 +13,16 @@ import { TransactionSheet } from '../transactions/TransactionSheet'
 export function AppLayout() {
   return (
     <>
+      <a className="skip-link" href="#conteudo">
+        Pular para o conteúdo
+      </a>
       <div className="app-glow" />
       <div className="app-shell app">
         <Sidebar />
         <main className="main-area main">
           <PwaInstallBanner />
           <Topbar />
-          <div className="view-container">
+          <div className="view-container" id="conteudo" tabIndex={-1}>
             <Outlet />
           </div>
         </main>

@@ -80,7 +80,7 @@
       /* Semantic Typography & Foreground (Neutros) */
       --ds-foreground: #ededed;
       --ds-foreground-muted: #888888;
-      --ds-foreground-faint: #555555;
+      --ds-foreground-faint: #8a8a8a;
       --ds-foreground-contrast: #000000;
 
       /* Borders & Shadows */
@@ -133,7 +133,7 @@
       --ds-amber-alpha-200: rgba(245, 166, 35, 0.1);
 
       --ds-green-600: #008f5d;
-      --ds-green-700: #15803d;
+      --ds-green-700: #116932;
       --ds-green-alpha-200: rgba(0, 143, 93, 0.1);
 
       --ds-teal-700: #0b9bb0;
@@ -155,7 +155,7 @@
 
       --ds-foreground: #111111;
       --ds-foreground-muted: #666666;
-      --ds-foreground-faint: #999999;
+      --ds-foreground-faint: #6e6e6e;
       --ds-foreground-contrast: #ffffff;
 
       --ds-border: var(--ds-gray-alpha-300);
@@ -4546,7 +4546,7 @@
     }
 
     .badge.b-warn {
-      color: #f5a623;
+      color: var(--ds-amber-text);
       background: rgba(245, 166, 35, 0.15);
       border: 1px solid rgba(245, 166, 35, 0.25);
       padding: 3px 9px;
@@ -4556,7 +4556,7 @@
     }
 
     .badge.b-ok {
-      color: #00cc88;
+      color: var(--ds-green-text);
       background: rgba(0, 204, 136, 0.15);
       border: 1px solid rgba(0, 204, 136, 0.25);
       padding: 3px 9px;
@@ -4661,7 +4661,7 @@
     }
 
     .gastos-container .tx .a.pos {
-      color: var(--ds-green-500, #00cc88);
+      color: var(--ds-green-text);
     }
 
     .gastos-container .empty {

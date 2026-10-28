@@ -361,6 +361,7 @@
   position: relative;
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   gap: 10px;
   width: fit-content;
   font-size: 13.5px;
@@ -1636,6 +1637,7 @@
 }
 
 .page-title {
+  margin: 0;
   font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -1901,7 +1903,8 @@
   color: var(--ds-foreground-muted);
 }
 
-.empty-state h4 {
+.empty-state h3,
+.error-state h3 {
   font-size: 14.5px;
   color: var(--ds-foreground);
 }
@@ -3572,5 +3575,56 @@
 
   .admin-search {
     max-width: none;
+  }
+}
+
+/* ==========================================================================
+   ACESSIBILIDADE — link "Pular para o conteúdo" (visível apenas no foco)
+   ========================================================================== */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 1000;
+  padding: 10px 16px;
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-foreground);
+  color: var(--ds-background-100);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+  transition: transform var(--ds-duration-fast) var(--ds-ease);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.view-container:focus {
+  outline: none;
+}
+
+/* ==========================================================================
+   ACESSIBILIDADE — alvos de toque de no mínimo 44x44 px no mobile
+   A área clicável cresce com um pseudo-elemento invisível, sem alterar o
+   visual dos controles compactos (chips, ícones, abas e links).
+   ========================================================================== */
+@media (max-width: 880px) {
+  :is(.btn-icon, .chip, .link, .btn, .ds-btn, .cfg-nav-item, .io-pair, .seg > button, .touch-target) {
+    position: relative;
+  }
+
+  :is(.btn-icon, .chip, .link, .btn, .ds-btn, .cfg-nav-item, .io-pair, .seg > button, .touch-target)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+
+  .ds-input {
+    min-height: 44px;
   }
 }

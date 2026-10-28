@@ -149,7 +149,7 @@ export function TransactionsScreen() {
               id="sum-count"
               style={{
                 background: 'rgba(245, 166, 35, 0.15)',
-                color: 'var(--ds-amber-500, #f5a623)',
+                color: 'var(--ds-amber-text)',
                 border: '1px solid rgba(245, 166, 35, 0.3)',
                 borderRadius: '9999px',
                 padding: '3px 10px',

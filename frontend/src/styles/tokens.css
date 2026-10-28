@@ -66,7 +66,11 @@
   --ds-purple-alpha-200: rgba(121, 40, 202, 0.18);
   --ds-foreground: #ededed;
   --ds-foreground-muted: #888888;
-  --ds-foreground-faint: #555555;
+  --ds-foreground-faint: #8a8a8a;
+  /* Cores de texto com contraste AA (>= 4.5:1) sobre os fundos do tema */
+  --ds-link: #3291ff;
+  --ds-amber-text: #f5a623;
+  --ds-green-text: #00cc88;
   --ds-foreground-contrast: #000000;
   --ds-border: var(--ds-gray-alpha-300);
   --ds-border-strong: var(--ds-gray-alpha-500);
@@ -111,7 +115,7 @@
   --ds-amber-700: #b45309;
   --ds-amber-alpha-200: rgba(245, 166, 35, 0.1);
   --ds-green-600: #008f5d;
-  --ds-green-700: #15803d;
+  --ds-green-700: #116932;
   --ds-green-alpha-200: rgba(0, 143, 93, 0.1);
   --ds-teal-600: #0b9bb0;
   --ds-teal-700: #12b5cb;
@@ -121,7 +125,10 @@
   --ds-purple-alpha-200: rgba(121, 40, 202, 0.12);
   --ds-foreground: #111111;
   --ds-foreground-muted: #666666;
-  --ds-foreground-faint: #999999;
+  --ds-foreground-faint: #6e6e6e;
+  --ds-link: #095ed5;
+  --ds-amber-text: #92400e;
+  --ds-green-text: #116932;
   --ds-foreground-contrast: #ffffff;
   --ds-border: var(--ds-gray-alpha-300);
   --ds-border-strong: var(--ds-gray-alpha-500);

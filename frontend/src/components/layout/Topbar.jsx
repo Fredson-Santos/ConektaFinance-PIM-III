@@ -31,7 +31,7 @@ export function Topbar() {
           </div>
         </div>
         <div>
-          <p className="page-title">{title}</p>
+          <h1 className="page-title">{title}</h1>
           <p className="page-sub">{subtitle}</p>
         </div>
       </div>

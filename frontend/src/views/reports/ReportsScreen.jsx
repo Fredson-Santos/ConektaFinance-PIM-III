@@ -205,7 +205,7 @@ function MobileReports({ summary, byCategory, trend, insights, period, setPeriod
               {(summary.data?.balance || 0) >= 0 ? 'Azul' : 'Vermelho'}
             </span>
           </div>
-          <div className="num" style={{ fontSize: 17, fontWeight: 700, color: (summary.data?.balance || 0) >= 0 ? 'var(--ds-green-500, #00cc88)' : 'var(--ds-red-500)' }}>
+          <div className="num" style={{ fontSize: 17, fontWeight: 700, color: (summary.data?.balance || 0) >= 0 ? 'var(--ds-green-text)' : 'var(--ds-red-700)' }}>
             {(summary.data?.balance || 0) >= 0 ? '+ ' : ''}{formatCurrency(summary.data?.balance || 0)}
           </div>
           <div style={{ fontSize: 11, color: 'var(--ds-foreground-muted)', marginTop: 2 }}>
@@ -248,11 +248,11 @@ function MobileReports({ summary, byCategory, trend, insights, period, setPeriod
         <div className="card" style={{ padding: '12px 14px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
             <span style={{ fontSize: 11.5, color: 'var(--ds-foreground-muted)' }}>Maior gasto</span>
-            <span className="badge" style={{ fontSize: 10, padding: '2px 6px', color: 'var(--ds-amber-600)' }}>
+            <span className="badge" style={{ fontSize: 10, padding: '2px 6px', color: 'var(--ds-amber-text)' }}>
               Pico
             </span>
           </div>
-          <div className="num" style={{ fontSize: 17, fontWeight: 700, color: 'var(--ds-amber-600)' }}>
+          <div className="num" style={{ fontSize: 17, fontWeight: 700, color: 'var(--ds-amber-text)' }}>
             {summary.data?.largestExpense ? formatCurrency(summary.data.largestExpense.amount) : 'R$ 0'}
           </div>
           <div style={{ fontSize: 11, color: 'var(--ds-foreground-muted)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -450,7 +450,7 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
                 : 'Sem gastos'}
             </span>
           </div>
-          <p className="stat-value num" style={{ fontSize: 22, fontWeight: 700, margin: '4px 0', color: 'var(--ds-amber-600)' }}>
+          <p className="stat-value num" style={{ fontSize: 22, fontWeight: 700, margin: '4px 0', color: 'var(--ds-amber-text)' }}>
             {summary.data?.largestExpense ? formatCurrency(summary.data.largestExpense.amount) : 'R$ 0,00'}
           </p>
           <p className="stat-foot" style={{ fontSize: 11.5, color: 'var(--ds-foreground-muted)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -468,7 +468,7 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
               <div>
                 <div className="card-head" style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <p className="card-title" style={{ fontSize: 14.5, fontWeight: 600, margin: 0 }}>Composição dos gastos</p>
+                    <h2 className="card-title" style={{ fontSize: 14.5, fontWeight: 600, margin: 0 }}>Composição dos gastos</h2>
                     <span className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>Participação relativa na média semestral</span>
                   </div>
                   <span className="badge" style={{ flexShrink: 0 }}>
@@ -530,7 +530,7 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
             <div className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
               <div className="card-head" style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <p className="card-title" style={{ fontSize: 14.5, fontWeight: 600, margin: 0 }}>Diagnóstico & Insights da IA</p>
+                  <h2 className="card-title" style={{ fontSize: 14.5, fontWeight: 600, margin: 0 }}>Diagnóstico & Insights da IA</h2>
                   <span className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>Análise automatizada de padrões e economias</span>
                 </div>
                 <span className="badge">
@@ -665,7 +665,7 @@ function SixMonthsEvolutionChart({ trend }) {
     <div className="card" style={{ marginBottom: 20 }} aria-label="Evolução de 6 meses">
       <div className="card-head">
         <div>
-          <p className="card-title">Evolução dos Últimos 6 Meses</p>
+          <h2 className="card-title" style={{ margin: 0 }}>Evolução dos Últimos 6 Meses</h2>
           <span className="stat-foot">Comparativo mensal entre Receitas, Despesas e Saldo Líquido Guardado</span>
         </div>
         <div className="chart-6m-legend">
