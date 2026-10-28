@@ -9,10 +9,33 @@ services:
       - .env
     environment:
       ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=${CONEKTA_POSTGRES_DB};Username=${CONEKTA_POSTGRES_USER};Password=${CONEKTA_POSTGRES_PASSWORD}
       Evolution__Instance: conekta
     volumes:
-      - sqlite_data:/app/data
       - uploads_data:/app/wwwroot/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Banco da aplicacao (API, web e PWA). Porta publicada apenas no localhost
+  # para desenvolvimento local (dotnet run) e administracao via psql.
+  postgres:
+    image: postgres:16-alpine
+    container_name: conektafinance-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${CONEKTA_POSTGRES_DB}
+      POSTGRES_USER: ${CONEKTA_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${CONEKTA_POSTGRES_PASSWORD}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   frontend:
     build:
@@ -77,7 +100,7 @@ services:
       - evolution_redis_data:/data
 
 volumes:
-  sqlite_data:
+  postgres_data:
     driver: local
   uploads_data:
     driver: local

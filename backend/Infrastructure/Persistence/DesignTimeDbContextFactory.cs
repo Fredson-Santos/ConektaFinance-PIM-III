@@ -8,9 +8,9 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
 {
     public AppDbContext CreateDbContext(string[] args)
     {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlite("Data Source=financeiro.db")
-            .Options;
-        return new AppDbContext(options);
+        var options = new DbContextOptionsBuilder<AppDbContext>();
+        options.UseConektaPostgres(Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+            ?? "Host=localhost;Port=5433;Database=conektafinance");
+        return new AppDbContext(options.Options);
     }
 }

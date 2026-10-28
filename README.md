@@ -1,7 +1,7 @@
 # 📊 ConektaFinance — Sistema de Controle Financeiro Pessoal
 
 [![.NET 10.0](https://img.shields.io/badge/.NET-10.0-blueviolet.svg)](https://dotnet.microsoft.com/)
-[![SQLite](https://img.shields.io/badge/Database-SQLite-blue.svg)](https://www.sqlite.org/)
+[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL%2016-blue.svg)](https://www.postgresql.org/)
 [![Docker Compose](https://img.shields.io/badge/Container-Docker_Compose-blue.svg)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -19,7 +19,7 @@ O **ConektaFinance** é um sistema completo de gestão de finanças pessoais des
 
 ### Backend
 * **Runtime**: ASP.NET Core 10.0 Web API (Controllers)
-* **Banco de Dados**: SQLite (EF Core 10) com geração e migração automática de banco no startup
+* **Banco de Dados**: PostgreSQL 16 (EF Core 10 + Npgsql) com migrations aplicadas automaticamente no startup
 * **Segurança**: Autenticação via Token JWT, Criptografia de senhas com BCrypt.Net e validação de requisições com FluentValidation
 * **Logs & Documentação**: Serilog para registros detalhados e Swagger/OpenAPI para documentação de rotas da API
 
@@ -53,7 +53,7 @@ O sistema é dividido em dois módulos principais desacoplados que se comunicam 
                                │ (EF Core 10)
                                ▼
                       ┌──────────────────┐
-                      │  SQLite Database │
+                      │    PostgreSQL    │
                       │ (Volume Mapeado) │
                       └──────────────────┘
 ```
@@ -123,7 +123,7 @@ Você pode rodar o projeto localmente para desenvolvimento ou via Docker Compose
 
 ### Opção 2: Produção ou Teste via Docker Compose (Recomendado)
 
-Esta opção constrói os containers do frontend e backend, configura o banco SQLite com persistência local e unifica tudo sob a porta padrão HTTP `80` utilizando o Nginx como proxy reverso (eliminando erros de CORS).
+Esta opção constrói os containers do frontend e backend, sobe o PostgreSQL com persistência em volume e unifica tudo sob a porta padrão HTTP `80` utilizando o Nginx como proxy reverso (eliminando erros de CORS).
 
 #### Pré-requisitos
 * [Docker](https://www.docker.com/) e Docker Compose instalados.
@@ -131,6 +131,7 @@ Esta opção constrói os containers do frontend e backend, configura o banco SQ
 #### Execução
 1. Na raiz do projeto (onde está o arquivo `docker-compose.yml`), execute:
    ```bash
+   cp .env.example .env   # preencha JWT_SECRET e CONEKTA_POSTGRES_PASSWORD
    docker compose up -d --build
    ```
 2. O Docker compilará a imagem .NET, preparará o Nginx e iniciará os serviços em segundo plano.
@@ -146,7 +147,7 @@ Esta opção constrói os containers do frontend e backend, configura o banco SQ
 
 ## 🔒 Credenciais de Teste (Seed Data)
 
-Ao iniciar pela primeira vez, o banco SQLite é migrado e populado automaticamente com os seguintes usuários de teste (senhas em texto plano pré-criptografadas com BCrypt no banco):
+Ao iniciar pela primeira vez, o banco PostgreSQL é migrado e populado automaticamente com os seguintes usuários de teste (senhas em texto plano pré-criptografadas com BCrypt no banco):
 
 | Nome | E-mail | Senha |
 |------|--------|-------|

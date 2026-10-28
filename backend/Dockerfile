@@ -14,8 +14,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 
-# Criar diretório para persistência do SQLite e uploads de avatar
-RUN mkdir -p /app/data /app/wwwroot/uploads
+# Criar diretório para uploads de avatar e imagens do assistente
+RUN mkdir -p /app/wwwroot/uploads
 
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080

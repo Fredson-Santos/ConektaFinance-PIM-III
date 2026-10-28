@@ -55,7 +55,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseConektaPostgres(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();

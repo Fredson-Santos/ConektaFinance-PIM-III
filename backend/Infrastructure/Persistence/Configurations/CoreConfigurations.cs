@@ -8,7 +8,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.ToTable("Users");
         builder.HasKey(u => u.Id);
         builder.Property(u => u.FullName).IsRequired().HasMaxLength(255);
         builder.Property(u => u.DisplayName).HasMaxLength(120);
@@ -30,7 +29,6 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
 {
     public void Configure(EntityTypeBuilder<Category> builder)
     {
-        builder.ToTable("Categories");
         builder.HasKey(c => c.Id);
         builder.Property(c => c.Name).IsRequired().HasMaxLength(100);
         builder.Property(c => c.Description).HasMaxLength(300);
@@ -49,7 +47,6 @@ public class BudgetConfiguration : IEntityTypeConfiguration<Budget>
 {
     public void Configure(EntityTypeBuilder<Budget> builder)
     {
-        builder.ToTable("Budgets");
         builder.HasKey(b => b.Id);
         builder.Property(b => b.LimitValue).HasPrecision(18, 2);
         builder.HasOne(b => b.User)

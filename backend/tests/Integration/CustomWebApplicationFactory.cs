@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -13,7 +12,7 @@ namespace PIM_III_Backend.Tests.Integration;
 
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
-    private readonly SqliteConnection _connection = new("Data Source=:memory:");
+    private readonly string _connectionString = PostgresTestServer.CreateDatabaseAsync().GetAwaiter().GetResult();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -22,14 +21,9 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             Path.Combine(Path.GetTempPath(), "conekta-test-uploads"));
         builder.UseSetting("RateLimit:AuthPermitLimit", "10000");
         builder.UseSetting("RateLimit:AuthWindowSeconds", "60");
+        builder.UseSetting("ConnectionStrings:DefaultConnection", _connectionString);
         builder.ConfigureServices(services =>
         {
-            _connection.Open();
-            var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
-            if (descriptor is not null)
-                services.Remove(descriptor);
-            services.AddDbContext<AppDbContext>(options => options.UseSqlite(_connection));
-
             // Regra tests.md: a IA e sempre simulada na suíte — nem user secrets
             // locais do dev podem ligar o LLM real nos testes de integracao.
             var copilotDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(ICopilotAiClient));
@@ -46,11 +40,5 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 services.Remove(otpDescriptor);
             services.AddScoped<IOtpSender, DevOtpSender>();
         });
-    }
-
-    public override async ValueTask DisposeAsync()
-    {
-        await _connection.DisposeAsync();
-        await base.DisposeAsync();
     }
 }

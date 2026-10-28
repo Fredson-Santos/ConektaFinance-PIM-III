@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PIM_III_Backend.Infrastructure.Persistence;
 
 #nullable disable
@@ -15,426 +16,558 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "10.0.7")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Alert", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("CategoryId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("category_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_at");
 
                     b.Property<string>("DedupKey")
                         .IsRequired()
                         .HasMaxLength(60)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("dedup_key");
 
                     b.Property<bool>("IsRead")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_read");
 
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasMaxLength(300)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("message");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(120)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("title");
 
                     b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("updated_at");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_alerts");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("ix_alerts_category_id");
 
                     b.HasIndex("UserId", "DedupKey")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_alerts_user_id_dedup_key");
 
-                    b.ToTable("Alerts", (string)null);
+                    b.ToTable("alerts", (string)null);
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Budget", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CategoryId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("category_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_at");
 
                     b.Property<decimal>("LimitValue")
                         .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("limit_value");
 
                     b.Property<int>("PeriodMonth")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("period_month");
 
                     b.Property<int>("PeriodYear")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("period_year");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("updated_at");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_budgets");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("ix_budgets_category_id");
 
                     b.HasIndex("UserId", "CategoryId", "PeriodMonth", "PeriodYear")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_budgets_user_id_category_id_period_month_period_year");
 
-                    b.ToTable("Budgets", (string)null);
+                    b.ToTable("budgets", (string)null);
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ColorCode")
                         .IsRequired()
                         .HasMaxLength(7)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(7)")
+                        .HasColumnName("color_code");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_at");
 
                     b.Property<string>("Description")
                         .HasMaxLength(300)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("description");
 
                     b.Property<string>("Icon")
                         .IsRequired()
                         .HasMaxLength(40)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("icon");
 
                     b.Property<bool>("IsSystem")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_system");
 
                     b.Property<int>("Kind")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("kind");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
 
                     b.Property<int>("SortOrder")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(0);
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("sort_order");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("updated_at");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_categories");
 
                     b.HasIndex("UserId", "Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_categories_user_id_name");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("categories", (string)null);
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.ChatMessage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ActionPayload")
                         .HasMaxLength(2000)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("action_payload");
 
                     b.Property<int>("Channel")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(0);
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("channel");
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(4000)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(4000)")
+                        .HasColumnName("content");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_at");
 
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(300)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("image_url");
 
                     b.Property<int>("Role")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("role");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_chat_messages");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_chat_messages_user_id");
 
-                    b.HasIndex("UserId", "Channel");
+                    b.HasIndex("UserId", "Channel")
+                        .HasDatabaseName("ix_chat_messages_user_id_channel");
 
-                    b.ToTable("ChatMessages", (string)null);
+                    b.ToTable("chat_messages", (string)null);
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.ImportBatch", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("AutoCategorize")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("boolean")
+                        .HasColumnName("auto_categorize");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_at");
 
                     b.Property<int>("DetectedCount")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("detected_count");
 
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("file_name");
 
                     b.Property<bool>("IgnoreDuplicates")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("boolean")
+                        .HasColumnName("ignore_duplicates");
 
                     b.Property<int>("ImportedCount")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("imported_count");
 
                     b.Property<string>("ItemsJson")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text")
+                        .HasColumnName("items_json");
 
                     b.Property<int>("SkippedDuplicates")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("skipped_duplicates");
 
                     b.Property<int>("Status")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_import_batches");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_import_batches_user_id");
 
-                    b.ToTable("ImportBatches", (string)null);
+                    b.ToTable("import_batches", (string)null);
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.OtpCode", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Attempts")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("attempts");
 
                     b.Property<string>("CodeHash")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text")
+                        .HasColumnName("code_hash");
 
                     b.Property<DateTime?>("ConsumedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("consumed_at");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_at");
 
                     b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("expires_at");
 
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("phone");
 
                     b.Property<int>("Purpose")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("purpose");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_otp_codes");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_otp_codes_user_id");
 
-                    b.HasIndex("Phone", "CreatedAt");
+                    b.HasIndex("Phone", "CreatedAt")
+                        .HasDatabaseName("ix_otp_codes_phone_created_at");
 
-                    b.ToTable("OtpCodes", (string)null);
+                    b.ToTable("otp_codes", (string)null);
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Transaction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CategoryId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("category_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_at");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("description");
 
                     b.Property<string>("ExternalId")
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("external_id");
 
                     b.Property<int?>("ImportBatchId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("import_batch_id");
 
                     b.Property<bool>("IsRecurrent")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_recurrent");
 
                     b.Property<string>("Observation")
                         .HasMaxLength(500)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("observation");
 
                     b.Property<int?>("PaymentMethod")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("payment_method");
 
                     b.Property<int>("Source")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("source");
 
                     b.Property<int>("Status")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
 
                     b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("transaction_date");
 
                     b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("updated_at");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
                     b.Property<decimal>("Value")
                         .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("value");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_transactions");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("ix_transactions_category_id");
 
-                    b.HasIndex("ImportBatchId");
+                    b.HasIndex("ImportBatchId")
+                        .HasDatabaseName("ix_transactions_import_batch_id");
 
                     b.HasIndex("UserId", "ExternalId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_transactions_user_id_external_id");
 
-                    b.HasIndex("UserId", "TransactionDate");
+                    b.HasIndex("UserId", "TransactionDate")
+                        .HasDatabaseName("ix_transactions_user_id_transaction_date");
 
-                    b.ToTable("Transactions", (string)null);
+                    b.ToTable("transactions", (string)null);
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AccountType")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("TEXT")
-                        .HasDefaultValue("Standard");
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("Standard")
+                        .HasColumnName("account_type");
 
                     b.Property<string>("AvatarUrl")
                         .HasMaxLength(500)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("avatar_url");
 
                     b.Property<string>("Cpf")
                         .HasMaxLength(14)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(14)")
+                        .HasColumnName("cpf");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_at");
 
                     b.Property<string>("Currency")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(3)
-                        .HasColumnType("TEXT")
-                        .HasDefaultValue("BRL");
+                        .HasColumnType("character varying(3)")
+                        .HasDefaultValue("BRL")
+                        .HasColumnName("currency");
 
                     b.Property<int>("CycleStartDay")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(1);
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("cycle_start_day");
 
                     b.Property<string>("DisplayName")
                         .HasMaxLength(120)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("display_name");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("email");
 
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("full_name");
 
                     b.Property<decimal>("MonthlyCeiling")
                         .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("monthly_ceiling");
 
                     b.Property<string>("Occupation")
                         .HasMaxLength(120)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("occupation");
 
                     b.Property<DateTime?>("OnboardingCompletedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("onboarding_completed_at");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text")
+                        .HasColumnName("password_hash");
 
                     b.Property<string>("Phone")
                         .HasMaxLength(20)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("phone");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("updated_at");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_users");
 
                     b.HasIndex("Email")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_email");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Alert", b =>
@@ -442,13 +575,15 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.HasOne("PIM_III_Backend.Domain.Entities.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_alerts_categories_category_id");
 
                     b.HasOne("PIM_III_Backend.Domain.Entities.User", "User")
                         .WithMany("Alerts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_alerts_users_user_id");
 
                     b.Navigation("Category");
 
@@ -461,13 +596,15 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .WithMany("Budgets")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_budgets_categories_category_id");
 
                     b.HasOne("PIM_III_Backend.Domain.Entities.User", "User")
                         .WithMany("Budgets")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_budgets_users_user_id");
 
                     b.Navigation("Category");
 
@@ -480,7 +617,8 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .WithMany("Categories")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_categories_users_user_id");
 
                     b.Navigation("User");
                 });
@@ -491,7 +629,8 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .WithMany("ChatMessages")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_chat_messages_users_user_id");
 
                     b.Navigation("User");
                 });
@@ -502,7 +641,8 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .WithMany("ImportBatches")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_import_batches_users_user_id");
 
                     b.Navigation("User");
                 });
@@ -511,7 +651,8 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                 {
                     b.HasOne("PIM_III_Backend.Domain.Entities.User", null)
                         .WithMany("OtpCodes")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("fk_otp_codes_users_user_id");
                 });
 
             modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Transaction", b =>
@@ -520,18 +661,21 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                         .WithMany("Transactions")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_transactions_categories_category_id");
 
                     b.HasOne("PIM_III_Backend.Domain.Entities.ImportBatch", "ImportBatch")
                         .WithMany()
                         .HasForeignKey("ImportBatchId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_transactions_import_batches_import_batch_id");
 
                     b.HasOne("PIM_III_Backend.Domain.Entities.User", "User")
                         .WithMany("Transactions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_transactions_users_user_id");
 
                     b.Navigation("Category");
 

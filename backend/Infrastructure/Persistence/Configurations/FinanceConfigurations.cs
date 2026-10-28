@@ -9,7 +9,6 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 {
     public void Configure(EntityTypeBuilder<Transaction> builder)
     {
-        builder.ToTable("Transactions");
         builder.HasKey(t => t.Id);
         builder.Property(t => t.Description).IsRequired().HasMaxLength(255);
         builder.Property(t => t.Value).HasPrecision(18, 2);
@@ -36,7 +35,6 @@ public class AlertConfiguration : IEntityTypeConfiguration<Alert>
 {
     public void Configure(EntityTypeBuilder<Alert> builder)
     {
-        builder.ToTable("Alerts");
         builder.HasKey(a => a.Id);
         builder.Property(a => a.Title).IsRequired().HasMaxLength(120);
         builder.Property(a => a.Message).IsRequired().HasMaxLength(300);
@@ -57,7 +55,6 @@ public class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMessage>
 {
     public void Configure(EntityTypeBuilder<ChatMessage> builder)
     {
-        builder.ToTable("ChatMessages");
         builder.HasKey(m => m.Id);
         builder.Property(m => m.Content).IsRequired().HasMaxLength(4000);
         builder.Property(m => m.ActionPayload).HasMaxLength(2000);
@@ -76,7 +73,6 @@ public class OtpCodeConfiguration : IEntityTypeConfiguration<OtpCode>
 {
     public void Configure(EntityTypeBuilder<OtpCode> builder)
     {
-        builder.ToTable("OtpCodes");
         builder.HasKey(o => o.Id);
         builder.Property(o => o.Phone).IsRequired().HasMaxLength(20);
         builder.Property(o => o.CodeHash).IsRequired();
@@ -88,7 +84,6 @@ public class ImportBatchConfiguration : IEntityTypeConfiguration<ImportBatch>
 {
     public void Configure(EntityTypeBuilder<ImportBatch> builder)
     {
-        builder.ToTable("ImportBatches");
         builder.HasKey(b => b.Id);
         builder.Property(b => b.FileName).IsRequired().HasMaxLength(255);
         builder.Property(b => b.ItemsJson).IsRequired();
