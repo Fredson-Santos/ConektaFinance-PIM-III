@@ -383,12 +383,12 @@ export function OnboardingScreen() {
                 <dd>{fullName.trim()}</dd>
               </div>
               <div>
-                <dt>E-mail</dt>
-                <dd>{email.trim()}</dd>
-              </div>
-              <div>
                 <dt>Teto mensal</dt>
                 <dd className="num">{formatCurrency(ceiling)}</dd>
+              </div>
+              <div className="is-wide">
+                <dt>E-mail</dt>
+                <dd>{email.trim()}</dd>
               </div>
             </dl>
             <div className="login-field">

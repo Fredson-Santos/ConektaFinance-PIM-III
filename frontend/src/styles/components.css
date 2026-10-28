@@ -629,7 +629,8 @@
 
 .onboarding-progress {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: 6px;
   list-style: none;
   margin: 0;
@@ -643,6 +644,18 @@
   font-size: 11.5px;
   font-weight: 500;
   color: var(--ds-foreground-faint);
+  white-space: nowrap;
+}
+
+.onboarding-progress li span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 400px) {
+  .onboarding-progress li {
+    font-size: 10.5px;
+  }
 }
 
 .onboarding-progress li::before {
@@ -772,6 +785,10 @@
   padding: 12px 14px;
   background: var(--login-field);
   min-width: 0;
+}
+
+.onboarding-summary div.is-wide {
+  grid-column: 1 / -1;
 }
 
 .onboarding-summary dt {
