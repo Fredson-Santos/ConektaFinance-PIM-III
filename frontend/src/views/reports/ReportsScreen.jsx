@@ -61,10 +61,9 @@ export function ReportsScreen() {
     return reportService.byCategory(prevRange.start, prevRange.end)
   }, [])
   const insights = useAsync(() => insightService.list(), [])
+  const toast = useToast()
 
   if (summary.error) return <ErrorState message={summary.error.message} onRetry={summary.refetch} />
-
-  const toast = useToast()
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
