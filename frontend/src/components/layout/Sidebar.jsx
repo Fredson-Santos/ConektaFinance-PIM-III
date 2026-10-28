@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Receipt, Target, BarChart3, Sun, Moon, LogOut, Settings } from 'lucide-react'
+import { LayoutDashboard, Receipt, Target, BarChart3, Sun, Moon, LogOut, Settings, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
 import { useUi } from '../../context/UiContext'
@@ -50,8 +50,14 @@ const NAV_ITEMS = [
   },
 ]
 
+const ADMIN_ITEM = {
+  to: '/admin',
+  label: 'Administração',
+  icon: () => <ShieldCheck className="icon" size={16} />,
+}
+
 export function Sidebar() {
-  const { user, logout } = useAuth()
+  const { user, logout, isAdmin } = useAuth()
   const { theme, setTheme } = useTheme()
   const { openOverlay, toggleOverlay, overlays } = useUi()
   const toast = useToast()
@@ -84,7 +90,7 @@ export function Sidebar() {
       </div>
 
       <nav className="side-nav" aria-label="Navegação principal">
-        {NAV_ITEMS.map((item) => (
+        {(isAdmin ? [...NAV_ITEMS, ADMIN_ITEM] : NAV_ITEMS).map((item) => (
           <NavLink key={item.to} to={item.to} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
             <item.icon />
             {item.label}
@@ -104,7 +110,7 @@ export function Sidebar() {
             <div className="avatar">{initials}</div>
             <div className="user-info">
               <p className="user-name">{name}</p>
-              <p className="user-role">Conta pessoal</p>
+              <p className="user-role">{isAdmin ? 'Administrador' : 'Conta pessoal'}</p>
             </div>
             <svg className="icon user-chevron" style={{ width: 12, height: 12, marginLeft: 'auto' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M6 9L12 15L18 9" />

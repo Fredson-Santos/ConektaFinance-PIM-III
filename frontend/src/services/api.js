@@ -89,6 +89,10 @@ export function put(path, body) {
   return request(path, { method: 'PUT', body: JSON.stringify(body) })
 }
 
+export function patch(path, body) {
+  return request(path, { method: 'PATCH', body: JSON.stringify(body) })
+}
+
 export function del(path, body) {
   return request(path, { method: 'DELETE', body: body ? JSON.stringify(body) : undefined })
 }

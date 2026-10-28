@@ -9,6 +9,7 @@ import { DashboardScreen } from '../views/dashboard/DashboardScreen'
 import { ReportsScreen } from '../views/reports/ReportsScreen'
 import { SettingsScreen } from '../views/settings/SettingsScreen'
 import { OnboardingScreen } from '../views/onboarding/OnboardingScreen'
+import { AdminScreen } from '../views/admin/AdminScreen'
 
 function RequireAuth({ children, onboarding = false }) {
   const { isAuthenticated, initialized, needsOnboarding } = useAuth()
@@ -27,6 +28,12 @@ function RequireAuth({ children, onboarding = false }) {
   if (needsOnboarding && !onboarding) return <Navigate to="/boas-vindas" replace />
   if (!needsOnboarding && onboarding) return <Navigate to="/dashboard" replace />
   return children
+}
+
+// Guarda de perfil: usuário comum que digitar /admin volta ao dashboard.
+function RequireAdmin({ children }) {
+  const { isAdmin } = useAuth()
+  return isAdmin ? children : <Navigate to="/dashboard" replace />
 }
 
 export function AppRoutes() {
@@ -57,6 +64,14 @@ export function AppRoutes() {
         <Route path="/categorias" element={<BudgetsScreen />} />
         <Route path="/relatorios" element={<ReportsScreen />} />
         <Route path="/configuracoes" element={<SettingsScreen />} />
+        <Route
+          path="/admin"
+          element={(
+            <RequireAdmin>
+              <AdminScreen />
+            </RequireAdmin>
+          )}
+        />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

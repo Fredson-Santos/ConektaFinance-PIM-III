@@ -10,8 +10,10 @@ import {
   Sparkles,
   Bell,
   Settings,
+  ShieldCheck,
 } from 'lucide-react'
 import { useUi } from '../../context/UiContext'
+import { useAuth } from '../../context/AuthContext'
 
 const COMMANDS = [
   { name: 'Ir para Dashboard', icon: LayoutDashboard, hint: 'Página', run: (navigate) => navigate('/dashboard') },
@@ -23,11 +25,13 @@ const COMMANDS = [
   { name: 'Importar extrato', icon: Import, hint: 'Ação', run: (_navigate, ui) => ui.openOverlay('import') },
   { name: 'Abrir assistente de IA', icon: Sparkles, hint: 'Ação', run: (_navigate, ui) => ui.openOverlay('ai') },
   { name: 'Ver alertas de orçamento', icon: Bell, hint: 'Ação', run: (_navigate, ui) => ui.openOverlay('notif') },
+  { name: 'Ir para Administração', icon: ShieldCheck, hint: 'Página', adminOnly: true, run: (navigate) => navigate('/admin') },
 ]
 
 export function CommandPalette() {
   const { overlays, closeOverlay, openTransactionSheet, openOverlay } = useUi()
   const navigate = useNavigate()
+  const { isAdmin } = useAuth()
   const [query, setQuery] = useState('')
   const [highlight, setHighlight] = useState(0)
   const inputRef = useRef(null)
@@ -63,9 +67,10 @@ export function CommandPalette() {
 
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase()
-    if (!term) return COMMANDS
-    return COMMANDS.filter((command) => command.name.toLowerCase().includes(term))
-  }, [query])
+    const available = COMMANDS.filter((command) => !command.adminOnly || isAdmin)
+    if (!term) return available
+    return available.filter((command) => command.name.toLowerCase().includes(term))
+  }, [query, isAdmin])
 
   const execute = (command) => {
     closeOverlay('cmdk')

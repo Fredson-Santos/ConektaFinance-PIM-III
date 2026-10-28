@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Search, Bell, Import, Plus } from 'lucide-react'
+import { Search, Bell, Import, Plus, ShieldCheck } from 'lucide-react'
 import { useUi } from '../../context/UiContext'
 import { useAuth } from '../../context/AuthContext'
 import { useUnreadAlerts } from '../../hooks/useUnreadAlerts'
@@ -11,11 +11,12 @@ const PAGE_META = {
   '/categorias': ['Categorias', 'Organize suas despesas e limites por categoria'],
   '/relatorios': ['Relatórios', 'Balanço semestral & inteligência preditiva · Abril a Setembro de 2026'],
   '/configuracoes': ['Configurações', 'Perfil, segurança e privacidade'],
+  '/admin': ['Administração', 'Métricas da plataforma e gestão de contas'],
 }
 
 export function Topbar() {
   const { openOverlay, overlays } = useUi()
-  const { user } = useAuth()
+  const { user, isAdmin } = useAuth()
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const { count } = useUnreadAlerts()
@@ -59,6 +60,17 @@ export function Topbar() {
         <button type="button" className="btn primary desktop-only" onClick={() => openOverlay('transaction')}>
           <Plus size={14} /> Novo lançamento
         </button>
+        {isAdmin ? (
+          <button
+            type="button"
+            className="btn-icon icon-btn mobile-only"
+            aria-label="Administração"
+            onClick={() => navigate('/admin')}
+            style={{ width: 34, height: 34 }}
+          >
+            <ShieldCheck size={16} />
+          </button>
+        ) : null}
         <button
           type="button"
           className="btn-icon mobile-only"

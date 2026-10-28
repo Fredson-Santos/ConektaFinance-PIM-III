@@ -1,4 +1,4 @@
-import { get, post, put, del, postForm, downloadFile, getWithMeta } from './api'
+import { get, post, put, patch, del, postForm, downloadFile, getWithMeta } from './api'
 
 export const authService = {
   login: (email, password) => post('/auth/login', { email, password }),
@@ -125,4 +125,14 @@ export const importService = {
     return postForm('/imports/preview', form)
   },
   confirm: (batchId, payload) => post(`/imports/${batchId}/confirm`, payload),
+}
+
+export const adminService = {
+  metrics: () => get('/admin/metrics'),
+  users: ({ search, page = 1, pageSize = 20 } = {}) => {
+    const query = new URLSearchParams({ page, pageSize })
+    if (search) query.set('search', search)
+    return get(`/admin/users?${query}`)
+  },
+  updateStatus: (id, isActive) => patch(`/admin/users/${id}/status`, { isActive }),
 }

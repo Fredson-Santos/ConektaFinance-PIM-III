@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { CommandPalette } from '../components/cmdk/CommandPalette'
 import { UiProvider, useUi } from '../context/UiContext'
+import { AuthProvider } from '../context/AuthContext'
 import { useEffect } from 'react'
 
 function OverlayOpener({ overlay }) {
@@ -16,10 +17,12 @@ function OverlayOpener({ overlay }) {
 function renderPalette(initiallyOpen = true) {
   const rendered = render(
     <MemoryRouter>
-      <UiProvider>
-        {initiallyOpen ? <OverlayOpener overlay="cmdk" /> : null}
-        <CommandPalette />
-      </UiProvider>
+      <AuthProvider>
+        <UiProvider>
+          {initiallyOpen ? <OverlayOpener overlay="cmdk" /> : null}
+          <CommandPalette />
+        </UiProvider>
+      </AuthProvider>
     </MemoryRouter>,
   )
   return rendered

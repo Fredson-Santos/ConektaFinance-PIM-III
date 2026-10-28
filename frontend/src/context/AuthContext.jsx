@@ -107,6 +107,7 @@ export function AuthProvider({ children }) {
       startSession,
       completeOnboarding,
       needsOnboarding: user?.onboardingCompleted === false,
+      isAdmin: user?.accountType === 'Admin',
     }),
     [user, initialized, login, loginByOtp, demoLogin, register, logout, refreshUser, startSession, completeOnboarding],
   )
