@@ -10,7 +10,7 @@ import { ThemeProvider } from '../context/ThemeContext'
 
 // Auditoria WCAG 2.1 A/AA automatizada das telas principais (roda no CI).
 // Contraste de cores fica fora: o jsdom nao calcula estilos renderizados; ele e
-// verificado com axe no navegador real (ver docs/TASKS_FASE_14.md, F14.10).
+// verificado com axe no navegador real (ver docs/02-planejamento/fases/TASKS_FASE_14.md, F14.10).
 
 const admin = {
   id: 1,
