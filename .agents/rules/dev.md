@@ -13,7 +13,7 @@
      - Metadados públicos do sistema (`<title>`, `manifest.json`, descrições PWA).
 
 3. **Papel dos Documentos Acadêmicos no Repositório**:
-   - Arquivos como manuais acadêmicos (`docs/manual-pimIV/`), roadmaps e relatórios existem no repositório **estritamente como referência interna de critérios e boas práticas técnicas** (banco de dados, PWA, arquitetura, etc.) para guiar as entregas do projeto.
+   - Arquivos como manuais acadêmicos (`docs/00-manual-pim-iv/`), roadmaps e relatórios existem no repositório **estritamente como referência interna de critérios e boas práticas técnicas** (banco de dados, PWA, arquitetura, etc.) para guiar as entregas do projeto.
    - O software e todo o seu código de produção devem permanecer 100% agnósticos a essas menções.
 
 4. **Consistência de Design System e Usabilidade**:

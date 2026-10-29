@@ -127,8 +127,9 @@ Convenção: **DoD** = critério de pronto · **Commit** no padrão `git.md` (pt
 
 | ID | Área | Task | DoD | Commit previsto |
 |---|---|---|---|---|
-| F12.1 | docs | Capturas de telas + Swagger + diagramas p/ relatório ABNT (ROADMAP Etapas 4–8) | imagens organizadas em `frontend/docs/telas/` e `docsPIM-IV` | `docs(pim-iv): atualiza evidencias de telas e api para o relatorio` |
-| F12.2 | docs | Manual do usuário atualizado (React novo) | manual reflete fluxos reais | `docs: revisa manual do usuario para o novo frontend` |
+| F12.1 | docs | Capturas de telas + Swagger + diagramas p/ relatório ABNT (ROADMAP Etapas 4–8) | imagens organizadas em `docs/01-relatorio-abnt/figuras/` | `docs(pim-iv): atualiza evidencias de telas e api para o relatorio` |
+| F12.2 | docs | Manual do usuário atualizado (React novo) | manual reflete fluxos reais (PWA, OTP, import, PDF, cmdk) | `docs: revisa manual do usuario para o novo frontend` |
+| F12.3 | docs | Consolidação dos capítulos do relatório ABNT | monografia acadêmica estruturada conforme critérios UNIP | `docs(pim-iv): estrutura capitulos do relatorio academico abnt` |
 
 ## 3. Estratégia de testes (6.3) — regra `tests.md`
 

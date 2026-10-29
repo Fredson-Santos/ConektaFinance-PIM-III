@@ -78,7 +78,7 @@ PIM-III/
 │   ├── vite.config.js        # Configuração do Vite (portas e proxies)
 │   ├── Dockerfile            # Arquivo de containerização do frontend
 │   └── nginx.conf            # Configuração de proxy e rotas do Nginx
-├── docs/                     # Planejamento, especificações, tarefas e manual do usuário
+├── docs/                     # Documentação acadêmica e técnica (ver docs/README.md)
 ├── docker-compose.yml        # Configuração do deploy local/produção em containers
 └── README.md                 # Este documento
 ```
@@ -173,7 +173,7 @@ Ao iniciar pela primeira vez, o banco PostgreSQL é migrado e populado automatic
 
 ## 📘 Manual do Usuário
 
-Para entender em detalhes como utilizar cada funcionalidade do sistema (Dashboard, Gestão de Categorias, Transações, Relatórios, Alertas e Assistente IA), consulte o [Manual do Usuário](file:///c:/Users/Fred/ADS/PIM-III/docs/MANUAL_DO_USUARIO.md) disponível na pasta de documentação.
+Para entender em detalhes como utilizar cada funcionalidade do sistema (Dashboard, Gestão de Categorias, Transações, Relatórios, Alertas e Assistente IA), consulte o [Manual do Usuário](docs/04-documentacao-software/manual-usuario/). A versão anterior (PIM III) está em [legacy/docs-pim-III/MANUAL_DO_USUARIO.md](legacy/docs-pim-III/MANUAL_DO_USUARIO.md).
 
 ---
 

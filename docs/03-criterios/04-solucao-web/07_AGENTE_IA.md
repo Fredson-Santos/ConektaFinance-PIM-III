@@ -154,3 +154,18 @@ POST /api/v1/webhooks/whatsapp (assinatura/verify token da Evolution)
 ```
 
 **⚠️ Risco:** APIs não oficiais violam os termos da Meta e o número pode ser banido. Usar **chip pré-pago dedicado** para o projeto — nunca o número pessoal.
+
+## Ética e não discriminação (F14.11)
+
+O assistente segue diretrizes de responsabilidade social em duas camadas, para não depender só do comportamento do modelo de linguagem:
+
+1. **Prompt do sistema** (`CopilotEthics.PromptRules`, incluído em `LlmCopilotClient`): o agente nunca infere, pergunta ou usa raça, cor, etnia, gênero, orientação sexual, religião, deficiência, idade, origem ou região do usuário ou de terceiros; recusa comparações ou generalizações financeiras sobre esses grupos; usa linguagem simples, respeitosa e neutra, sem jargão bancário; não recomenda crédito, empréstimos ou investimentos específicos; e não faz julgamento moral sobre os gastos.
+2. **Filtro determinístico** (`CopilotEthics.IsDiscriminatoryRequest`, aplicado em `CopilotService` antes da chamada ao modelo): mensagens que associam um grupo protegido a um julgamento ou decisão financeira (ex.: "imigrantes são caloteiros?", "mulheres gastam mais?") recebem uma recusa neutra fixa, sem chegar ao LLM. O filtro vale para os canais web e WhatsApp.
+
+A recusa explica o limite e devolve a conversa às finanças do próprio usuário:
+
+> Não faço comparações, generalizações ou recomendações com base em raça, cor, etnia, gênero, orientação sexual, religião, deficiência, idade ou origem. Cada pessoa organiza o dinheiro do seu jeito. Posso ajudar com os seus gastos, orçamentos e metas: quer um resumo do mês?
+
+O trecho "ETICA E RESPEITO" também entrou nos marcadores de vazamento de prompt, para que o modelo não exponha essas instruções internas.
+
+**Testes:** `CopilotEthicsTests` (casos discriminatórios e mensagens financeiras comuns que não podem ser bloqueadas), `CopilotServiceTests.Pergunta_com_vies_discriminatorio_e_recusada_sem_chamar_a_ia`, `LlmCopilotClientTests.Prompt_do_sistema_nao_contem_dados_do_usuario` e `CopilotFlowTests.Pergunta_com_vies_discriminatorio_recebe_recusa_neutra` (fluxo completo pela API, com IA simulada conforme `tests.md`).

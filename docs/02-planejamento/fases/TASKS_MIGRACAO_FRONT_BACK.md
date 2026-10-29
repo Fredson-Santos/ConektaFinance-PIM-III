@@ -1,15 +1,15 @@
 # Tasks de Planejamento e Implementação — Migração do Front para React e Refação do Backend
 
-> **Escopo deste documento:** Rastreamento unificado do ciclo de vida da migração: **Planejamento (Etapas 1–7 — Concluído)** e **Execução/Implementação (Fases F0–F12 — F0 a F11 concluídas; F12 dispensada pelo time)**.
-> **Fonte da verdade e especificação:** Protótipo em `docsPIM-IV/prototipo/index.html` e especificações técnicas em `docsPIM-IV/planejamento/`.
+> **Escopo deste documento:** Rastreamento unificado do ciclo de vida da migração: **Planejamento (Etapas 1–7 — Concluído)** e **Execução/Implementação (Fases F0–F13 — F0 a F11 concluídas; F12 planejada; F13 planejada)**.
+> **Fonte da verdade e especificação:** Protótipo em `docs/02-planejamento/prototipo/index.html` e especificações técnicas em `docs/03-criterios/04-solucao-web/`, `docs/03-criterios/07-banco-de-dados/` e `docs/02-planejamento/fases/06_PLANO_IMPLEMENTACAO.md`.
 > **Direção técnica:** React + Vite (SPA/PWA) no front · ASP.NET Core (.NET 10) no back · EF Core + SQLite · Nginx + Docker.
 
 **Legenda:** `[ ]` pendente · `[x]` concluído
 
-> **Status Atual (20/10/2026):**
+> **Status Atual (28/10/2026):**
 > - **Planejamento (Etapas 1–7):** **100% Concluído e Aprovado**.
 > - **Implementação (Fases F0–F11):** **100% Concluída** — backend com 133 testes verdes (`dotnet test`), frontend com 61 testes verdes (`npm test` + `npm run build`), 30 commits atômicos no padrão do `git.md`.
-> - **Fase F12 (evidências e manual):** **Dispensada pela equipe** em 20/10/2026.
+> - **Fase F12 (Documentação e Evidências):** **Necessária e planejada** — documentação acadêmica, manual de usuário atualizado e evidências visuais obrigatórias para os entregáveis do PIM IV.
 
 ---
 
@@ -17,12 +17,12 @@
 
 | # | Etapa | Entregável | Depende de | Status |
 |---|---|---|---|---|
-| 1 | Inventário do protótipo | `docsPIM-IV/planejamento/01_INVENTARIO_FRONT.md` | — | **Concluído** |
-| 2 | Plano de componentização React | `docsPIM-IV/planejamento/02_PLANO_COMPONENTES.md` | 1 | **Concluído** |
-| 3 | Modelo de dados & MER | `docsPIM-IV/planejamento/03_MODELO_DADOS.md` + `diagramas/DIAGRAMA_ER.md` | 1 | **Concluído** |
-| 4 | Contrato da API REST | `docsPIM-IV/planejamento/04_CONTRATO_API.md` | 1, 3 | **Concluído** |
-| 5 | Análise do backend atual (gap) | `docsPIM-IV/planejamento/05_GAP_BACKEND.md` | 3, 4 | **Concluído** |
-| 6 | Plano de implementação e testes | `docsPIM-IV/planejamento/06_PLANO_IMPLEMENTACAO.md` | 2, 4, 5 | **Concluído** |
+| 1 | Inventário do protótipo | `docs/03-criterios/04-solucao-web/01_INVENTARIO_FRONT.md` | — | **Concluído** |
+| 2 | Plano de componentização React | `docs/03-criterios/04-solucao-web/02_PLANO_COMPONENTES.md` | 1 | **Concluído** |
+| 3 | Modelo de dados & MER | `docs/03-criterios/07-banco-de-dados/03_MODELO_DADOS.md` + `docs/03-criterios/07-banco-de-dados/DIAGRAMA_ER.md` | 1 | **Concluído** |
+| 4 | Contrato da API REST | `docs/03-criterios/04-solucao-web/04_CONTRATO_API.md` | 1, 3 | **Concluído** |
+| 5 | Análise do backend atual (gap) | `docs/03-criterios/04-solucao-web/05_GAP_BACKEND.md` | 3, 4 | **Concluído** |
+| 6 | Plano de implementação e testes | `docs/02-planejamento/fases/06_PLANO_IMPLEMENTACAO.md` | 2, 4, 5 | **Concluído** |
 | 7 | Revisão e aprovação formal | Registro de decisões abaixo (§ Etapa 7) | 1–6 | **Concluído** |
 
 ---
@@ -278,9 +278,25 @@ F0 Fundações → F1 Auth → F2 Categorias → F3 Transações → F4 Orçamen
 
 ### Fase F12 — Documentação Acadêmica & Entregáveis PIM IV
 
-> **Dispensada pela equipe em 20/10/2026.** As capturas de evidência podem ser geradas pelo time com `npx playwright test specs/04-capturas.spec.ts` (stack local: `dotnet run` + `npm run dev`).
+> **Atualizado em 28/10/2026:** A documentação técnica, manual de usuário atualizado e evidências visuais são entregáveis necessários para a consolidação do PIM IV (UNIP).
 
 | Status | ID | Área | Tarefa | Critério de Aceite (DoD) | Commit Previsto |
 |:---:|---|---|---|---|---|
-| [ ] | F12.1 | `docs` | Capturar evidências visuais (Swagger, PWA mobile e telas) para o relatório ABNT | Imagens organizadas por etapa do roadmap prontas para inserção nos capítulos da monografia | `docs(pim-iv): atualiza evidencias de telas e api para o relatorio` |
-| [ ] | F12.2 | `docs` | Atualizar manual do usuário com os novos fluxos de autenticação e navegação | Documento com guia passo a passo refletindo o sistema final em produção | `docs: revisa manual do usuario para o novo frontend` |
+| [ ] | F12.1 | `docs` | Capturar evidências visuais (Dashboard, Transações, Categorias, Relatórios, Configurações, Assistente IA, Command Palette e Swagger API) | Imagens de alta fidelidade e OpenAPI spec organizados para os capítulos da monografia | `docs(pim-iv): atualiza evidencias de telas e api para o relatorio` |
+| [ ] | F12.2 | `docs` | Atualizar manual do usuário com os novos fluxos de autenticação, PWA, relatórios, importação e Command Palette | Guia passo a passo completo refletindo a versão 2.0 (React 19 + PWA + .NET 10) em `docs/04-documentacao-software/manual-usuario/` | `docs: revisa manual do usuario para o novo frontend` |
+| [ ] | F12.3 | `docs` | Consolidar seções do relatório ABNT com base no ROADMAP PIM IV (Etapas 1 a 9) | Monografia acadêmica em conformidade com as diretrizes e rubricas da UNIP | `docs(pim-iv): estrutura capitulos do relatorio academico abnt` |
+
+---
+
+### Fase F13 — Refinamento de UX, Autenticação e Onboarding
+
+> Detalhamento completo e especificações arquiteturais disponíveis em [**`docs/02-planejamento/fases/TASKS_FASE_13.md`**](TASKS_FASE_13.md).
+
+| Status | ID | Área | Tarefa | Critério de Aceite (DoD) | Commit Previsto |
+|:---:|---|---|---|---|---|
+| [ ] | F13.1 | `frontend` | Redesenhar tela de login com estética clean/moderna e autenticação exclusiva via WhatsApp (OTP) com sessão salva | Redesign minimalista; remoção total de e-mail/senha; fluxo único WhatsApp OTP; checkbox "Salvar sessão"; botão de demo discreto | `feat(frontend): redesenha tela de login com layout clean e auth exclusiva por whatsapp` |
+| [ ] | F13.2 | `frontend` / `backend` | Implementar fluxo guiado de Onboarding para novos usuários | Modal/tela de primeiro acesso coletando nome, teto de gastos mensal e preferências; persistência no backend e boas-vindas | `feat(frontend): implementa fluxo guiado de onboarding para novos usuarios` |
+| [ ] | F13.3 | `frontend` | Destacar o dia atual em azul no gráfico "Distribuição de gastos na semana" | Dia corrente identificado dinamicamente e destacado em azul (`var(--ds-blue-600)`); demais barras com preenchimento neutro | `style(frontend): destaca dia atual em azul no grafico de gastos semanais` |
+| [ ] | F13.4 | `frontend` | Integrar teto do Onboarding ao card "Consumo do Limite" no Dashboard | Card utiliza o teto mensal definido no onboarding; calcula porcentagem de consumo e exibe alerta de proximidade da meta | `feat(frontend): conecta teto orcamentario do onboarding ao card de consumo` |
+| [ ] | F13.5 | `frontend` | Corrigir totalizador da tela "Gastos" para somar exclusivamente despesas | Indicador "Transações por período" filtra estritamente `type === 'expense'`, excluindo receitas da somatória | `fix(frontend): ajusta totalizador de gastos para somar exclusivamente despesas` |
+| [ ] | F13.6 | `frontend` | Tornar o gráfico de "Entradas e Saídas" mais descritivo e intuitivo | Legenda visual com marcadores Verde/Vermelho; custom tooltip com entradas, saídas e saldo líquido do mês em R$ | `style(frontend): enriquece informacoes e tooltips do grafico de entradas e saidas` |
