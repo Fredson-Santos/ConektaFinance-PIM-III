@@ -3302,30 +3302,20 @@
       }
 
       .sheet {
-        top: auto !important;
-        bottom: max(16px, env(safe-area-inset-bottom, 16px));
-        right: 14px !important;
-        left: 14px !important;
-        width: auto !important;
-        max-width: calc(100% - 28px) !important;
-        margin: 0 auto;
-        height: auto;
-        max-height: calc(100dvh - 90px);
-        border-radius: 24px;
-        transform: translateY(100%);
-        transform-origin: bottom center;
+        position: relative;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        border-radius: 20px 20px 0 0;
         z-index: 1060;
-        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.75), 0 0 0 1px var(--ds-border-strong);
-        border: 1px solid var(--ds-border-strong);
-        padding: 16px 16px 14px;
+        padding: 16px 16px max(20px, env(safe-area-inset-bottom, 20px));
         overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior: contain;
-        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+        box-sizing: border-box;
       }
 
       .sheet.open {
-        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
       }
 
       .sheet-head {
@@ -4276,10 +4266,14 @@
       pointer-events: none;
     }
 
+    .gastos-search .ds-input {
+      padding: 0 14px 0 36px;
+    }
+
     .ds-input {
       width: 100%;
       height: 40px;
-      padding: 0 14px 0 36px;
+      padding: 0 14px;
       font-size: 14px;
       background: var(--ds-background-100);
       border: 1px solid var(--ds-gray-alpha-400);

@@ -172,7 +172,7 @@ function TransactionForm({ editing, prefill, afterSubmit }) {
         </button>
       </div>
 
-      <Field label={isExpense ? 'Descrição da despesa' : 'Origem / Descrição da receita'}>
+      <Field label={isExpense ? 'Descrição da despesa' : 'Origem ou descrição'}>
         <Input
           value={description}
           onChange={(event) => setDescription(event.target.value)}
@@ -180,7 +180,7 @@ function TransactionForm({ editing, prefill, afterSubmit }) {
         />
       </Field>
 
-      <div className="ds-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div className="tx-form-row">
         <Field label="Valor (R$)">
           <div style={{ position: 'relative' }}>
             <span
@@ -199,7 +199,13 @@ function TransactionForm({ editing, prefill, afterSubmit }) {
           </div>
         </Field>
         <Field label="Data">
-          <Input type="date" value={date} max={toIsoDate(new Date())} onChange={(event) => setDate(event.target.value)} />
+          <Input
+            type="date"
+            className="ds-input-date"
+            value={date}
+            max={toIsoDate(new Date())}
+            onChange={(event) => setDate(event.target.value)}
+          />
         </Field>
       </div>
 
