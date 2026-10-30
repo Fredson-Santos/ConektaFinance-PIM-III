@@ -5,7 +5,6 @@ import { Field, Input } from '../common/Input'
 import { Button } from '../common/Button'
 import { Icon } from '../common/Icon'
 import { categoryService, transactionService } from '../../services'
-import { useAsync } from '../../hooks/useAsync'
 import { useUi } from '../../context/UiContext'
 import { useToast } from '../../context/ToastContext'
 import { parseMoneyInput } from '../../utils/money'
@@ -51,21 +50,47 @@ function TransactionForm({ editing, prefill, afterSubmit }) {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
 
-  const { data: categories } = useAsync(() => categoryService.list({ kind: type }), [type])
+  const [categoriesCache, setCategoriesCache] = useState({ expense: [], income: [] })
 
   useEffect(() => {
-    if (!categories || categories.length === 0) return
-    const fromEditing = editing
-      ? categories.find((category) => category.id === editing.category.id)
-      : null
-    const fromPrefill = prefill?.categoryName
-      ? categories.find((category) => category.name.toLowerCase() === prefill.categoryName.toLowerCase())
-      : null
-    setCategoryId((current) => String(fromEditing?.id || fromPrefill?.id || categories[0].id) || current)
-  }, [categories, editing, prefill])
+    let active = true
+    Promise.all([
+      categoryService.list({ kind: 'expense' }).catch(() => []),
+      categoryService.list({ kind: 'income' }).catch(() => []),
+    ]).then(([expenseList, incomeList]) => {
+      if (!active) return
+      const expense = Array.isArray(expenseList) ? expenseList : []
+      const income = Array.isArray(incomeList) ? incomeList : []
+      setCategoriesCache({ expense, income })
+
+      const currentList = type === 'income' ? income : expense
+      const fromEditing = editing
+        ? currentList.find((category) => category.id === editing.category?.id)
+        : null
+      const fromPrefill = prefill?.categoryName
+        ? currentList.find((category) => category.name.toLowerCase() === prefill.categoryName.toLowerCase())
+        : null
+      const nextId = String(fromEditing?.id || fromPrefill?.id || (currentList[0] ? currentList[0].id : ''))
+      if (nextId) setCategoryId(nextId)
+    })
+    return () => {
+      active = false
+    }
+  }, [editing, prefill])
+
+  const categories = categoriesCache[type] || []
+
+  const handleTypeChange = (nextType) => {
+    if (nextType === type) return
+    setType(nextType)
+    const list = categoriesCache[nextType] || []
+    if (list.length > 0) {
+      setCategoryId(String(list[0].id))
+    }
+  }
 
   const selectedCategory = useMemo(
-    () => (categories || []).find((category) => String(category.id) === String(categoryId)),
+    () => categories.find((category) => String(category.id) === String(categoryId)),
     [categories, categoryId],
   )
 
@@ -132,7 +157,7 @@ function TransactionForm({ editing, prefill, afterSubmit }) {
           role="tab"
           aria-selected={isExpense}
           className={`auth-tab ${isExpense ? 'active' : ''}`}
-          onClick={() => setType('expense')}
+          onClick={() => handleTypeChange('expense')}
         >
           Despesa
         </button>
@@ -141,7 +166,7 @@ function TransactionForm({ editing, prefill, afterSubmit }) {
           role="tab"
           aria-selected={!isExpense}
           className={`auth-tab ${!isExpense ? 'active' : ''}`}
-          onClick={() => setType('income')}
+          onClick={() => handleTypeChange('income')}
         >
           Entrada
         </button>
@@ -179,7 +204,7 @@ function TransactionForm({ editing, prefill, afterSubmit }) {
       </div>
 
       <Field label="Categoria">
-        <div className="chips">
+        <div className="chips" style={{ minHeight: 38, alignItems: 'center' }}>
           {(categories || []).map((category) => (
             <button
               key={category.id}

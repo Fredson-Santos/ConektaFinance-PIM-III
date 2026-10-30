@@ -506,3 +506,67 @@ h2 {
   }
 }
 
+/* ==========================================================================
+   Estabilidade de Layout em Formulários e Abas de Modais (Zero Layout Shift)
+   ========================================================================== */
+.modal-overlay .sheet form {
+  box-sizing: border-box;
+}
+
+.modal-overlay .sheet .auth-tabs,
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 4px;
+  background: var(--ds-background-200);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+  box-sizing: border-box;
+  margin-bottom: 4px;
+}
+
+.modal-overlay .sheet .auth-tab,
+.auth-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--ds-radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ds-foreground-muted);
+  background: transparent;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background-color var(--ds-duration-fast) var(--ds-ease),
+              color var(--ds-duration-fast) var(--ds-ease),
+              border-color var(--ds-duration-fast) var(--ds-ease),
+              box-shadow var(--ds-duration-fast) var(--ds-ease);
+}
+
+.modal-overlay .sheet .auth-tab:hover,
+.auth-tab:hover {
+  color: var(--ds-foreground);
+}
+
+.modal-overlay .sheet .auth-tab.active,
+.auth-tab.active {
+  background: var(--ds-background-100);
+  color: var(--ds-foreground);
+  border-color: var(--ds-border);
+  box-shadow: var(--ds-shadow-small);
+  font-weight: 600;
+}
+
+.modal-overlay .sheet .chips,
+.chips {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
