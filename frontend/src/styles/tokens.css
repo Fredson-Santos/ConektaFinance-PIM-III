@@ -1,3 +1,8 @@
+/* ==========================================================================
+   HYBRID CRAFT UI — BeUI Dark × shadcn/ui Light × Precision Runtime
+   Fonte única de tokens. Os tokens semânticos da skill (--bg-*, --text-*,
+   --accent-*, --tm-*) alimentam a escala --ds-* consumida pelos componentes.
+   ========================================================================== */
 :root {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'IBM Plex Mono', Menlo, Monaco, 'Courier New', monospace;
@@ -10,132 +15,241 @@
   --ds-space-8: 32px;
   --ds-space-10: 40px;
   --ds-space-12: 48px;
-  --ds-radius-sm: 4px;
-  --ds-radius-md: 6px;
-  --ds-radius-lg: 8px;
-  --ds-radius-xl: 12px;
-  --ds-radius-2xl: 16px;
+
+  /* Geometria: cards 18–20px, controles em cápsula */
+  --ds-radius-sm: 6px;
+  --ds-radius-md: 10px;
+  --ds-radius-lg: 14px;
+  --ds-radius-xl: 20px;
+  --ds-radius-2xl: 24px;
+  --ds-radius-card: 20px;
+  --ds-radius-panel: 18px;
+  --ds-radius-control: 18px;
   --ds-radius-full: 9999px;
+
+  /* Tracking Precision Craft */
+  --ds-tracking-tight: -0.03em;
+  --ds-tracking-tighter: -0.05em;
+
   --ds-ease: cubic-bezier(0.16, 1, 0.3, 1);
   --ds-duration-fast: 120ms;
   --ds-duration-normal: 200ms;
+  --ds-duration-switch: 320ms;
 }
 
+/* DARK — BeUI Minimalist (padrão) */
 :root,
 [data-theme='dark'] {
   color-scheme: dark;
-  --ds-background-100: #000000;
-  --ds-background-200: #0a0a0a;
-  --ds-background-surface: #121212;
-  --ds-background-card: #111111;
-  --ds-gray-100: #111111;
-  --ds-gray-200: #191919;
-  --ds-gray-300: #222222;
+
+  --bg-canvas: #151515;
+  --bg-surface: #1c1c1c;
+  --bg-muted: #262626;
+  --bg-surface-hover: #242424;
+  --bg-terminal: #111111;
+  --border-subtle: #262626;
+  --border-card: rgba(255, 255, 255, 0.08);
+  --text-foreground: #ededed;
+  --text-body: #d0d6e0;
+  --text-muted: #8e8e93;
+  --text-timestamp: #62666d;
+  --accent-action: #0084ff;
+  --accent-action-hover: #1a90ff;
+  --accent-action-contrast: #ffffff;
+  --accent-brand: #d5ff66;
+  --accent-brand-contrast: #151515;
+
+  /* Telemetria */
+  --tm-success: #27a644;
+  --tm-edge: #38bdf8;
+  --tm-dispatch: #0d9488;
+  --tm-warning: #fbbf24;
+  --tm-destructive: #ef4444;
+
+  /* Gráfico minimalista: traço Electric Blue com brilho de 25% */
+  --chart-primary: #0084ff;
+  --chart-fill-opacity: 0.25;
+  --chart-grid: rgba(255, 255, 255, 0.08);
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.06);
+
+  --ds-background-100: var(--bg-surface);
+  --ds-background-200: var(--bg-canvas);
+  --ds-background-surface: var(--bg-muted);
+  --ds-background-card: var(--bg-surface);
+  --ds-background-hover: var(--bg-surface-hover);
+  --ds-gray-100: #1c1c1c;
+  --ds-gray-200: #222222;
+  --ds-gray-300: #262626;
   --ds-gray-400: #2e2e2e;
   --ds-gray-500: #444444;
   --ds-gray-600: #666666;
-  --ds-gray-700: #888888;
-  --ds-gray-800: #999999;
-  --ds-gray-900: #cccccc;
+  --ds-gray-700: #8e8e93;
+  --ds-gray-800: #a1a1a6;
+  --ds-gray-900: #d0d6e0;
   --ds-gray-1000: #ededed;
-  --ds-gray-alpha-100: rgba(255, 255, 255, 0.05);
-  --ds-gray-alpha-200: rgba(255, 255, 255, 0.08);
-  --ds-gray-alpha-300: rgba(255, 255, 255, 0.12);
-  --ds-gray-alpha-400: rgba(255, 255, 255, 0.16);
-  --ds-gray-alpha-500: rgba(255, 255, 255, 0.24);
+  --ds-gray-alpha-100: rgba(255, 255, 255, 0.04);
+  --ds-gray-alpha-200: rgba(255, 255, 255, 0.06);
+  --ds-gray-alpha-300: rgba(255, 255, 255, 0.08);
+  --ds-gray-alpha-400: rgba(255, 255, 255, 0.12);
+  --ds-gray-alpha-500: rgba(255, 255, 255, 0.18);
   --ds-gray-alpha-600: rgba(255, 255, 255, 0.38);
   --ds-gray-alpha-700: rgba(255, 255, 255, 0.54);
-  --ds-blue-600: #0068d6;
-  --ds-blue-700: #0070f3;
-  --ds-blue-800: #0050a4;
-  --ds-blue-alpha-200: rgba(0, 112, 243, 0.15);
-  --ds-red-600: #c92a2a;
-  --ds-red-700: #e5484d;
-  --ds-red-alpha-200: rgba(238, 0, 0, 0.15);
+  --ds-blue-600: #0074e0;
+  --ds-blue-700: #0084ff;
+  --ds-blue-800: #005fcc;
+  --ds-blue-alpha-200: rgba(0, 132, 255, 0.15);
+  --ds-red-600: #dc2626;
+  --ds-red-700: #ef4444;
+  --ds-red-alpha-200: rgba(239, 68, 68, 0.15);
   --ds-amber-600: #d97706;
-  --ds-amber-700: #f5a623;
-  --ds-amber-alpha-200: rgba(245, 166, 35, 0.15);
-  --ds-green-600: #008f5d;
-  --ds-green-700: #00cc88;
-  --ds-green-alpha-200: rgba(0, 229, 153, 0.15);
-  --ds-teal-600: #0b9bb0;
-  --ds-teal-700: #12b5cb;
-  --ds-teal-alpha-200: rgba(18, 181, 203, 0.15);
+  --ds-amber-700: #fbbf24;
+  --ds-amber-alpha-200: rgba(251, 191, 36, 0.15);
+  --ds-green-600: #1f8a38;
+  --ds-green-700: #27a644;
+  --ds-green-alpha-200: rgba(39, 166, 68, 0.15);
+  --ds-teal-600: #0d9488;
+  --ds-teal-700: #14b8a6;
+  --ds-teal-alpha-200: rgba(13, 148, 136, 0.15);
+  --ds-sky-700: #38bdf8;
   --ds-purple-600: #7928ca;
   --ds-purple-700: #8e4ec6;
   --ds-purple-alpha-200: rgba(121, 40, 202, 0.18);
-  --ds-foreground: #ededed;
-  --ds-foreground-muted: #888888;
-  --ds-foreground-faint: #8a8a8a;
+  --ds-pink-700: #e93d82;
+  --ds-pink-alpha-200: rgba(233, 61, 130, 0.14);
+  --ds-lime-700: #d5ff66;
+  --ds-lime-alpha-200: rgba(213, 255, 102, 0.12);
+
+  --cat-alimentacao: var(--ds-red-700);
+  --cat-moradia: var(--ds-amber-700);
+  --cat-transporte: var(--ds-blue-700);
+  --cat-lazer: var(--ds-green-700);
+  --cat-saude: var(--ds-pink-700);
+  --cat-educacao: var(--ds-purple-700);
+  --cat-outros: var(--ds-gray-700);
+
+  --ds-foreground: var(--text-foreground);
+  --ds-foreground-body: var(--text-body);
+  --ds-foreground-muted: var(--text-muted);
+  --ds-foreground-faint: #86868b;
   /* Cores de texto com contraste AA (>= 4.5:1) sobre os fundos do tema */
-  --ds-link: #3291ff;
-  --ds-amber-text: #f5a623;
-  --ds-green-text: #00cc88;
-  --ds-foreground-contrast: #000000;
-  --ds-border: var(--ds-gray-alpha-300);
-  --ds-border-strong: var(--ds-gray-alpha-500);
-  --ds-border-subtle: var(--ds-gray-alpha-200);
-  --ds-shadow-small: 0 1px 2px rgba(0, 0, 0, 0.8);
-  --ds-shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.7);
-  --ds-shadow-large: 0 30px 60px rgba(0, 0, 0, 0.9);
-  --ds-focus-ring: 0 0 0 2px var(--ds-background-100), 0 0 0 4px #0070f3;
+  --ds-link: #3d9eff;
+  --ds-amber-text: #fbbf24;
+  --ds-green-text: #3fbf5c;
+  --ds-foreground-contrast: #151515;
+  --ds-border: var(--border-card);
+  --ds-border-strong: rgba(255, 255, 255, 0.16);
+  --ds-border-subtle: var(--border-subtle);
+  --ds-shadow-small: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --ds-shadow-medium: 0 12px 32px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --ds-shadow-large: 0 30px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --ds-focus-ring: 0 0 0 2px var(--ds-background-200), 0 0 0 4px var(--accent-action);
   --ds-grid-line: rgba(255, 255, 255, 0.035);
 }
 
+/* LIGHT — shadcn/ui Minimalist */
 [data-theme='light'] {
   color-scheme: light;
-  --ds-background-100: #ffffff;
-  --ds-background-200: #fafafa;
-  --ds-background-surface: #f5f5f5;
-  --ds-background-card: #ffffff;
+
+  --bg-canvas: #f5f5f5;
+  --bg-surface: #ffffff;
+  --bg-muted: #fafafa;
+  --bg-surface-hover: #f0f0f0;
+  --bg-terminal: #f9f9f9;
+  --border-subtle: #e5e5e5;
+  --border-card: #e5e5e5;
+  --text-foreground: #0a0a0a;
+  --text-body: #171717;
+  --text-muted: #737373;
+  --text-timestamp: #8a8a8a;
+  --accent-action: #0a0a0a;
+  --accent-action-hover: #262626;
+  --accent-action-contrast: #ffffff;
+  --accent-brand: #0a0a0a;
+  --accent-brand-contrast: #ffffff;
+
+  --tm-success: #16a34a;
+  --tm-edge: #0284c7;
+  --tm-dispatch: #0f766e;
+  --tm-warning: #d97706;
+  --tm-destructive: #e7000b;
+
+  /* Gráfico minimalista: traço preto com preenchimento de 12% */
+  --chart-primary: #0a0a0a;
+  --chart-fill-opacity: 0.12;
+  --chart-grid: #e5e5e5;
+
+  --shadow-card: 0 0 0 1px rgba(23, 23, 23, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08);
+
+  --ds-background-100: var(--bg-surface);
+  --ds-background-200: var(--bg-canvas);
+  --ds-background-surface: var(--bg-muted);
+  --ds-background-card: var(--bg-surface);
+  --ds-background-hover: var(--bg-surface-hover);
   --ds-gray-100: #fafafa;
   --ds-gray-200: #f0f0f0;
-  --ds-gray-300: #e6e6e6;
-  --ds-gray-400: #d6d6d6;
+  --ds-gray-300: #e5e5e5;
+  --ds-gray-400: #d4d4d4;
   --ds-gray-500: #a3a3a3;
   --ds-gray-600: #737373;
   --ds-gray-700: #525252;
-  --ds-gray-800: #333333;
-  --ds-gray-900: #1c1c1c;
-  --ds-gray-1000: #111111;
+  --ds-gray-800: #262626;
+  --ds-gray-900: #171717;
+  --ds-gray-1000: #0a0a0a;
   --ds-gray-alpha-100: rgba(0, 0, 0, 0.03);
-  --ds-gray-alpha-200: rgba(0, 0, 0, 0.06);
+  --ds-gray-alpha-200: rgba(0, 0, 0, 0.05);
   --ds-gray-alpha-300: rgba(0, 0, 0, 0.09);
   --ds-gray-alpha-400: rgba(0, 0, 0, 0.13);
   --ds-gray-alpha-500: rgba(0, 0, 0, 0.22);
   --ds-gray-alpha-600: rgba(0, 0, 0, 0.4);
   --ds-gray-alpha-700: rgba(0, 0, 0, 0.58);
-  --ds-blue-600: #0070f3;
-  --ds-blue-700: #095ed5;
-  --ds-blue-alpha-200: rgba(0, 112, 243, 0.1);
-  --ds-red-600: #ee0000;
-  --ds-red-700: #c92a2a;
-  --ds-red-alpha-200: rgba(238, 0, 0, 0.1);
-  --ds-amber-600: #f5a623;
+  --ds-blue-600: #005fb8;
+  --ds-blue-700: #006fd6;
+  --ds-blue-800: #004f99;
+  --ds-blue-alpha-200: rgba(0, 111, 214, 0.1);
+  --ds-red-600: #e7000b;
+  --ds-red-700: #c8000a;
+  --ds-red-alpha-200: rgba(231, 0, 11, 0.08);
+  --ds-amber-600: #d97706;
   --ds-amber-700: #b45309;
-  --ds-amber-alpha-200: rgba(245, 166, 35, 0.1);
-  --ds-green-600: #008f5d;
-  --ds-green-700: #116932;
-  --ds-green-alpha-200: rgba(0, 143, 93, 0.1);
-  --ds-teal-600: #0b9bb0;
-  --ds-teal-700: #12b5cb;
-  --ds-teal-alpha-200: rgba(18, 181, 203, 0.1);
+  --ds-amber-alpha-200: rgba(217, 119, 6, 0.1);
+  --ds-green-600: #16a34a;
+  --ds-green-700: #15803d;
+  --ds-green-alpha-200: rgba(22, 163, 74, 0.1);
+  --ds-teal-600: #0f766e;
+  --ds-teal-700: #0f766e;
+  --ds-teal-alpha-200: rgba(15, 118, 110, 0.1);
+  --ds-sky-700: #0284c7;
   --ds-purple-600: #7928ca;
-  --ds-purple-700: #8e4ec6;
-  --ds-purple-alpha-200: rgba(121, 40, 202, 0.12);
-  --ds-foreground: #111111;
-  --ds-foreground-muted: #666666;
+  --ds-purple-700: #7928ca;
+  --ds-purple-alpha-200: rgba(121, 40, 202, 0.1);
+  --ds-pink-700: #db2777;
+  --ds-pink-alpha-200: rgba(219, 39, 119, 0.1);
+  --ds-lime-700: #0a0a0a;
+  --ds-lime-alpha-200: rgba(0, 0, 0, 0.06);
+
+  --cat-alimentacao: var(--ds-red-700);
+  --cat-moradia: var(--ds-amber-700);
+  --cat-transporte: var(--ds-blue-700);
+  --cat-lazer: var(--ds-green-700);
+  --cat-saude: var(--ds-pink-700);
+  --cat-educacao: var(--ds-purple-700);
+  --cat-outros: var(--ds-gray-600);
+
+  --ds-foreground: var(--text-foreground);
+  --ds-foreground-body: var(--text-body);
+  --ds-foreground-muted: var(--text-muted);
   --ds-foreground-faint: #6e6e6e;
-  --ds-link: #095ed5;
+  --ds-link: #005fb8;
   --ds-amber-text: #92400e;
-  --ds-green-text: #116932;
+  --ds-green-text: #15803d;
   --ds-foreground-contrast: #ffffff;
-  --ds-border: var(--ds-gray-alpha-300);
-  --ds-border-strong: var(--ds-gray-alpha-500);
-  --ds-border-subtle: var(--ds-gray-alpha-200);
+  --ds-border: var(--border-card);
+  --ds-border-strong: #d4d4d4;
+  --ds-border-subtle: var(--border-subtle);
   --ds-shadow-small: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --ds-shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.1);
-  --ds-shadow-large: 0 30px 60px rgba(0, 0, 0, 0.15);
-  --ds-focus-ring: 0 0 0 2px var(--ds-background-100), 0 0 0 4px #0070f3;
+  --ds-shadow-medium: 0 0 0 1px rgba(23, 23, 23, 0.05), 0 8px 24px rgba(0, 0, 0, 0.08);
+  --ds-shadow-large: 0 0 0 1px rgba(23, 23, 23, 0.05), 0 24px 48px rgba(0, 0, 0, 0.12);
+  --ds-focus-ring: 0 0 0 2px var(--ds-background-200), 0 0 0 4px var(--accent-action);
   --ds-grid-line: rgba(0, 0, 0, 0.035);
 }

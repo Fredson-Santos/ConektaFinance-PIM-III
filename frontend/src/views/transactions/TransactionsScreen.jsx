@@ -267,7 +267,7 @@ export function TransactionsScreen() {
               <div className="cat-meter-list" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {topItems.map((item) => {
                   const pct = item.pct
-                  const color = item.colorCode || (item.name.toLowerCase().includes('morad') ? '#0070f3' : item.name.toLowerCase().includes('alim') ? '#f5a623' : item.name.toLowerCase().includes('trans') ? '#8e4ec6' : '#e93d82')
+                  const color = item.colorCode || (item.name.toLowerCase().includes('morad') ? '#0084ff' : item.name.toLowerCase().includes('alim') ? '#f5a623' : item.name.toLowerCase().includes('trans') ? '#8e4ec6' : '#e93d82')
                   return (
                     <div className="cat-meter-item" key={item.categoryId || item.name}>
                       <div className="cat-meter-head" style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, marginBottom: 4 }}>

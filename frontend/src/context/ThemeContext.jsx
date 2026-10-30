@@ -7,6 +7,7 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#151515' : '#f5f5f5')
     localStorage.setItem('conekta_theme', theme)
   }, [theme])
 

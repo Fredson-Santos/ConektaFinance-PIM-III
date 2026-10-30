@@ -98,7 +98,7 @@ export function BudgetsScreen() {
             style={{
               width: `${Math.min(100, overview.percentage)}%`,
               height: '100%',
-              background: overview.status === 'over' ? 'var(--ds-red-700)' : 'linear-gradient(90deg, #0070f3, #00cc88)',
+              background: overview.status === 'over' ? 'var(--ds-red-700)' : 'linear-gradient(90deg, var(--ds-blue-700), var(--ds-green-700))',
               borderRadius: 99,
             }}
           />
@@ -111,7 +111,7 @@ export function BudgetsScreen() {
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', fontSize: 12, color: 'var(--ds-foreground-muted)', borderTop: '1px solid var(--ds-gray-alpha-200)', paddingTop: 12 }}>
           {(categories || []).filter((c) => c.kind === 'expense').slice(0, 5).map((c) => (
             <span key={c.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: c.colorCode || '#0070f3' }} />
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: c.colorCode || '#0084ff' }} />
               {c.name}: <strong style={{ color: 'var(--ds-foreground)' }}>{formatCurrency(c.spent || 0)}</strong>
             </span>
           ))}
@@ -190,14 +190,14 @@ function CategoryCard({ category, onOpenExtrato, onSetLimit, onEdit }) {
   const pct = limit > 0 ? Math.round((spent / limit) * 100) : null
   const isOver = pct && pct > 100
   const isWarn = pct && pct >= 80 && pct <= 100
-  const barColor = isOver ? 'var(--ds-red-700, #e5484d)' : isWarn ? 'var(--ds-amber-500, #f5a623)' : (category.colorCode || '#0070f3')
+  const barColor = isOver ? 'var(--ds-red-700, #e5484d)' : isWarn ? 'var(--ds-amber-500, #f5a623)' : (category.colorCode || '#0084ff')
   const remaining = limit > 0 ? Math.max(0, limit - spent) : null
 
   return (
     <div className="cat-card" style={{ cursor: 'pointer' }} onClick={onOpenExtrato}>
       <div className="cat-card-head" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <span className="cat-icon-wrap" style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--ds-radius-lg)', background: 'var(--ds-gray-alpha-200)', border: '1px solid var(--ds-border)' }}>
-          <Icon name={category.icon || 'tag'} size={16} style={{ color: category.colorCode || '#0070f3' }} />
+          <Icon name={category.icon || 'tag'} size={16} style={{ color: category.colorCode || '#0084ff' }} />
         </span>
         <span
           className={`badge ${isOver ? 'b-bad' : isWarn ? 'b-warn' : limit > 0 ? 'b-ok' : ''}`}

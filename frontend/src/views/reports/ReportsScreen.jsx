@@ -153,7 +153,7 @@ function MobileReports({ summary, byCategory, trend, insights, period, setPeriod
   }, [trend.data])
 
 
-  const donutColors = ['#0070f3', '#f5a623', '#8e4ec6', '#e93d82', '#00cc88', '#666666']
+  const donutColors = ['#0084ff', '#f5a623', '#8e4ec6', '#e93d82', '#00cc88', '#666666']
   const activeCategories = useMemo(() => {
     const raw = (byCategory.data || []).filter((cat) => (cat.total || 0) > 0)
     const total = raw.reduce((sum, cat) => sum + cat.total, 0)
@@ -338,7 +338,7 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
   const isFallback = !byCategory.data || rawComp.length === 0
   const compItems = isFallback
     ? [
-        { categoryId: 1, name: 'Moradia', total: 1800, pct: 42, colorCode: '#0070f3' },
+        { categoryId: 1, name: 'Moradia', total: 1800, pct: 42, colorCode: '#0084ff' },
         { categoryId: 2, name: 'Alimentação', total: 980, pct: 23, colorCode: '#f5a623' },
         { categoryId: 3, name: 'Lazer & Lojas', total: 470, pct: 11, colorCode: '#8e4ec6' },
         { categoryId: 4, name: 'Transporte', total: 380, pct: 9, colorCode: '#12b5cb' },
@@ -354,7 +354,7 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
 
   const compTotal = compItems.reduce((sum, item) => sum + item.total, 0)
   const sortedComp = [...compItems].sort((a, b) => b.pct - a.pct)
-  const topCat = sortedComp[0] || { name: '—', total: 0, pct: 0, colorCode: '#0070f3' }
+  const topCat = sortedComp[0] || { name: '—', total: 0, pct: 0, colorCode: '#0084ff' }
   const top3List = sortedComp.slice(0, 3)
   const top3Tot = top3List.reduce((s, i) => s + i.total, 0)
   const top3Ratio = top3List.reduce((s, i) => s + i.pct, 0)
@@ -396,7 +396,7 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
           <div className="card-head" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
             <span className="stat-label" style={{ margin: 0, fontSize: 12.5, color: 'var(--ds-foreground-muted)' }}>Taxa de poupança</span>
             <span className="badge" style={{ flexShrink: 0 }}>
-              <span className="badge-dot" style={{ background: 'var(--ds-blue-600)' }} />
+              <span className="badge-dot" style={{ background: 'var(--chart-primary)' }} />
               {summary.data?.savingsRate != null && summary.data.savingsRate >= 20 ? 'Meta 20% atingida' : 'Poupança do período'}
             </span>
           </div>
@@ -472,7 +472,7 @@ function DesktopReports({ summary, byCategory, trend, insights, previousCategori
                     <span className="stat-foot" style={{ fontSize: 12, color: 'var(--ds-foreground-muted)' }}>Participação relativa na média semestral</span>
                   </div>
                   <span className="badge" style={{ flexShrink: 0 }}>
-                    <span className="badge-dot" style={{ background: 'var(--ds-blue-600)' }} />
+                    <span className="badge-dot" style={{ background: 'var(--chart-primary)' }} />
                     {compItems.length} categorias
                   </span>
                 </div>
@@ -674,7 +674,7 @@ function SixMonthsEvolutionChart({ trend }) {
             Receitas (Méd. {formatCurrency(avgIncome)})
           </span>
           <span className="chart-6m-legend-item">
-            <span className="badge-dot" style={{ background: 'var(--ds-blue-600)' }} />
+            <span className="badge-dot" style={{ background: 'var(--chart-primary)' }} />
             Despesas (Méd. {formatCurrency(avgExpense)})
           </span>
           <span className="chart-6m-legend-item">
@@ -702,8 +702,8 @@ function SixMonthsEvolutionChart({ trend }) {
               <stop offset="100%" stopColor="var(--ds-green-700)" stopOpacity="0.01" />
             </linearGradient>
             <linearGradient id="areaGradDespesa" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--ds-blue-600)" stopOpacity="0.12" />
-              <stop offset="100%" stopColor="var(--ds-blue-600)" stopOpacity="0.01" />
+              <stop offset="0%" style={{ stopColor: 'var(--chart-primary)', stopOpacity: 'var(--chart-fill-opacity)' }} />
+              <stop offset="100%" style={{ stopColor: 'var(--chart-primary)', stopOpacity: 0 }} />
             </linearGradient>
             <linearGradient id="areaGradReserva" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="var(--ds-gray-500)" stopOpacity="0.10" />
@@ -757,7 +757,7 @@ function SixMonthsEvolutionChart({ trend }) {
                     {formatCurrency(item.income || 0)}
                   </text>
                   <text className="chart-6m-tooltip-text muted" x={12} y={50}>Despesas:</text>
-                  <text className="chart-6m-tooltip-text bold" x={148} y={50} textAnchor="end" fill="var(--ds-blue-600)">
+                  <text className="chart-6m-tooltip-text bold" x={148} y={50} textAnchor="end" fill="var(--chart-primary)">
                     {formatCurrency(item.expense || 0)}
                   </text>
                   <text className="chart-6m-tooltip-text muted" x={12} y={66}>Guardado:</text>
@@ -844,7 +844,7 @@ function CategoryTable({ byCategory, previousCategories }) {
   if (byCategory.loading) return <SkeletonRows rows={5} />
   const rawItems = byCategory.data || []
   const items = rawItems.length > 0 ? rawItems : [
-    { categoryId: 1, name: 'Moradia', total: 1800, limit: 2000, avg: 1800, totalAcc: 10800, percentage: 90, colorCode: '#0070f3' },
+    { categoryId: 1, name: 'Moradia', total: 1800, limit: 2000, avg: 1800, totalAcc: 10800, percentage: 90, colorCode: '#0084ff' },
     { categoryId: 2, name: 'Alimentação', total: 980, limit: 1500, avg: 980, totalAcc: 5880, percentage: 65, colorCode: '#f5a623' },
     { categoryId: 3, name: 'Transporte', total: 380, limit: 600, avg: 380, totalAcc: 2280, percentage: 63, colorCode: '#12b5cb' },
     { categoryId: 4, name: 'Lazer & Lojas', total: 470, limit: 800, avg: 470, totalAcc: 2820, percentage: 59, colorCode: '#8e4ec6' },
@@ -883,7 +883,7 @@ function CategoryTable({ byCategory, previousCategories }) {
                   <td>
                     <div className="tx-cell" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <span className="tx-icon" style={{ width: 28, height: 28, borderRadius: 'var(--ds-radius-md)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'var(--ds-gray-alpha-200)', border: '1px solid var(--ds-border)' }}>
-                        <span style={{ width: 8, height: 8, borderRadius: '50%', background: item.colorCode || '#0070f3' }} />
+                        <span style={{ width: 8, height: 8, borderRadius: '50%', background: item.colorCode || '#0084ff' }} />
                       </span>
                       <span style={{ fontWeight: 600 }}>{item.name}</span>
                     </div>
@@ -894,7 +894,7 @@ function CategoryTable({ byCategory, previousCategories }) {
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <div className="mini-bar" style={{ width: 110, margin: 0, height: 6, background: 'var(--ds-gray-alpha-200)', borderRadius: 99, overflow: 'hidden' }}>
-                        <div className="mini-bar-fill" style={{ width: `${Math.min(100, pct)}%`, height: '100%', background: item.colorCode || '#0070f3', borderRadius: 99 }} />
+                        <div className="mini-bar-fill" style={{ width: `${Math.min(100, pct)}%`, height: '100%', background: item.colorCode || '#0084ff', borderRadius: 99 }} />
                       </div>
                       <span className="num" style={{ fontSize: 12, fontWeight: 600 }}>{pct}%</span>
                     </div>

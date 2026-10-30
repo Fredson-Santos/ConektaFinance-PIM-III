@@ -32,8 +32,8 @@ export default defineConfig({
         scope: '/',
         display: 'standalone',
         display_override: ['standalone', 'window-controls-overlay'],
-        background_color: '#0a0a0a',
-        theme_color: '#000000',
+        background_color: '#151515',
+        theme_color: '#151515',
         orientation: 'portrait-primary',
         icons: [
           {

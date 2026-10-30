@@ -118,26 +118,21 @@ export function Sidebar() {
           </button>
           <UserPopover onLogout={handleLogout} />
         </div>
-        <div className="theme-switch-pill" role="radiogroup" aria-label="Tema">
-          <button
-            type="button"
-            className={`theme-pill-btn ${theme === 'light' ? 'active' : ''}`}
-            onClick={() => setTheme('light')}
-            aria-label="Tema claro"
-            title="Modo Claro"
-          >
-            <Sun size={13} />
-          </button>
-          <button
-            type="button"
-            className={`theme-pill-btn ${theme === 'dark' ? 'active' : ''}`}
-            onClick={() => setTheme('dark')}
-            aria-label="Tema escuro"
-            title="Modo Escuro"
-          >
-            <Moon size={13} />
-          </button>
-        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={theme === 'dark'}
+          aria-label="Modo escuro"
+          title={theme === 'dark' ? 'Mudar para o modo claro' : 'Mudar para o modo escuro'}
+          className={`theme-toggle ${theme === 'dark' ? 'on' : ''}`}
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        >
+          <Sun className="theme-toggle-ico sun" size={11} aria-hidden="true" />
+          <Moon className="theme-toggle-ico moon" size={11} aria-hidden="true" />
+          <i className="theme-toggle-thumb" aria-hidden="true">
+            {theme === 'dark' ? <Moon size={11} /> : <Sun size={11} />}
+          </i>
+        </button>
       </div>
     </aside>
   )

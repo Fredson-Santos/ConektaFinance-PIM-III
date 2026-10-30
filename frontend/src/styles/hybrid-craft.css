@@ -1,0 +1,435 @@
+/* ==========================================================================
+   HYBRID CRAFT UI — camada de componentes
+   Carregada por último: aplica a geometria, as superfícies e as assinaturas
+   (switch tátil BeUI, gráfico shadcn, Runtime Log Precision) sobre a base.
+   ========================================================================== */
+
+/* --- Tipografia Precision: tracking apertado em títulos e valores --- */
+.page-title,
+.card-title,
+.sheet-title,
+.hello,
+.stat-value,
+.kpi-value,
+.big,
+h1,
+h2 {
+  letter-spacing: var(--ds-tracking-tight);
+}
+
+.stat-value,
+.kpi-value,
+.balance .num {
+  letter-spacing: var(--ds-tracking-tighter);
+}
+
+/* --- Cards e painéis: raio 20px, hairline 1px, sombra bimodal --- */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-card);
+  box-shadow: var(--shadow-card);
+  transition:
+    border-color var(--ds-duration-fast) var(--ds-ease),
+    box-shadow var(--ds-duration-normal) var(--ds-ease);
+}
+
+.card:hover {
+  border-color: var(--ds-border-strong);
+}
+
+.modal-content,
+.sheet,
+.popover,
+.user-popover,
+.notif-popover {
+  border-radius: var(--ds-radius-card);
+  border-color: var(--ds-border);
+}
+
+.table-wrap {
+  border-radius: var(--ds-radius-panel);
+}
+
+/* --- Controles em cápsula (18px / rounded-full) --- */
+.btn,
+.ds-btn,
+.btn-icon,
+.chip,
+.search-trigger,
+.sheet-submit,
+.cat-card-link,
+.seg,
+.seg button,
+.pill,
+.field input,
+.field select {
+  border-radius: var(--ds-radius-full);
+}
+
+.field textarea {
+  border-radius: var(--ds-radius-panel);
+}
+
+.nav-item {
+  border-radius: var(--ds-radius-control);
+}
+
+.nav-item.active {
+  background: var(--bg-surface-hover);
+  border-color: var(--ds-border);
+  box-shadow: var(--shadow-card);
+}
+
+/* Ação primária: inversão preta (light) / Electric Blue (dark) */
+.btn.primary,
+.ds-btn-primary,
+.sheet-submit {
+  background: var(--accent-action);
+  border-color: var(--accent-action);
+  color: var(--accent-action-contrast);
+}
+
+.btn.primary:hover,
+.ds-btn-primary:hover:not(:disabled),
+.sheet-submit:hover {
+  background: var(--accent-action-hover);
+  border-color: var(--accent-action-hover);
+  opacity: 1;
+}
+
+.btn.primary .icon,
+.ds-btn-primary .icon {
+  stroke: var(--accent-action-contrast);
+}
+
+.chip.active,
+.seg button.on {
+  box-shadow: var(--shadow-card);
+}
+
+/* --- Badges cápsula e marca (Chartreuse Acid no escuro) --- */
+.badge,
+.ds-badge {
+  border-radius: var(--ds-radius-full);
+}
+
+.brand-mark,
+.avatar {
+  background: var(--accent-brand);
+  color: var(--accent-brand-contrast);
+  border-color: transparent;
+}
+
+.brand-mark .icon {
+  stroke: var(--accent-brand-contrast);
+}
+
+.btn-icon .notif-dot {
+  background: var(--accent-brand);
+  box-shadow: 0 0 0 2px var(--bg-surface);
+}
+
+/* --- Switch tátil BeUI: pílula 44×24, botão 20px, transição física --- */
+.switch {
+  width: 44px;
+  height: 24px;
+  background: var(--bg-muted);
+  border: 1px solid var(--ds-border-strong);
+  transition: background var(--ds-duration-switch) var(--ds-ease), border-color var(--ds-duration-switch) var(--ds-ease);
+}
+
+.switch i {
+  top: 1px;
+  left: 1px;
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  transition: transform var(--ds-duration-switch) var(--ds-ease);
+}
+
+.switch.on {
+  background: var(--accent-action);
+  border-color: var(--accent-action);
+}
+
+.switch-slider {
+  background: var(--bg-muted);
+  border-color: var(--ds-border-strong);
+  transition: background var(--ds-duration-switch) var(--ds-ease);
+}
+
+.switch-slider:before {
+  background: #ffffff;
+  transition: transform var(--ds-duration-switch) var(--ds-ease);
+}
+
+.switch input:checked + .switch-slider {
+  background: var(--accent-action);
+  border-color: var(--accent-action);
+}
+
+.switch input:checked + .switch-slider:before {
+  background: #ffffff;
+}
+
+/* Alternador de tema (Light shadcn ↔ Dark BeUI) */
+.theme-toggle {
+  position: relative;
+  margin-left: auto;
+  flex: none;
+  width: 44px;
+  height: 24px;
+  padding: 0;
+  border-radius: var(--ds-radius-full);
+  border: 1px solid var(--ds-border-strong);
+  background: var(--bg-muted);
+  cursor: pointer;
+  transition: background var(--ds-duration-switch) var(--ds-ease), border-color var(--ds-duration-switch) var(--ds-ease);
+}
+
+.theme-toggle.on {
+  background: var(--bg-muted);
+  border-color: var(--ds-border-strong);
+}
+
+.theme-toggle-thumb {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  color: var(--accent-action);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--ds-border);
+  transition: transform var(--ds-duration-switch) var(--ds-ease), background var(--ds-duration-switch) var(--ds-ease);
+}
+
+.theme-toggle.on .theme-toggle-thumb {
+  transform: translateX(20px);
+  background: var(--accent-brand);
+  color: var(--accent-brand-contrast);
+  box-shadow: 0 0 10px rgba(213, 255, 102, 0.35);
+}
+
+.theme-toggle-ico {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ds-foreground-muted);
+  pointer-events: none;
+}
+
+.theme-toggle-ico.sun {
+  left: 6px;
+}
+
+.theme-toggle-ico.moon {
+  right: 6px;
+}
+
+
+/* --- Gráfico minimalista shadcn: traço contínuo, grade pontilhada, dados sólidos --- */
+.chart-6m-path.despesa {
+  stroke: var(--chart-primary);
+}
+
+[data-theme='dark'] .chart-6m-path.despesa {
+  filter: drop-shadow(0 0 6px rgba(0, 132, 255, 0.45));
+}
+
+.chart-6m-dot.receita,
+.chart-6m-dot.despesa,
+.chart-6m-dot.reserva {
+  stroke: var(--bg-surface);
+  stroke-width: 2;
+}
+
+.chart-6m-dot.receita {
+  fill: var(--ds-green-700);
+}
+
+.chart-6m-dot.despesa {
+  fill: var(--chart-primary);
+}
+
+.chart-6m-dot.reserva {
+  fill: var(--ds-gray-500);
+}
+
+.chart-6m-grid-line,
+.chart-grid line {
+  stroke: var(--chart-grid);
+  stroke-dasharray: 2 4;
+  opacity: 1;
+}
+
+.week-bar {
+  border-radius: 6px 6px 3px 3px;
+  background: linear-gradient(180deg, var(--chart-primary), color-mix(in srgb, var(--chart-primary) 25%, transparent));
+}
+
+.week-bar-col.now .week-bar,
+.mobile-dash-content .bar.now span {
+  background: var(--chart-primary);
+}
+
+[data-theme='dark'] .week-bar-col.now .week-bar,
+[data-theme='dark'] .mobile-dash-content .bar.now span {
+  box-shadow: 0 0 12px rgba(0, 132, 255, 0.45);
+}
+
+/* --- Runtime Log (assinatura Precision Craft) --- */
+.runtime-log {
+  background: var(--bg-terminal);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-panel);
+  box-shadow: var(--shadow-card);
+  padding: 14px 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text-body);
+}
+
+.runtime-log-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--ds-border);
+}
+
+.runtime-log-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-foreground-muted);
+}
+
+.runtime-log-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--ds-foreground-muted);
+}
+
+.runtime-log-live i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tm-success);
+  box-shadow: 0 0 0 0 var(--tm-success);
+  animation: runtime-pulse 2s var(--ds-ease) infinite;
+}
+
+.runtime-log-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.runtime-log-line {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.runtime-log-time {
+  flex: none;
+  color: var(--text-timestamp);
+}
+
+.runtime-log-level {
+  flex: none;
+  min-width: 64px;
+  font-weight: 600;
+}
+
+.runtime-log-level.success {
+  color: var(--tm-success);
+}
+
+.runtime-log-level.edge {
+  color: var(--tm-edge);
+}
+
+.runtime-log-level.dispatch {
+  color: var(--accent-action);
+}
+
+[data-theme='light'] .runtime-log-level.dispatch {
+  color: var(--tm-dispatch);
+}
+
+.runtime-log-level.warning {
+  color: var(--tm-warning);
+}
+
+.runtime-log-level.destructive {
+  color: var(--tm-destructive);
+}
+
+.runtime-log-msg {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.runtime-log-msg b {
+  font-weight: 500;
+  color: var(--text-foreground);
+}
+
+.runtime-log-empty {
+  color: var(--ds-foreground-muted);
+}
+
+@keyframes runtime-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--tm-success) 60%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .runtime-log-live i {
+    animation: none;
+  }
+
+  .switch,
+  .switch i,
+  .theme-toggle,
+  .theme-toggle-thumb {
+    transition: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .runtime-log-line {
+    flex-wrap: wrap;
+    gap: 2px 8px;
+  }
+
+  .runtime-log-msg {
+    flex-basis: 100%;
+    white-space: normal;
+  }
+}

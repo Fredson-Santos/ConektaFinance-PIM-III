@@ -1,172 +1,4 @@
-    /* ==========================================================================
-   DESIGN TOKENS â€” INSPIRADO NO DESIGN SYSTEM (VERCEL / MINIMALIST PRECISION)
-   ========================================================================== */
-    :root {
-      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      --font-mono: 'IBM Plex Mono', Menlo, Monaco, 'Courier New', monospace;
-
-      --ds-radius-sm: 4px;
-      --ds-radius-md: 6px;
-      --ds-radius-lg: 8px;
-      --ds-radius-xl: 12px;
-      --ds-radius-2xl: 16px;
-      --ds-radius-full: 9999px;
-
-      --ds-ease: cubic-bezier(0.16, 1, 0.3, 1);
-      --ds-duration-fast: 120ms;
-      --ds-duration-normal: 200ms;
-    }
-
-    /* DARK THEME (PADRÃƒO) */
-    :root[data-theme="dark"] {
-      color-scheme: dark;
-
-      --ds-background-100: #000000;
-      --ds-background-200: #0a0a0a;
-      --ds-background-surface: #121212;
-
-      --ds-gray-100: #111111;
-      --ds-gray-200: #191919;
-      --ds-gray-300: #222222;
-      --ds-gray-400: #2e2e2e;
-      --ds-gray-500: #444444;
-      --ds-gray-600: #666666;
-      --ds-gray-700: #888888;
-      --ds-gray-800: #999999;
-      --ds-gray-900: #cccccc;
-      --ds-gray-1000: #ededed;
-
-      --ds-gray-alpha-100: rgba(255, 255, 255, 0.05);
-      --ds-gray-alpha-200: rgba(255, 255, 255, 0.08);
-      --ds-gray-alpha-300: rgba(255, 255, 255, 0.12);
-      --ds-gray-alpha-400: rgba(255, 255, 255, 0.16);
-      --ds-gray-alpha-500: rgba(255, 255, 255, 0.24);
-
-      /* Functional Palette (usadas estritamente em indicadores grÃ¡ficos, barras e badges pontuais) */
-      --ds-blue-600: #0068d6;
-      --ds-blue-700: #0070f3;
-      --ds-blue-alpha-200: rgba(0, 112, 243, 0.14);
-
-      --ds-red-600: #c92a2a;
-      --ds-red-700: #e5484d;
-      --ds-red-alpha-200: rgba(229, 72, 77, 0.14);
-
-      --ds-amber-600: #d97706;
-      --ds-amber-700: #f5a623;
-      --ds-amber-alpha-200: rgba(245, 166, 35, 0.14);
-
-      --ds-green-600: #008f5d;
-      --ds-green-700: #00cc88;
-      --ds-green-alpha-200: rgba(0, 204, 136, 0.14);
-
-      --ds-teal-700: #12b5cb;
-      --ds-teal-alpha-200: rgba(18, 181, 203, 0.14);
-
-      --ds-purple-700: #8e4ec6;
-      --ds-purple-alpha-200: rgba(142, 78, 198, 0.14);
-
-      --ds-pink-700: #e93d82;
-      --ds-pink-alpha-200: rgba(233, 61, 130, 0.14);
-
-      /* Categorias mapeadas nos tokens */
-      --cat-alimentacao: var(--ds-red-700);
-      --cat-moradia: var(--ds-amber-700);
-      --cat-transporte: var(--ds-blue-700);
-      --cat-lazer: var(--ds-green-700);
-      --cat-saude: var(--ds-pink-700);
-      --cat-educacao: var(--ds-purple-700);
-      --cat-outros: var(--ds-gray-700);
-
-      /* Semantic Typography & Foreground (Neutros) */
-      --ds-foreground: #ededed;
-      --ds-foreground-muted: #888888;
-      --ds-foreground-faint: #8a8a8a;
-      --ds-foreground-contrast: #000000;
-
-      /* Borders & Shadows */
-      --ds-border: var(--ds-gray-alpha-300);
-      --ds-border-strong: var(--ds-gray-alpha-500);
-      --ds-shadow-small: 0 1px 2px rgba(0, 0, 0, 0.6);
-      --ds-shadow-medium: 0 12px 36px rgba(0, 0, 0, 0.7);
-      --ds-shadow-large: 0 30px 60px rgba(0, 0, 0, 0.9);
-      --ds-focus-ring: 0 0 0 2px var(--ds-background-100), 0 0 0 4px var(--ds-blue-700);
-
-      /* Blueprint Grid */
-      --ds-grid-line: rgba(255, 255, 255, 0.035);
-    }
-
-    /* LIGHT THEME */
-    :root[data-theme="light"] {
-      color-scheme: light;
-
-      --ds-background-100: #ffffff;
-      --ds-background-200: #fafafa;
-      --ds-background-surface: #f5f5f5;
-
-      --ds-gray-100: #fafafa;
-      --ds-gray-200: #f0f0f0;
-      --ds-gray-300: #e6e6e6;
-      --ds-gray-400: #d6d6d6;
-      --ds-gray-500: #a3a3a3;
-      --ds-gray-600: #737373;
-      --ds-gray-700: #525252;
-      --ds-gray-800: #333333;
-      --ds-gray-900: #1c1c1c;
-      --ds-gray-1000: #111111;
-
-      --ds-gray-alpha-100: rgba(0, 0, 0, 0.03);
-      --ds-gray-alpha-200: rgba(0, 0, 0, 0.06);
-      --ds-gray-alpha-300: rgba(0, 0, 0, 0.09);
-      --ds-gray-alpha-400: rgba(0, 0, 0, 0.14);
-      --ds-gray-alpha-500: rgba(0, 0, 0, 0.22);
-
-      --ds-blue-600: #0070f3;
-      --ds-blue-700: #095ed5;
-      --ds-blue-alpha-200: rgba(0, 112, 243, 0.1);
-
-      --ds-red-600: #ee0000;
-      --ds-red-700: #c92a2a;
-      --ds-red-alpha-200: rgba(238, 0, 0, 0.1);
-
-      --ds-amber-600: #f5a623;
-      --ds-amber-700: #b45309;
-      --ds-amber-alpha-200: rgba(245, 166, 35, 0.1);
-
-      --ds-green-600: #008f5d;
-      --ds-green-700: #116932;
-      --ds-green-alpha-200: rgba(0, 143, 93, 0.1);
-
-      --ds-teal-700: #0b9bb0;
-      --ds-teal-alpha-200: rgba(11, 155, 176, 0.1);
-
-      --ds-purple-700: #7928ca;
-      --ds-purple-alpha-200: rgba(121, 40, 202, 0.1);
-
-      --ds-pink-700: #db2777;
-      --ds-pink-alpha-200: rgba(219, 39, 119, 0.1);
-
-      --cat-alimentacao: var(--ds-red-700);
-      --cat-moradia: var(--ds-amber-700);
-      --cat-transporte: var(--ds-blue-700);
-      --cat-lazer: var(--ds-green-700);
-      --cat-saude: var(--ds-pink-700);
-      --cat-educacao: var(--ds-purple-700);
-      --cat-outros: var(--ds-gray-600);
-
-      --ds-foreground: #111111;
-      --ds-foreground-muted: #666666;
-      --ds-foreground-faint: #6e6e6e;
-      --ds-foreground-contrast: #ffffff;
-
-      --ds-border: var(--ds-gray-alpha-300);
-      --ds-border-strong: var(--ds-gray-alpha-500);
-      --ds-shadow-small: 0 1px 2px rgba(0, 0, 0, 0.05);
-      --ds-shadow-medium: 0 12px 30px rgba(0, 0, 0, 0.08);
-      --ds-shadow-large: 0 30px 60px rgba(0, 0, 0, 0.12);
-      --ds-focus-ring: 0 0 0 2px var(--ds-background-100), 0 0 0 4px var(--ds-blue-700);
-
-      --ds-grid-line: rgba(0, 0, 0, 0.035);
-    }
+    /* Tokens de design: ver tokens.css (Hybrid Craft UI) — fonte única de cores, raios e sombras. */
 
     /* ==========================================================================
    RESET & BASE STYLES
@@ -259,7 +91,7 @@
       transform: translateX(-50%);
       width: 900px;
       height: 500px;
-      background: radial-gradient(ellipse at center, rgba(0, 112, 243, 0.07) 0%, transparent 70%);
+      background: radial-gradient(ellipse at center, rgba(0, 132, 255, 0.07) 0%, transparent 70%);
       filter: blur(80px);
       pointer-events: none;
       z-index: 0;
@@ -1793,7 +1625,7 @@
     .tx-icon-alimentacao {
       background: rgba(239, 68, 68, 0.14) !important;
       border-color: rgba(239, 68, 68, 0.28) !important;
-      color: #f87171 !important;
+      color: var(--ds-red-700) !important;
     }
 
     .tx-icon-moradia {
@@ -2426,7 +2258,7 @@
       font-weight: 600;
       transition: transform var(--ds-duration-fast), opacity var(--ds-duration-fast), box-shadow var(--ds-duration-fast);
       user-select: none;
-      touch-action: none;
+      touch-action: manipulation;
     }
 
     .ai-fab:hover {
@@ -2440,13 +2272,6 @@
 
     .ai-fab.is-open {
       box-shadow: 0 0 0 2px var(--ds-background-100), 0 0 0 4px var(--ds-blue-600);
-    }
-
-    .ai-fab.is-dragging {
-      cursor: grabbing !important;
-      transform: scale(1.08) !important;
-      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55), 0 0 0 2px var(--ds-blue-600) !important;
-      transition: none !important;
     }
 
     .ai-fab .icon {
@@ -4110,7 +3935,7 @@
       height: 124px;
       border-radius: 50%;
       flex-shrink: 0;
-      background: conic-gradient(var(--cat-moradia, #0070f3) 0% 41%,
+      background: conic-gradient(var(--cat-moradia, #0084ff) 0% 41%,
           var(--cat-alimentacao, #f5a623) 41% 69%,
           var(--cat-transporte, #8e4ec6) 69% 81%,
           var(--cat-lazer, #e93d82) 81% 89%,

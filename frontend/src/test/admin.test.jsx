@@ -131,4 +131,14 @@ describe('Painel administrativo', () => {
     expect(await screen.findByText('Conta pessoal')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /administração/i })).not.toBeInTheDocument()
   })
+
+  it('alterna o tema pelo switch tátil da sidebar', async () => {
+    userService.profile.mockResolvedValue(standard)
+    renderWithProviders(<Sidebar />, '/dashboard')
+    const toggle = await screen.findByRole('switch', { name: 'Modo escuro' })
+    const initial = toggle.getAttribute('aria-checked')
+    fireEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-checked', initial === 'true' ? 'false' : 'true')
+    expect(document.documentElement.getAttribute('data-theme')).toBe(initial === 'true' ? 'light' : 'dark')
+  })
 })

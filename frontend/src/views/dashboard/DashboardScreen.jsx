@@ -52,7 +52,7 @@ function MobileDashboard() {
     spent: m.spent,
     limit: m.limit,
     percentage: m.percentage,
-    color: m.colorCode || '#0070f3',
+    color: m.colorCode || '#0084ff',
   }))
 
   return (
@@ -278,7 +278,7 @@ function DesktopDashboard() {
     spent: m.spent,
     limit: m.limit,
     percentage: m.percentage,
-    color: m.colorCode || '#0070f3',
+    color: m.colorCode || '#0084ff',
   }))
 
   return (
@@ -503,7 +503,7 @@ function DesktopDashboard() {
             <tbody>
               {recentList.map((item) => {
                 const isIncome = item.type === 'income'
-                const amountColor = isIncome ? 'var(--ds-green-700)' : '#f87171'
+                const amountColor = isIncome ? 'var(--ds-green-700)' : 'var(--ds-red-700)'
                 const dateStr = item.transactionDate ? formatDayLabel(item.transactionDate) : 'Hoje'
                 return (
                   <tr key={item.id} style={{ cursor: 'pointer' }} onClick={() => openTransactionSheet({ editing: item })}>

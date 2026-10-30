@@ -5,6 +5,7 @@ import './styles/tokens.css'
 import './styles/base.css'
 import './styles/components.css'
 import './styles/prototype.css'
+import './styles/hybrid-craft.css'
 import App from './App.jsx'
 
 registerSW({ immediate: true })

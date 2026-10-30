@@ -5,7 +5,7 @@ import { Button } from '../../components/common/Button'
 import { categoryService } from '../../services'
 import { ApiError } from '../../services/api'
 
-const COLORS = ['#ef4444', '#f5a623', '#0070f3', '#00cc88', '#e93d82', '#8e4ec6', '#12b5cb', '#888888']
+const COLORS = ['#ef4444', '#f5a623', '#0084ff', '#00cc88', '#e93d82', '#8e4ec6', '#12b5cb', '#888888']
 
 export function CategoryFormModal({ modal, onClose, onSaved, onDeleted, onConflict }) {
   const isEdit = modal.mode === 'edit'
