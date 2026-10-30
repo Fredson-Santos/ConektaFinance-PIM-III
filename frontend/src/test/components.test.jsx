@@ -8,7 +8,6 @@ import { OtpBoxes } from '../components/common/OtpBoxes'
 import { MoneyText } from '../components/common/MoneyText'
 import { Topbar } from '../components/layout/Topbar'
 import { UiProvider, useUi } from '../context/UiContext'
-import { ToastProvider } from '../context/ToastContext'
 import { AuthProvider } from '../context/AuthContext'
 
 describe('Button', () => {
@@ -88,22 +87,17 @@ describe('MoneyText', () => {
 })
 
 describe('Topbar', () => {
-  it('renderiza o botao de logoff mobile e encerra a sessao ao clicar', () => {
-    localStorage.setItem('conekta_token', 'mock_token')
+  it('renderiza o botao de perfil/configuracoes no mobile', () => {
     render(
       <MemoryRouter>
         <AuthProvider>
           <UiProvider>
-            <ToastProvider>
-              <Topbar />
-            </ToastProvider>
+            <Topbar />
           </UiProvider>
         </AuthProvider>
       </MemoryRouter>,
     )
-    const logoutBtn = screen.getByRole('button', { name: /sair da conta/i })
-    expect(logoutBtn).toBeInTheDocument()
-    fireEvent.click(logoutBtn)
-    expect(localStorage.getItem('conekta_token')).toBeNull()
+    const settingsBtn = screen.getByRole('button', { name: /configurações/i })
+    expect(settingsBtn).toBeInTheDocument()
   })
 })
