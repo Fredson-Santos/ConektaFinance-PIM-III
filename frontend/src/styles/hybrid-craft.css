@@ -617,3 +617,58 @@ input[type="date"],
   scrollbar-width: none;
 }
 
+/* ==========================================================================
+   Animação de Entrada do Assistente de IA ao Abrir o App
+   ========================================================================== */
+@keyframes aiFabIntro {
+  0% {
+    transform: scale(0.6) translateY(24px);
+    opacity: 0;
+  }
+  35% {
+    transform: scale(1.1) translateY(-6px);
+    opacity: 1;
+    box-shadow: 0 0 0 10px rgba(0, 112, 243, 0.35), 0 18px 45px rgba(0, 0, 0, 0.5);
+  }
+  55% {
+    transform: scale(0.96) translateY(0);
+    box-shadow: 0 0 0 5px rgba(0, 112, 243, 0.2), 0 12px 30px rgba(0, 0, 0, 0.4);
+  }
+  75% {
+    transform: scale(1.04) translateY(-3px);
+    box-shadow: 0 0 0 14px rgba(0, 112, 243, 0), 0 14px 35px rgba(0, 0, 0, 0.4);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes aiSparklePulse {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+    filter: drop-shadow(0 0 2px rgba(0, 112, 243, 0.4));
+  }
+  50% {
+    transform: rotate(18deg) scale(1.25);
+    filter: drop-shadow(0 0 8px rgba(0, 132, 255, 0.9));
+  }
+}
+
+.ai-fab.ai-fab-intro {
+  animation: aiFabIntro 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.ai-fab.ai-fab-intro .ai-fab-sparkle {
+  animation: aiSparklePulse 1.2s ease-in-out infinite;
+}
+
+.ai-fab-sparkle {
+  transition: transform var(--ds-duration-normal) var(--ds-ease);
+}
+
+.ai-fab:hover .ai-fab-sparkle {
+  transform: rotate(15deg) scale(1.18);
+}
+
+
