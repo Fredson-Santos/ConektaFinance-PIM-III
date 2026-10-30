@@ -1884,10 +1884,7 @@
     }
 
     .sheet {
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -46%);
+      position: relative;
       width: 480px;
       max-width: calc(100vw - 32px);
       max-height: calc(100vh - 40px);
@@ -1899,16 +1896,14 @@
       border-radius: var(--ds-radius-2xl);
       padding: 20px 24px;
       z-index: 1050;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity var(--ds-duration-normal), transform var(--ds-duration-normal) var(--ds-ease);
+      opacity: 1;
+      pointer-events: auto;
       box-shadow: var(--ds-shadow-large);
     }
 
     .sheet.open {
       opacity: 1;
       pointer-events: auto;
-      transform: translate(-50%, -50%);
     }
 
     .sheet-head {
