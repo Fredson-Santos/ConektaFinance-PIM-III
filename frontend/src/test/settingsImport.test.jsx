@@ -160,6 +160,15 @@ describe('SettingsScreen', () => {
 
     await waitFor(() => expect(userService.deleteAccount).toHaveBeenCalledWith('SenhaForte@123'))
   })
+
+  it('permite encerrar a sessao pelo botao sair da conta', async () => {
+    localStorage.setItem('conekta_token', 'mock_token')
+    renderSettings('geral')
+    const logoutBtn = await screen.findByRole('button', { name: /sair da conta/i })
+    expect(logoutBtn).toBeInTheDocument()
+    fireEvent.click(logoutBtn)
+    expect(localStorage.getItem('conekta_token')).toBeNull()
+  })
 })
 
 describe('ImportSheet', () => {

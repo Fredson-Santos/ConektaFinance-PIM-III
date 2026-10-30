@@ -1,7 +1,8 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Search, Bell, Import, Plus, ShieldCheck } from 'lucide-react'
+import { Search, Bell, Import, Plus, ShieldCheck, LogOut } from 'lucide-react'
 import { useUi } from '../../context/UiContext'
 import { useAuth } from '../../context/AuthContext'
+import { useToast } from '../../context/ToastContext'
 import { useUnreadAlerts } from '../../hooks/useUnreadAlerts'
 import { Avatar } from '../common/Avatar'
 
@@ -16,11 +17,18 @@ const PAGE_META = {
 
 export function Topbar() {
   const { openOverlay, overlays } = useUi()
-  const { user, isAdmin } = useAuth()
+  const { user, isAdmin, logout } = useAuth()
+  const toast = useToast()
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const { count } = useUnreadAlerts()
   const [title, subtitle] = PAGE_META[pathname] || PAGE_META['/dashboard']
+
+  const handleLogout = () => {
+    logout()
+    toast.push('Sessão encerrada. Até logo!')
+    navigate('/login')
+  }
 
   return (
     <header className="topbar">
@@ -80,6 +88,28 @@ export function Topbar() {
           style={{ width: 30, height: 30, padding: 0, border: 'none', background: 'none', cursor: 'pointer' }}
         >
           <Avatar name={user?.displayName || user?.fullName || 'UT'} src={user?.avatarUrl} size={28} />
+        </button>
+        <button
+          type="button"
+          className="btn-icon icon-btn mobile-only"
+          aria-label="Sair da conta"
+          title="Encerrar sessão"
+          onClick={handleLogout}
+          id="mobile-logout-btn"
+          style={{
+            width: 34,
+            height: 34,
+            borderRadius: 'var(--ds-radius-md)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'transparent',
+            border: '1px solid var(--ds-border)',
+            color: 'var(--ds-foreground)',
+            cursor: 'pointer',
+          }}
+        >
+          <LogOut size={15} />
         </button>
       </div>
     </header>

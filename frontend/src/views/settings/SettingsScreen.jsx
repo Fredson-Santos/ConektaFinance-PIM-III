@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { User, Lock, ShieldAlert, Download, Upload, Camera, Trash2 } from 'lucide-react'
+import { User, Lock, ShieldAlert, Download, Upload, Camera, Trash2, LogOut } from 'lucide-react'
 import { userService, reportService } from '../../services'
 import { useAuth } from '../../context/AuthContext'
 import { useUi } from '../../context/UiContext'
@@ -58,9 +58,16 @@ export function SettingsScreen() {
 }
 
 function GeneralTab() {
-  const { user, refreshUser } = useAuth()
+  const { user, refreshUser, logout } = useAuth()
+  const navigate = useNavigate()
   const toast = useToast()
   const fileRef = useRef(null)
+
+  const handleLogout = () => {
+    logout()
+    toast.push('Sessão encerrada. Até logo!')
+    navigate('/login')
+  }
   const [form, setForm] = useState({
     fullName: user?.fullName || '',
     displayName: user?.displayName || '',
@@ -192,6 +199,17 @@ function GeneralTab() {
         </div>
         <span className="ds-hint">Moeda operacional: {user?.currency || 'BRL'} — Real Brasileiro (R$)</span>
       </form>
+
+      <section className="card cfg-card" aria-label="Sessão da conta">
+        <div className="card-head"><p className="card-title">Sessão da Conta</p></div>
+        <div className="toggle-row">
+          <span>
+            <b>Encerrar sessão</b>
+            <p>Desconecta sua conta com segurança neste dispositivo.</p>
+          </span>
+          <Button variant="secondary" onClick={handleLogout} icon={LogOut}>Sair da conta</Button>
+        </div>
+      </section>
     </div>
   )
 }

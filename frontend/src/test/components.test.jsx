@@ -1,11 +1,15 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import { Button } from '../components/common/Button'
 import { Badge } from '../components/common/Badge'
 import { Meter } from '../components/common/Meter'
 import { OtpBoxes } from '../components/common/OtpBoxes'
 import { MoneyText } from '../components/common/MoneyText'
+import { Topbar } from '../components/layout/Topbar'
 import { UiProvider, useUi } from '../context/UiContext'
+import { ToastProvider } from '../context/ToastContext'
+import { AuthProvider } from '../context/AuthContext'
 
 describe('Button', () => {
   it('dispara onClick e desabilita durante loading', () => {
@@ -80,5 +84,26 @@ describe('MoneyText', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'alternar' }))
     expect(screen.getByText('R$ •••')).toBeInTheDocument()
+  })
+})
+
+describe('Topbar', () => {
+  it('renderiza o botao de logoff mobile e encerra a sessao ao clicar', () => {
+    localStorage.setItem('conekta_token', 'mock_token')
+    render(
+      <MemoryRouter>
+        <AuthProvider>
+          <UiProvider>
+            <ToastProvider>
+              <Topbar />
+            </ToastProvider>
+          </UiProvider>
+        </AuthProvider>
+      </MemoryRouter>,
+    )
+    const logoutBtn = screen.getByRole('button', { name: /sair da conta/i })
+    expect(logoutBtn).toBeInTheDocument()
+    fireEvent.click(logoutBtn)
+    expect(localStorage.getItem('conekta_token')).toBeNull()
   })
 })
