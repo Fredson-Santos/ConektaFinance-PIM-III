@@ -3,7 +3,7 @@
 // Pré-requisitos: backend em http://127.0.0.1:5041 e frontend (Vite) em http://localhost:5173,
 // de preferência contra um banco recém-criado, para o seed da conta demo cobrir o mês atual.
 // Uso (na pasta backend/tests/e2e-tests):  node scripts/capturas-relatorio.mjs
-import { chromium, devices } from '@playwright/test'
+import { chromium } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -109,46 +109,7 @@ const browser = await chromium.launch()
   await context.close()
 }
 
-// ---------- Mobile / PWA (capítulo 6) ----------
-{
-  const context = await browser.newContext({ ...devices['iPhone 13'], locale: 'pt-BR', timezoneId: 'America/Sao_Paulo' })
-  const page = await context.newPage()
-  page.on('response', (r) => { if (r.status() >= 400) problemas.push(`HTTP ${r.status()} ${new URL(r.url()).pathname}`) })
-  page.on('console', (m) => { if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) problemas.push(`console (mobile): ${m.text().slice(0, 160)}`) })
-
-  await page.goto(`${APP}/login`)
-  await pausa(page, 1500)
-  await salvar(page, '06-mobile-login')
-
-  await entrarDemo(page)
-  // No iPhone o app mostra a instrução de instalação (Compartilhar > Adicionar à Tela de Início).
-  await salvar(page, '06-mobile-banner-instalacao')
-  const dispensar = page.getByRole('button', { name: /dispensar aviso de instalação/i })
-  if (await dispensar.isVisible().catch(() => false)) await dispensar.click()
-  await salvar(page, '06-mobile-dashboard')
-
-  for (const [rota, nome] of [
-    ['/transacoes', '06-mobile-gastos'],
-    ['/categorias', '06-mobile-categorias'],
-    ['/relatorios', '06-mobile-relatorios'],
-  ]) {
-    await page.goto(`${APP}${rota}`)
-    await pausa(page, 2000)
-    await salvar(page, nome)
-  }
-
-  await page.goto(`${APP}/dashboard`)
-  await pausa(page, 2000)
-  await page.getByRole('button', { name: /nova transação/i }).click()
-  await pausa(page, 1200)
-  await salvar(page, '06-mobile-novo-lancamento')
-  await page.keyboard.press('Escape')
-  await pausa(page, 600)
-
-  await perguntarAoAssistente(page, 'Me dá um resumo do mês')
-  await salvar(page, '06-mobile-assistente-ia')
-  await context.close()
-}
+// As telas do PWA (capítulo 6) foram capturadas em um celular real: figuras/01-PWA-*.png.
 
 await browser.close()
 
