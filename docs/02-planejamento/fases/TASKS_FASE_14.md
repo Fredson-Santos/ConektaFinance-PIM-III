@@ -197,7 +197,7 @@ O manual pede o **script completo**. Além de unificar, o script precisa ser pro
 
 - [x] `conektafinance.sql` roda do zero sem erros e deixa o banco populado.
 - [x] Todos os `ASSERT` passam; uma falha interrompe o job (`ON_ERROR_STOP=1`).
-- [ ] Job `database` verde no GitHub Actions. — *pendente (02/11/2026): o CI nunca rodou sobre este código; o workflow só dispara em `main`, `feature/**` e PRs para a `main`, e a branch `refine-frontend` não se encaixa. Localmente os mesmos passos passam*
+- [x] Job `database` verde no GitHub Actions. *(verificado no PR #17, 02/11/2026)*
 
 ---
 
@@ -356,7 +356,7 @@ O manual pede "recursos tecnológicos inclusivos" e "ações voltadas à acessib
 
 - [x] Zero violações axe de impacto *serious* ou *critical* nas telas listadas.
 - [ ] Navegação completa por teclado com foco visível em todas as telas. — *pendente (02/11/2026): foco visível conferido só no dashboard*
-- [ ] Testes de acessibilidade rodando no CI. — *pendente (02/11/2026): estão no `npm test` do CI, mas o CI ainda não rodou sobre este código*
+- [x] Testes de acessibilidade rodando no CI. *(verificado no PR #17, 02/11/2026)*
 
 ---
 
