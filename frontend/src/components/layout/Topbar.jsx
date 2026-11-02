@@ -9,7 +9,8 @@ const PAGE_META = {
   '/dashboard': ['Dashboard', 'Sua visão geral financeira'],
   '/transacoes': ['Gastos', 'Gerencie todas as suas despesas'],
   '/categorias': ['Categorias', 'Organize suas despesas e limites por categoria'],
-  '/relatorios': ['Relatórios', 'Balanço semestral & inteligência preditiva · Abril a Setembro de 2026'],
+  // O período selecionado (mês, 6 meses ou ano) é exibido pela própria tela de relatórios.
+  '/relatorios': ['Relatórios', 'Balanço do período & inteligência preditiva'],
   '/configuracoes': ['Configurações', 'Perfil, segurança e privacidade'],
   '/admin': ['Administração', 'Métricas da plataforma e gestão de contas'],
 }
