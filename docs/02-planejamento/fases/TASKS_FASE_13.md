@@ -43,11 +43,11 @@ A tela de autenticação é a porta de entrada da plataforma. Para modernizar a 
   - Acesso de demonstração (*Demo*) posicionado como link discreto ou botão secundário fantasma (*ghost*).
 
 #### 3. Critérios de Aceite (DoD)
-- [ ] Eliminação completa de campos e abas de e-mail e senha.
-- [ ] Transição fluida entre etapa 1 (inserção do telefone) e etapa 2 (código OTP de 6 dígitos).
-- [ ] Checkbox de salvar sessão funcional: persiste sessão no `localStorage` quando marcado; usa `sessionStorage` quando desmarcado.
-- [ ] Totalmente responsivo e adaptado para PWA/Mobile-first (sem rolagem desnecessária no teclado virtual).
-- [ ] Suporte consistente aos temas Claro e Escuro com conformidade de contraste WCAG AA.
+- [x] Eliminação completa de campos e abas de e-mail e senha.
+- [x] Transição fluida entre etapa 1 (inserção do telefone) e etapa 2 (código OTP de 6 dígitos).
+- [x] Checkbox de salvar sessão funcional: persiste sessão no `localStorage` quando marcado; usa `sessionStorage` quando desmarcado.
+- [ ] Totalmente responsivo e adaptado para PWA/Mobile-first (sem rolagem desnecessária no teclado virtual). — *pendente (02/11/2026): não verificado em celular ou viewport móvel*
+- [ ] Suporte consistente aos temas Claro e Escuro com conformidade de contraste WCAG AA. — *pendente (02/11/2026): o axe no jsdom não mede contraste; falta conferir no navegador nos dois temas*
 
 ---
 
@@ -66,10 +66,10 @@ Usuários recém-cadastrados precisam de uma ambientação acolhedora para confi
 * **Persistência:** Atualização das informações no endpoint correspondente de perfil do backend (`/api/v1/users/profile` ou `/api/v1/users/me`).
 
 #### 3. Critérios de Aceite (DoD)
-- [ ] Primeiro acesso direciona o usuário diretamente para o fluxo de onboarding.
-- [ ] Validações amigáveis de formulário com máscaras monetárias adequadas (R$).
-- [ ] Persistência bem-sucedida dos dados no banco via API.
-- [ ] Usuários com cadastro já completo não são interceptados pelo onboarding.
+- [x] Primeiro acesso direciona o usuário diretamente para o fluxo de onboarding.
+- [x] Validações amigáveis de formulário com máscaras monetárias adequadas (R$).
+- [x] Persistência bem-sucedida dos dados no banco via API.
+- [x] Usuários com cadastro já completo não são interceptados pelo onboarding.
 
 ---
 
@@ -89,9 +89,9 @@ Na tela de visão geral, o gráfico de barras que exibe a "Distribuição de gas
   - Exibir indicação textual clara *"Hoje"* no cabeçalho ou tooltip ao inspecionar a barra do dia corrente.
 
 #### 3. Critérios de Aceite (DoD)
-- [ ] A barra correspondente ao dia de hoje é renderizada em azul destacado.
-- [ ] As demais barras da semana permanecem neutras, garantindo contraste e hierarquia visual.
-- [ ] Mudança de dia reflete automaticamente sem necessidade de reload manual.
+- [x] A barra correspondente ao dia de hoje é renderizada em azul destacado.
+- [x] As demais barras da semana permanecem neutras, garantindo contraste e hierarquia visual.
+- [x] Mudança de dia reflete automaticamente sem necessidade de reload manual.
 
 ---
 
@@ -113,9 +113,9 @@ O card de "Consumo do Limite" no Dashboard deve refletir a meta real estipulada 
   - Atalho discreto de edição rápida (ícone de lápis/configuração) para alterar a meta sem sair do Dashboard.
 
 #### 3. Critérios de Aceite (DoD)
-- [ ] O valor do limite máximo no card corresponde ao valor setado no onboarding.
-- [ ] O percentual e o valor restante/excedente são calculados com precisão.
-- [ ] O card reage instantaneamente à inclusão ou edição de despesas do mês corrente.
+- [x] O valor do limite máximo no card corresponde ao valor setado no onboarding.
+- [x] O percentual e o valor restante/excedente são calculados com precisão.
+- [x] O card reage instantaneamente à inclusão ou edição de despesas do mês corrente.
 
 ---
 
@@ -136,9 +136,9 @@ Na tela de "Gastos" (`/transacoes`), o cartão consolidador de valores atualment
   - Ajustar o título do card para *"Total de Gastos no Período"* ou *"Despesas do Período"*.
 
 #### 3. Critérios de Aceite (DoD)
-- [ ] O card exibe estritamente o valor de despesas ocorridas no período filtrado.
-- [ ] Nenhuma entrada/receita é adicionada à somatória deste indicador na tela de Gastos.
-- [ ] O valor bate exatamente com a soma dos itens de saída listados na tabela.
+- [x] O card exibe estritamente o valor de despesas ocorridas no período filtrado.
+- [x] Nenhuma entrada/receita é adicionada à somatória deste indicador na tela de Gastos.
+- [x] O valor bate exatamente com a soma dos itens de saída listados na tabela.
 
 ---
 
@@ -160,9 +160,9 @@ O gráfico comparativo de Entradas vs Saídas precisa comunicar com clareza o re
   - Formatação dos valores dos eixos Y no padrão BRL abreviado (ex.: `R$ 1k`, `R$ 5k`).
 
 #### 3. Critérios de Aceite (DoD)
-- [ ] Gráfico possui legenda visual e semântica clara.
-- [ ] Tooltip customizada exibe entradas, saídas e o saldo líquido calculado para o período inspecionado.
-- [ ] Visual alinhado ao design system, responsivo e de fácil interpretação em dispositivos móveis.
+- [x] Gráfico possui legenda visual e semântica clara.
+- [x] Tooltip customizada exibe entradas, saídas e o saldo líquido calculado para o período inspecionado.
+- [ ] Visual alinhado ao design system, responsivo e de fácil interpretação em dispositivos móveis. — *pendente (02/11/2026): não verificado em viewport móvel*
 
 ---
 

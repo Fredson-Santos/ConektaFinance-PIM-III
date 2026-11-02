@@ -116,10 +116,10 @@ O manual exige o **modelo físico** e o **script completo** do banco. Hoje o sch
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] `psql -f database/01_schema.sql` executa sem erros em um PostgreSQL 16 limpo.
-- [ ] Todas as 8 entidades + `monthly_closings` + `audit_log` criadas com PK, FK, UNIQUE, CHECK e índices.
-- [ ] Script idempotente para ambiente de testes (`DROP SCHEMA IF EXISTS conekta CASCADE; CREATE SCHEMA conekta;` no topo).
-- [ ] Cada tabela e coluna relevante com `COMMENT ON` em português (vira dicionário de dados no relatório).
+- [x] `psql -f database/01_schema.sql` executa sem erros em um PostgreSQL 16 limpo.
+- [x] Todas as 8 entidades + `monthly_closings` + `audit_log` criadas com PK, FK, UNIQUE, CHECK e índices.
+- [ ] Script idempotente para ambiente de testes (`DROP SCHEMA IF EXISTS conekta CASCADE; CREATE SCHEMA conekta;` no topo). — *pendente (02/11/2026): o `01_schema.sql` é gerado das migrations do EF Core, não tem `DROP SCHEMA` e falha ao ser reexecutado (`relation "users" already exists`); hoje exige banco vazio*
+- [x] Cada tabela e coluna relevante com `COMMENT ON` em português (vira dicionário de dados no relatório).
 
 ---
 
@@ -147,9 +147,9 @@ Requisito explícito do manual (Etapa 7). As regras de negócio já existem em C
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] As três rotinas compilam e executam sem erro após o `01_schema.sql`.
-- [ ] Resultados batem com os do backend para o mesmo conjunto de dados (validado na F14.4).
-- [ ] Cada rotina com bloco de comentário no topo: objetivo, parâmetros, exemplo de chamada.
+- [x] As três rotinas compilam e executam sem erro após o `01_schema.sql`.
+- [x] Resultados batem com os do backend para o mesmo conjunto de dados (validado na F14.4).
+- [x] Cada rotina com bloco de comentário no topo: objetivo, parâmetros, exemplo de chamada.
 
 ---
 
@@ -171,9 +171,9 @@ Requisito explícito do manual (Etapa 7). Previstas no `ROADMAP_PIM_IV.md`: atua
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] Atualizar qualquer linha altera `updated_at` automaticamente.
-- [ ] INSERT/UPDATE/DELETE em `transactions` gera registro em `audit_log` com o JSON antes/depois.
-- [ ] Inserir despesa que leva a categoria a ≥ 80% gera alerta `type = 1`; acima de 100% gera `type = 0`; repetir a operação **não** duplica o alerta.
+- [x] Atualizar qualquer linha altera `updated_at` automaticamente.
+- [x] INSERT/UPDATE/DELETE em `transactions` gera registro em `audit_log` com o JSON antes/depois.
+- [x] Inserir despesa que leva a categoria a ≥ 80% gera alerta `type = 1`; acima de 100% gera `type = 0`; repetir a operação **não** duplica o alerta.
 
 ---
 
@@ -195,9 +195,9 @@ O manual pede o **script completo**. Além de unificar, o script precisa ser pro
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] `conektafinance.sql` roda do zero sem erros e deixa o banco populado.
-- [ ] Todos os `ASSERT` passam; uma falha interrompe o job (`ON_ERROR_STOP=1`).
-- [ ] Job `database` verde no GitHub Actions.
+- [x] `conektafinance.sql` roda do zero sem erros e deixa o banco populado.
+- [x] Todos os `ASSERT` passam; uma falha interrompe o job (`ON_ERROR_STOP=1`).
+- [ ] Job `database` verde no GitHub Actions. — *pendente (02/11/2026): o CI nunca rodou sobre este código; o workflow só dispara em `main`, `feature/**` e PRs para a `main`, e a branch `refine-frontend` não se encaixa. Localmente os mesmos passos passam*
 
 ---
 
@@ -217,9 +217,9 @@ Faz com que o script, as procedures e as triggers sejam de fato o banco "utiliza
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] `docker compose up --build` sobe API + PostgreSQL com schema, procedures, triggers e seed aplicados.
-- [ ] Suíte `dotnet test` 100% verde contra PostgreSQL.
-- [ ] Nenhuma referência residual a SQLite no backend, compose ou `.env.example`.
+- [x] `docker compose up --build` sobe API + PostgreSQL com schema, procedures, triggers e seed aplicados.
+- [x] Suíte `dotnet test` 100% verde contra PostgreSQL.
+- [x] Nenhuma referência residual a SQLite no backend, compose ou `.env.example`.
 
 ---
 
@@ -239,8 +239,8 @@ O manual exige MER, modelo lógico e modelo físico. Os diagramas em `legacy/doc
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] Os três diagramas refletem exatamente o `01_schema.sql` (mesmos nomes de tabelas e colunas).
-- [ ] PNGs legíveis em página A4 retrato.
+- [ ] Os três diagramas refletem exatamente o `01_schema.sql` (mesmos nomes de tabelas e colunas). — *pendente (02/11/2026): falta comparar os diagramas com o schema*
+- [ ] PNGs legíveis em página A4 retrato. — *pendente (02/11/2026): falta conferir na diagramação do relatório*
 
 ---
 
@@ -266,9 +266,9 @@ O manual pede explicitamente **"estrutura administrativa"** na solução Web. Ho
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] Usuário `Standard` recebe **403** em todos os endpoints `/admin`.
-- [ ] Conta desativada não consegue autenticar por nenhum dos três fluxos.
-- [ ] Testes de integração `AdminFlowTests` cobrindo métricas, paginação, bloqueio e autorização.
+- [x] Usuário `Standard` recebe **403** em todos os endpoints `/admin`.
+- [x] Conta desativada não consegue autenticar por nenhum dos três fluxos.
+- [x] Testes de integração `AdminFlowTests` cobrindo métricas, paginação, bloqueio e autorização.
 
 ---
 
@@ -291,9 +291,9 @@ Interface da estrutura administrativa exigida pelo manual, gerando evidência vi
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] Usuário comum não vê o menu e não acessa `/admin` digitando a URL.
-- [ ] Ativar/desativar reflete na lista sem recarregar a página.
-- [ ] Layout responsivo (mobile-first e desktop) e testes em `src/test/admin.test.jsx`.
+- [x] Usuário comum não vê o menu e não acessa `/admin` digitando a URL.
+- [x] Ativar/desativar reflete na lista sem recarregar a página.
+- [ ] Layout responsivo (mobile-first e desktop) e testes em `src/test/admin.test.jsx`. — *pendente (02/11/2026): testes ok; layout móvel não verificado*
 
 ---
 
@@ -311,9 +311,9 @@ Reforça o item "segurança" da Etapa 4 e o roadmap ("Proteção CORS e cabeçal
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] `curl -I` na API e no frontend exibe todos os cabeçalhos.
-- [ ] PWA, gráficos, exportação PDF e upload de imagem continuam funcionando com a CSP ativa (sem erros no console).
-- [ ] Teste de integração verificando os cabeçalhos em uma resposta da API.
+- [x] `curl -I` na API e no frontend exibe todos os cabeçalhos.
+- [ ] PWA, gráficos, exportação PDF e upload de imagem continuam funcionando com a CSP ativa (sem erros no console). — *pendente (02/11/2026): PWA (service worker ativo), gráficos e geração do PDF ok sem violações de CSP; falta testar o upload de imagem*
+- [x] Teste de integração verificando os cabeçalhos em uma resposta da API.
 
 ---
 
@@ -331,8 +331,8 @@ Roadmap: "Swagger / OpenAPI documentando 100% dos endpoints". Os controllers nã
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] Todo endpoint aparece no Swagger com descrição e códigos de resposta.
-- [ ] Build sem novos warnings de documentação ausente (`CS1591`) nos controllers.
+- [x] Todo endpoint aparece no Swagger com descrição e códigos de resposta.
+- [x] Build sem novos warnings de documentação ausente (`CS1591`) nos controllers.
 
 ---
 
@@ -354,9 +354,9 @@ O manual pede "recursos tecnológicos inclusivos" e "ações voltadas à acessib
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] Zero violações axe de impacto *serious* ou *critical* nas telas listadas.
-- [ ] Navegação completa por teclado com foco visível em todas as telas.
-- [ ] Testes de acessibilidade rodando no CI.
+- [x] Zero violações axe de impacto *serious* ou *critical* nas telas listadas.
+- [ ] Navegação completa por teclado com foco visível em todas as telas. — *pendente (02/11/2026): foco visível conferido só no dashboard*
+- [ ] Testes de acessibilidade rodando no CI. — *pendente (02/11/2026): estão no `npm test` do CI, mas o CI ainda não rodou sobre este código*
 
 ---
 
@@ -376,8 +376,8 @@ Etapa 3 cita "combate à discriminação" e o roadmap prevê "princípios ético
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] Teste unitário garantindo que o prompt de sistema contém as diretrizes.
-- [ ] Teste adversarial com o cliente de IA simulado (mock, regra `tests.md`): pergunta com viés discriminatório recebe recusa educada e neutra.
+- [ ] Teste unitário garantindo que o prompt de sistema contém as diretrizes. — *pendente (02/11/2026): não existe teste que verifique as diretrizes dentro do prompt de sistema; os testes atuais cobrem o filtro `CopilotEthics` e a recusa*
+- [x] Teste adversarial com o cliente de IA simulado (mock, regra `tests.md`): pergunta com viés discriminatório recebe recusa educada e neutra.
 
 ---
 
@@ -398,9 +398,9 @@ O manual pede **pipeline CI/CD**. O `ci.yml` atual cobre apenas CI (build, lint 
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] Merge na `main` publica as duas imagens no GHCR e dispara o deploy automaticamente.
-- [ ] Falha no CI impede a publicação.
-- [ ] Nenhum segredo versionado (verificação obrigatória do `git.md`).
+- [ ] Merge na `main` publica as duas imagens no GHCR e dispara o deploy automaticamente. — *pendente (02/11/2026): ainda não houve merge na `main` com este código*
+- [x] Falha no CI impede a publicação.
+- [x] Nenhum segredo versionado (verificação obrigatória do `git.md`).
 
 ---
 
@@ -422,9 +422,9 @@ O manual pede **monitoramento**. Hoje `/health` devolve sempre `ok` sem checar d
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] Cada requisição gera uma linha JSON com `CorrelationId`.
-- [ ] `/health/ready` retorna 503 com o banco indisponível.
-- [ ] Testes cobrindo correlation id e os endpoints de health.
+- [x] Cada requisição gera uma linha JSON com `CorrelationId`.
+- [x] `/health/ready` retorna 503 com o banco indisponível.
+- [x] Testes cobrindo correlation id e os endpoints de health.
 
 ---
 
@@ -443,8 +443,8 @@ Cobre **escalabilidade** e **segurança/continuidade** da Etapa 8 com evidência
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] `docker compose ps` mostra todos os serviços como `healthy`.
-- [ ] Backup gerado e restaurado com sucesso em um banco limpo (procedimento documentado em `database/README.md`).
+- [x] `docker compose ps` mostra todos os serviços como `healthy`.
+- [x] Backup gerado e restaurado com sucesso em um banco limpo (procedimento documentado em `database/README.md`).
 
 ---
 
@@ -465,8 +465,8 @@ O manual pede quadro Kanban e definição das entregas. Um quadro real, com hist
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] Todas as tasks F14 representadas no quadro com sprint e responsável.
-- [ ] Capturas do quadro em pelo menos dois momentos (início e fim da fase) para o relatório.
+- [ ] Todas as tasks F14 representadas no quadro com sprint e responsável. — *pendente (02/11/2026): o quadro não foi criado; o token do `gh` não tem o escopo `project`*
+- [ ] Capturas do quadro em pelo menos dois momentos (início e fim da fase) para o relatório. — *pendente (02/11/2026): depende do quadro*
 
 ---
 
