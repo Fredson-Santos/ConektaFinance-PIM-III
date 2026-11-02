@@ -1,0 +1,61 @@
+@startuml 08-arquitetura-nuvem
+' ConektaFinance - Arquitetura em nuvem e pipeline de implantação
+' Fonte: docker-compose.yml, frontend/nginx.conf, .github/workflows/ci.yml e cd.yml.
+' O Dokploy roda na VPS e usa o Traefik como proxy reverso, com certificados Let's Encrypt.
+skinparam dpi 150
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #555555
+}
+skinparam node {
+  BackgroundColor #FAFAFA
+  BorderColor #555555
+}
+top to bottom direction
+
+actor "Usuário\n(navegador ou PWA)" as U
+actor "Usuário\n(WhatsApp)" as UW
+
+rectangle "GitHub" as GH {
+  rectangle "Repositório (main)" as Repo
+  rectangle "Actions — CI\nbuild, lint e testes\n(.NET, React, PostgreSQL)" as CI
+  rectangle "Actions — CD\nbuild das imagens" as CD
+  rectangle "GHCR\nregistro de imagens" as GHCR
+}
+
+node "VPS (Linux + Docker)" as VPS {
+  rectangle "Traefik\nproxy reverso e HTTPS\n(Let's Encrypt)" as Tr
+  rectangle "Dokploy\norquestra o deploy" as Dok
+
+  node "docker compose — ConektaFinance" as DC {
+    rectangle "frontend\nNginx + PWA (React)\nproxy de /api e /uploads\nlimite 0,5 CPU · 128 MB" as FE
+    rectangle "backend\nASP.NET Core 10 (API REST)\nlogs JSON, /health/ready\nvolume: uploads_data" as BE
+    database "postgres\nPostgreSQL 16\nprocedures e triggers\nvolume: postgres_data" as PG
+    rectangle "postgres-backup\npg_dump diário (7 cópias)\nvolume: postgres_backups" as BK
+    rectangle "evolution\nEvolution API v2 (WhatsApp)\n+ PostgreSQL e Redis próprios\nvolumes: instances, dados" as EV
+  }
+}
+
+cloud "Provedor de IA (LLM)\nAPI compatível com OpenAI" as LLM
+cloud "Rede do WhatsApp" as WAN
+
+Repo -right-> CI : push / PR
+CI -right-> CD : CI verde\nna main
+CD -down-> GHCR : publica imagens
+CD -down-> Dok : webhook\nde deploy
+Dok -left-> GHCR : baixa imagens
+Dok ..> DC : recria contêineres
+
+U -down-> Tr : HTTPS
+Tr -down-> FE : dokploy-network
+FE -down-> BE : /api/v1
+BE -down-> PG
+BK -right-> PG : pg_dump
+BE -right-> EV : OTP e mensagens
+EV -left-> BE : webhook\n/api/v1/webhooks/whatsapp
+BE -left-> LLM : HTTPS
+UW -down-> WAN
+WAN <-down-> EV
+@enduml

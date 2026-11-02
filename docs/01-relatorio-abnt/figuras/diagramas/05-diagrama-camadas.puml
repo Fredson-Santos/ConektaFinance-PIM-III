@@ -1,0 +1,69 @@
+@startuml 05-diagrama-camadas
+' ConektaFinance - Diagrama de pacotes/camadas do backend (ASP.NET Core 10)
+' Fonte: pastas backend/Controllers, Application, Domain e Infrastructure.
+' As setas indicam dependência de compilação (quem usa quem).
+skinparam dpi 150
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+skinparam ArrowColor #444444
+skinparam package {
+  BackgroundColor #FAFAFA
+  BorderColor #555555
+}
+left to right direction
+
+package "Apresentação (API)" as P {
+  [Controllers\nAuth, Users, Transactions, Categories,\nBudgets, Dashboard, Reports, Alerts,\nImports, Copilot, Admin, Webhooks] as Ctrl
+  [BaseApiController\n(CurrentUserId)] as Base
+  [Program.cs\nInjeção de dependência,\nJWT, CORS, rate limiting,\nSwagger, health checks] as Prog
+}
+
+package "Application" as A {
+  [Services\nAuthService, TransactionService,\nBudgetService, CopilotService,\nReportService, AdminService ...] as Svc
+  [Interfaces de serviço\nIAuthService, ICopilotAiClient,\nIOtpSender, IEvolutionClient ...] as ISvc
+  [DTOs (records)] as Dto
+  [Validators\n(FluentValidation)] as Val
+  [Middleware\nErros (ProblemDetails),\nCorrelation ID,\ncabeçalhos de segurança] as Mw
+}
+
+package "Domain" as D {
+  [Entities\nUser, Transaction, Category,\nBudget, Alert, ChatMessage,\nImportBatch, OtpCode] as Ent
+  [Enums e Constants] as Enu
+  [Interfaces de repositório\nITransactionRepository,\nIUserRepository ...] as IRepo
+}
+
+package "Infrastructure" as I {
+  [Persistence\nAppDbContext (EF Core),\nConfigurations, Migrations,\nRepositories] as Pers
+  [Copilot\nLlmCopilotClient,\nRuleBasedCopilotClient,\nCompositeCopilotClient] as Cop
+  [Messaging\nEvolutionClient,\nEvolutionOtpSender,\nDevOtpSender] as Msg
+  [Files, Importing, Health] as Out
+}
+
+database "PostgreSQL 16\nprocedures e triggers" as DB
+cloud "Provedor de IA (LLM)" as LLM
+cloud "Evolution API\n(WhatsApp)" as WA
+
+Ctrl --> Svc
+Ctrl --> Dto
+Ctrl -up-|> Base
+Svc ..|> ISvc
+Svc --> IRepo
+Svc --> Ent
+Val --> Dto
+Pers ..|> IRepo
+Pers --> Ent
+Cop ..|> ISvc
+Msg ..|> ISvc
+Prog --> Mw
+Pers --> DB
+Cop --> LLM
+Msg --> WA
+
+note bottom of D
+  O Domain não depende de nenhuma outra camada.
+  Application e Infrastructure dependem de abstrações
+  (interfaces), e a ligação concreta é feita na
+  injeção de dependência (Program.cs).
+end note
+@enduml

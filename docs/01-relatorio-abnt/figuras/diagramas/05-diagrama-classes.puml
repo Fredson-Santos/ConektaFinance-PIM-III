@@ -1,0 +1,156 @@
+@startuml 05-diagrama-classes
+' ConektaFinance - Diagrama de classes (domínio e principais abstrações)
+' Fonte: backend/Domain/Entities, Domain/Enums, Application/Services e Infrastructure.
+' Propriedades de navegação e datas de auditoria (CreatedAt/UpdatedAt) omitidas para legibilidade.
+skinparam dpi 150
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #555555
+}
+hide empty members
+
+package "Domain.Entities" {
+  class User {
+    +Id : int
+    +FullName : string
+    +Email : string
+    +Phone : string?
+    +PasswordHash : string
+    +AccountType : string
+    +IsActive : bool
+    +MonthlyCeiling : decimal
+    +Currency : string
+    +OnboardingCompletedAt : DateTime?
+  }
+  class Transaction {
+    +Id : int
+    +Type : TransactionType
+    +Description : string
+    +Value : decimal
+    +TransactionDate : DateTime
+    +PaymentMethod : PaymentMethod?
+    +IsRecurrent : bool
+    +Status : TransactionStatus
+    +Source : TransactionSource
+  }
+  class Category {
+    +Id : int
+    +Name : string
+    +ColorCode : string
+    +Icon : string
+    +Kind : CategoryKind
+    +IsSystem : bool
+  }
+  class Budget {
+    +Id : int
+    +LimitValue : decimal
+    +PeriodMonth : int
+    +PeriodYear : int
+  }
+  class Alert {
+    +Id : int
+    +Type : AlertType
+    +Title : string
+    +Message : string
+    +IsRead : bool
+    +DedupKey : string
+  }
+  class ChatMessage {
+    +Id : int
+    +Role : ChatRole
+    +Channel : ChatChannel
+    +Content : string
+    +ActionPayload : string?
+  }
+  class ImportBatch {
+    +Id : int
+    +FileName : string
+    +DetectedCount : int
+    +ImportedCount : int
+    +SkippedDuplicates : int
+    +Status : ImportStatus
+  }
+  class OtpCode {
+    +Id : int
+    +Phone : string
+    +CodeHash : string
+    +ExpiresAt : DateTime
+    +Attempts : int
+    +Purpose : OtpPurpose
+  }
+}
+
+package "Domain.Enums" {
+  enum TransactionType {
+    Expense
+    Income
+  }
+  enum TransactionSource {
+    Manual
+    Import
+    Copilot
+  }
+  enum ChatChannel {
+    Web
+    WhatsApp
+  }
+}
+
+User "1" *-- "0..*" Transaction
+User "1" *-- "0..*" Category
+User "1" *-- "0..*" Budget
+User "1" *-- "0..*" Alert
+User "1" *-- "0..*" ChatMessage
+User "1" *-- "0..*" ImportBatch
+Category "1" -- "0..*" Transaction
+Category "1" -- "0..*" Budget
+Category "0..1" -- "0..*" Alert
+ImportBatch "0..1" -- "0..*" Transaction
+Transaction ..> TransactionType
+Transaction ..> TransactionSource
+ChatMessage ..> ChatChannel
+
+package "Abstração e polimorfismo" {
+  interface ICopilotAiClient {
+    +ReplyAsync(request) : CopilotReply
+  }
+  class LlmCopilotClient
+  class RuleBasedCopilotClient
+  class CompositeCopilotClient {
+    -llm : LlmCopilotClient?
+    -ruleBased : RuleBasedCopilotClient
+  }
+  ICopilotAiClient <|.. LlmCopilotClient
+  ICopilotAiClient <|.. RuleBasedCopilotClient
+  ICopilotAiClient <|.. CompositeCopilotClient
+  CompositeCopilotClient o-- LlmCopilotClient : tenta primeiro
+  CompositeCopilotClient o-- RuleBasedCopilotClient : fallback
+
+  interface IOtpSender {
+    +SendAsync(phone, code)
+  }
+  class EvolutionOtpSender
+  class DevOtpSender
+  IOtpSender <|.. EvolutionOtpSender
+  IOtpSender <|.. DevOtpSender
+
+  interface ITransactionRepository
+  class TransactionRepository
+  ITransactionRepository <|.. TransactionRepository
+}
+
+package "Herança" {
+  abstract class ControllerBase
+  abstract class BaseApiController {
+    #CurrentUserId : int
+  }
+  class TransactionsController
+  class CopilotController
+  ControllerBase <|-- BaseApiController
+  BaseApiController <|-- TransactionsController
+  BaseApiController <|-- CopilotController
+}
+@enduml

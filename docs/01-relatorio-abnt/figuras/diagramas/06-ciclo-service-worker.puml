@@ -1,0 +1,37 @@
+@startuml 06-ciclo-service-worker
+' ConektaFinance - Ciclo de vida do service worker do PWA
+' Fonte: frontend/vite.config.js (vite-plugin-pwa / Workbox, registerType autoUpdate,
+' skipWaiting, clientsClaim, navigateFallback, runtimeCaching) e frontend/src/main.jsx.
+skinparam dpi 150
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam state {
+  BackgroundColor #FFFFFF
+  BorderColor #555555
+}
+
+[*] --> Registro : app carrega\nregisterSW({ immediate: true })
+
+state Registro : navegador baixa /sw.js\n(Nginx serve com Cache-Control: no-cache)
+
+Registro --> Instalacao
+state "Instalação" as Instalacao : precache do app shell\n(HTML, JS, CSS, ícones, manifest)
+
+Instalacao --> Ativacao : skipWaiting
+state "Ativação" as Ativacao : cleanupOutdatedCaches remove\ncaches de versões anteriores;\nclientsClaim assume as abas abertas
+
+Ativacao --> Controlando
+
+state Controlando {
+  state "Requisição de navegação" as Nav : navigateFallback → /index.html\n(o app abre mesmo sem rede)
+  state "Arquivos do app" as Ast : servidos do precache
+  state "Fontes (Google Fonts)" as Fon : CacheFirst, validade de 1 ano
+  state "Chamadas /api" as Api : sem cache: vão sempre ao servidor\n(fonte única de verdade dos dados)
+}
+
+Controlando --> Atualizacao : novo deploy publica\num sw.js diferente
+state "Atualização" as Atualizacao : navegador detecta a nova versão\n(registerType: autoUpdate)
+Atualizacao --> Instalacao : nova versão instala e ativa;\na aba recarrega com o código novo
+
+Controlando --> [*] : usuário remove o app\nou limpa os dados do site
+@enduml
