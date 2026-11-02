@@ -46,6 +46,24 @@ public class RuleBasedCopilotClientTests
     }
 
     [Fact]
+    public async Task Resumo_usa_formato_brasileiro_mesmo_com_cultura_invariante()
+    {
+        // O container e o CI rodam com a cultura invariante; os valores devem continuar em R$ 0,00.
+        var original = System.Globalization.CultureInfo.CurrentCulture;
+        System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+        try
+        {
+            var reply = await _client.ReplyAsync(Request("Me da um resumo do mes"));
+
+            reply.Content.Should().Contain("R$ 5000,00").And.NotContain("5000.00");
+        }
+        finally
+        {
+            System.Globalization.CultureInfo.CurrentCulture = original;
+        }
+    }
+
+    [Fact]
     public async Task Economizar_sugere_categoria_acima_do_teto()
     {
         var reply = await _client.ReplyAsync(Request("Onde posso economizar este mes?"));

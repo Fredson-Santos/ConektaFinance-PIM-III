@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PIM_III_Backend.Application.Services;
+using PIM_III_Backend.Application.Formatting;
 using PIM_III_Backend.Domain.Constants;
 
 namespace PIM_III_Backend.Infrastructure.Copilot;
@@ -30,9 +31,9 @@ public partial class RuleBasedCopilotClient : ICopilotAiClient
 
         if (message.Contains("resumo") || (message.Contains("quanto") && (message.Contains("gast") || message.Contains("entr") || message.Contains("saldo"))))
             return new CopilotReply(
-                $"Resumo do mes atual: entradas de R$ {context.MonthlyIncome:F2}, saidas de R$ {context.MonthlyExpense:F2} e saldo acumulado de R$ {context.Balance:F2}." +
+                string.Create(PtBr.Culture, $"Resumo do mes atual: entradas de R$ {context.MonthlyIncome:F2}, saidas de R$ {context.MonthlyExpense:F2} e saldo acumulado de R$ {context.Balance:F2}.") +
                 (context.MonthlyCeiling > 0
-                    ? $" Suas saidas representam {Math.Round((double)(context.MonthlyExpense / context.MonthlyCeiling) * 100, 1)}% do seu teto geral de R$ {context.MonthlyCeiling:F2}."
+                    ? string.Create(PtBr.Culture, $" Suas saidas representam {Math.Round((double)(context.MonthlyExpense / context.MonthlyCeiling) * 100, 1)}% do seu teto geral de R$ {context.MonthlyCeiling:F2}.")
                     : string.Empty),
                 []);
 
@@ -44,15 +45,15 @@ public partial class RuleBasedCopilotClient : ICopilotAiClient
                 var excess = Math.Round(worst.Spent - worst.Limit, 2);
                 return new CopilotReply(
                     $"Atencao: {string.Join(", ", context.OverBudgetCategories)} esta(o) acima do teto neste mes. " +
-                    $"{worst.Name} consumiu {worst.Percentage}% do limite (R$ {worst.Spent:F2} de R$ {worst.Limit:F2}). " +
-                    $"Reduzindo cerca de R$ {Math.Max(excess, worst.Spent * 0.1m):F2} nele ate o fim do mes, voce volta ao plano. Quer que eu abra um novo orcamento para voce acompanhar?",
+                    string.Create(PtBr.Culture, $"{worst.Name} consumiu {worst.Percentage}% do limite (R$ {worst.Spent:F2} de R$ {worst.Limit:F2}). ") +
+                    string.Create(PtBr.Culture, $"Reduzindo cerca de R$ {Math.Max(excess, worst.Spent * 0.1m):F2} nele ate o fim do mes, voce volta ao plano. Quer que eu abra um novo orcamento para voce acompanhar?"),
                     []);
             }
             if (context.Categories.Count > 0)
             {
                 var highest = context.Categories.OrderByDescending(c => c.Spent).First();
                 return new CopilotReply(
-                    $"Sua maior area de gasto este mes e {highest.Name}: R$ {highest.Spent:F2} de R$ {highest.Limit:F2} ({highest.Percentage}% do teto). " +
+                    string.Create(PtBr.Culture, $"Sua maior area de gasto este mes e {highest.Name}: R$ {highest.Spent:F2} de R$ {highest.Limit:F2} ({highest.Percentage}% do teto). ") +
                     "Pequenos cortes diarios nessa categoria costumam gerar a maior economia ao fim do mes.",
                     []);
             }
@@ -74,7 +75,7 @@ public partial class RuleBasedCopilotClient : ICopilotAiClient
         if (!string.IsNullOrWhiteSpace(receipt.Merchant))
             args["description"] = $"Compra em {receipt.Merchant}";
         if (receipt.Items is { Count: > 0 })
-            args["items"] = receipt.Items.Select(i => $"{i.Name}: R$ {i.Value:F2}").ToList();
+            args["items"] = receipt.Items.Select(i => string.Create(PtBr.Culture, $"{i.Name}: R$ {i.Value:F2}")).ToList();
         return new CopilotReply(
             "Li a nota fiscal enviada. Revise os dados e confirme o lancamento:",
             [new CopilotAction("draft_transaction", args)]);

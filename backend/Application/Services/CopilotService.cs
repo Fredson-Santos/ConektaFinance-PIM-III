@@ -2,6 +2,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using PIM_III_Backend.Application.Dtos;
 using PIM_III_Backend.Application.Exceptions;
+using PIM_III_Backend.Application.Formatting;
 using PIM_III_Backend.Domain.Entities;
 using PIM_III_Backend.Domain.Enums;
 using PIM_III_Backend.Domain.Interfaces;
@@ -145,7 +146,7 @@ public class CopilotService(
             Role = ChatRole.Assistant,
             Channel = message.Channel,
             Content = $"Lancamento registrado com sucesso: {description}" +
-                      (value is not null ? $" de R$ {value:F2}" : string.Empty) +
+                      (value is not null ? string.Create(PtBr.Culture, $" de R$ {value:F2}") : string.Empty) +
                       (category is not null ? $" em {category}" : string.Empty) +
                       ". Ele ja aparece no seu historico e no dashboard."
         };

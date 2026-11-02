@@ -1,6 +1,7 @@
 using PIM_III_Backend.Application.Services;
 using PIM_III_Backend.Application.Dtos;
 using PIM_III_Backend.Application.Exceptions;
+using PIM_III_Backend.Application.Formatting;
 using PIM_III_Backend.Domain.Entities;
 using PIM_III_Backend.Domain.Enums;
 using PIM_III_Backend.Domain.Interfaces;
@@ -33,13 +34,13 @@ public class AlertService(
                 $"cat:{categoryId}:{year}-{month:D2}:exceeded",
                 AlertType.BudgetExceeded,
                 $"{category.Name} acima do teto",
-                $"Orcamento excedido em R$ {Math.Abs(budget.LimitValue - spent):F2}. Limite de R$ {budget.LimitValue:F2}.");
+                string.Create(PtBr.Culture, $"Orcamento excedido em R$ {Math.Abs(budget.LimitValue - spent):F2}. Limite de R$ {budget.LimitValue:F2}."));
         else if (percentage >= 80)
             await UpsertAsync(userId, categoryId,
                 $"cat:{categoryId}:{year}-{month:D2}:limit",
                 AlertType.CategoryLimit,
-                $"{category.Name} — {Math.Round(percentage)}% do teto",
-                $"Restam R$ {Math.Max(0, budget.LimitValue - spent):F2} ate o fechamento do mes.");
+                string.Create(PtBr.Culture, $"{category.Name} — {Math.Round(percentage)}% do teto"),
+                string.Create(PtBr.Culture, $"Restam R$ {Math.Max(0, budget.LimitValue - spent):F2} ate o fechamento do mes."));
     }
 
     private async Task UpsertAsync(int userId, int categoryId, string dedupKey, AlertType type, string title, string message)
