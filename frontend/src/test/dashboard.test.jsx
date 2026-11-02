@@ -120,11 +120,18 @@ describe('DashboardScreen', () => {
   })
 
   it('mostra grafico da semana com dias e total', async () => {
-    renderDashboard()
+    // Fixa uma quarta-feira: no dia atual o rótulo vira "HOJE", o que quebrava o teste às segundas e terças.
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date(2026, 9, 28, 12, 0, 0))
+    try {
+      renderDashboard()
 
-    expect(await screen.findByText('R$ 135,00')).toBeInTheDocument()
-    expect(screen.getByText('seg')).toBeInTheDocument()
-    expect(screen.getByText('ter')).toBeInTheDocument()
+      expect(await screen.findByText('R$ 135,00')).toBeInTheDocument()
+      expect(screen.getByText('seg')).toBeInTheDocument()
+      expect(screen.getByText('ter')).toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('garante que o grafico de gastos e exclusivo da semana sem filtro de mes', async () => {
