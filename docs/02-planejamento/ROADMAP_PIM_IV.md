@@ -10,7 +10,7 @@
 ## 📊 Progresso Geral
 
 > **Atualizado em 02/11/2026.** Os itens marcados abaixo têm evidência no código. As etapas só ficam completas com a redação acadêmica, os prints e os diagramas, que ainda estão pendentes.
-> **Código pronto:** Etapas 3, 4, 6, 7 e 8. **Parcial:** Etapa 5 (falta sincronização offline ou justificativa) e Etapa 9 (falta Kanban e backlog). **Sem código:** Etapas 1 e 2 (só texto).
+> **Código pronto:** Etapas 3, 4, 5, 6, 7 e 8 (na Etapa 5, a sincronização é feita pela API como fonte única de verdade; ver [`05-solucao-mobile`](../03-criterios/05-solucao-mobile/README.md)). **Parcial:** Etapa 9 (falta Kanban e backlog). **Sem código:** Etapas 1 e 2 (só texto).
 
 - [ ] **Etapa 1:** Caracterização da Organização *(1,0 pt)*
 - [ ] **Etapa 2:** Planejamento da Solução Tecnológica — Empreendedorismo *(1,0 pt)*
