@@ -210,4 +210,109 @@ public static class SeedData
         context.Alerts.AddRange(alerts);
         context.SaveChanges();
     }
+
+    /// <summary>
+    /// Garante que a conta demo sempre possua orcamentos e lancamentos no mes corrente,
+    /// mesmo apos a virada de mes em ambientes de longa duracao.
+    /// </summary>
+    public static void EnsureDemoCurrentMonth(AppDbContext context)
+    {
+        var demo = context.Users.FirstOrDefault(u => u.Email == "demo@conektafinance.com");
+        if (demo is null)
+            return;
+
+        var now = DateTime.UtcNow;
+        var monthStart = new DateTime(now.Year, now.Month, 1);
+        var nextMonthStart = monthStart.AddMonths(1);
+
+        var categories = context.Categories.Where(c => c.UserId == demo.Id).ToList();
+        if (categories.Count == 0)
+            return;
+        var cat = categories.ToDictionary(c => c.Name, c => c.Id);
+
+        // Garante os orcamentos do mes corrente
+        var existingBudgets = context.Budgets
+            .Where(b => b.UserId == demo.Id && b.PeriodMonth == now.Month && b.PeriodYear == now.Year)
+            .Select(b => b.CategoryId)
+            .ToHashSet();
+
+        var newBudgets = new List<Budget>();
+        foreach (var (name, limit) in new[] { ("Alimentação", 1500m), ("Transporte", 600m), ("Lazer", 800m), ("Moradia", 2300m), ("Saúde", 400m) })
+        {
+            if (cat.TryGetValue(name, out var categoryId) && !existingBudgets.Contains(categoryId))
+            {
+                newBudgets.Add(new Budget
+                {
+                    UserId = demo.Id,
+                    CategoryId = categoryId,
+                    LimitValue = limit,
+                    PeriodMonth = now.Month,
+                    PeriodYear = now.Year
+                });
+            }
+        }
+        if (newBudgets.Count > 0)
+        {
+            context.Budgets.AddRange(newBudgets);
+            context.SaveChanges();
+        }
+
+        // Se o mes atual ainda nao tiver lancamentos para a conta demo, semeia o mes corrente
+        var hasTransactionsThisMonth = context.Transactions
+            .Any(t => t.UserId == demo.Id && t.TransactionDate >= monthStart && t.TransactionDate < nextMonthStart);
+
+        if (!hasTransactionsThisMonth)
+        {
+            var transactions = new List<Transaction>();
+            void AddTx(string catName, TransactionType type, string description, decimal value, DateTime date,
+                PaymentMethod method, bool recurrent = false)
+            {
+                if (!cat.TryGetValue(catName, out var categoryId) || date > now)
+                    return;
+                transactions.Add(new Transaction
+                {
+                    UserId = demo.Id,
+                    CategoryId = categoryId,
+                    Type = type,
+                    Description = description,
+                    Value = value,
+                    TransactionDate = date,
+                    PaymentMethod = method,
+                    IsRecurrent = recurrent,
+                    Source = TransactionSource.Manual,
+                    CreatedAt = date,
+                    UpdatedAt = date
+                });
+            }
+
+            var d1 = monthStart.AddHours(10);
+            AddTx("Salário", TransactionType.Income, "Salário Tech Solutions", 5200m, d1, PaymentMethod.Transferencia, true);
+            AddTx("Moradia", TransactionType.Expense, "Aluguel do apartamento", 1450m, d1.AddHours(1), PaymentMethod.Boleto, true);
+            AddTx("Lazer", TransactionType.Expense, "Assinatura de streaming", 39.90m, d1.AddHours(2), PaymentMethod.Cartao, true);
+            AddTx("Alimentação", TransactionType.Expense, "Supermercado mensal", 320m, d1.AddHours(5), PaymentMethod.Cartao);
+
+            if (now.Day >= 2)
+            {
+                var d2 = monthStart.AddDays(1).AddHours(9);
+                AddTx("Alimentação", TransactionType.Expense, "Padaria pão de queijo", 24.50m, d2.AddMinutes(15), PaymentMethod.Dinheiro);
+                AddTx("Saúde", TransactionType.Expense, "Farmácia vitaminas", 89.90m, d2.AddHours(2).AddMinutes(30), PaymentMethod.Pix);
+                AddTx("Alimentação", TransactionType.Expense, "Restaurante almoço", 68.50m, d2.AddHours(4), PaymentMethod.Cartao);
+                AddTx("Transporte", TransactionType.Expense, "Uber reunião", 32.90m, d2.AddHours(5).AddMinutes(45), PaymentMethod.Pix);
+                AddTx("Transporte", TransactionType.Expense, "Combustível", 150.00m, d2.AddHours(7).AddMinutes(20), PaymentMethod.Cartao);
+            }
+
+            if (now.Day >= 5)
+            {
+                var d5 = monthStart.AddDays(4).AddHours(12);
+                AddTx("Alimentação", TransactionType.Expense, "Delivery de pizza", 78.50m, d5, PaymentMethod.Pix);
+                AddTx("Lazer", TransactionType.Expense, "Cinema com amigos", 85.00m, d5.AddHours(6), PaymentMethod.Cartao);
+            }
+
+            if (transactions.Count > 0)
+            {
+                context.Transactions.AddRange(transactions);
+                context.SaveChanges();
+            }
+        }
+    }
 }
