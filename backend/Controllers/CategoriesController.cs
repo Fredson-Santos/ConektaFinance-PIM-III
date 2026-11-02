@@ -1,77 +1,55 @@
 using Microsoft.AspNetCore.Mvc;
-using PIM_III_Backend.Application.Dtos.Categories;
+using PIM_III_Backend.Application.Dtos;
 using PIM_III_Backend.Application.Services;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
 
 namespace PIM_III_Backend.Controllers;
 
-[Authorize]
-[ApiController]
-[Route("api/[controller]")]
-public class CategoriesController : ControllerBase
+/// <summary>
+/// Categorias de receitas e despesas do usuário.
+/// </summary>
+[Tags("Categorias")]
+public class CategoriesController(ICategoryService categoryService) : BaseApiController
 {
-    private readonly ICategoryService _service;
-
-    public CategoriesController(ICategoryService service)
-    {
-        _service = service;
-    }
-
-    private int GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) 
-            ?? User.FindFirstValue("sub") 
-            ?? User.FindFirstValue("user_id");
-        
-        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
-        {
-            throw new UnauthorizedAccessException("Não foi possível extrair o identificador do usuário do token JWT.");
-        }
-        
-        return userId;
-    }
-
+    /// <summary>Lista as categorias, com filtro por tipo e, se informado o período, gasto e teto do mês.</summary>
+    [ProducesResponseType<List<CategoryResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CategoryResponse>>> GetAll()
-    {
-        return Ok(await _service.GetAllAsync(GetCurrentUserId()));
-    }
+    public async Task<ActionResult<List<CategoryResponse>>> List(
+        [FromQuery] string? kind, [FromQuery] int? month, [FromQuery] int? year) =>
+        Ok(await categoryService.ListAsync(CurrentUserId, kind, month, year));
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<CategoryResponse>> GetById(int id)
-    {
-        var category = await _service.GetByIdAsync(id, GetCurrentUserId());
-        if (category == null) return NotFound();
-        return Ok(category);
-    }
-
+    /// <summary>Cria uma categoria personalizada.</summary>
+    [ProducesResponseType<CategoryResponse>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
     [HttpPost]
     public async Task<ActionResult<CategoryResponse>> Create(CreateCategoryRequest request)
     {
-        var category = await _service.CreateAsync(request, GetCurrentUserId());
-        return CreatedAtAction(nameof(GetById), new { id = category.Id }, category);
+        var response = await categoryService.CreateAsync(CurrentUserId, request);
+        return StatusCode(StatusCodes.Status201Created, response);
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, UpdateCategoryRequest request)
-    {
-        try
-        {
-            await _service.UpdateAsync(id, request, GetCurrentUserId());
-            return NoContent();
-        }
-        catch (Exception)
-        {
-            return NotFound();
-        }
-    }
+    /// <summary>Atualiza nome, cor, ícone ou descrição de uma categoria.</summary>
+    [ProducesResponseType<CategoryResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<CategoryResponse>> Update(int id, UpdateCategoryRequest request) =>
+        Ok(await categoryService.UpdateAsync(CurrentUserId, id, request));
 
-    [Authorize]
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    /// <summary>Exclui uma categoria sem lançamentos vinculados.</summary>
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> Delete(int id)
     {
-        await _service.DeleteAsync(id, GetCurrentUserId());
+        await categoryService.DeleteAsync(CurrentUserId, id);
         return NoContent();
     }
 }

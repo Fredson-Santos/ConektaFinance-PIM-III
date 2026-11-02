@@ -13,6 +13,7 @@ public class Alert
     public int? CategoryId { get; set; }
     public Category? Category { get; set; }
     public bool IsRead { get; set; }
+    public string DedupKey { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

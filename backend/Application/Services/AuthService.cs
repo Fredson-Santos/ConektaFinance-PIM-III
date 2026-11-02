@@ -1,112 +1,78 @@
-using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using PIM_III_Backend.Application.DTOs;
+using BCrypt.Net;
+using PIM_III_Backend.Application.Dtos;
+using PIM_III_Backend.Application.Exceptions;
+using PIM_III_Backend.Domain.Constants;
 using PIM_III_Backend.Domain.Entities;
 using PIM_III_Backend.Domain.Interfaces;
-using BCrypt.Net;
 
 namespace PIM_III_Backend.Application.Services;
 
-public class AuthService : IAuthService
+public class AuthService(
+    IUserRepository userRepository,
+    ICategoryRepository categoryRepository,
+    ITokenService tokenService,
+    IConfiguration configuration) : IAuthService
 {
-    private readonly IUserRepository _userRepository;
-    private readonly IConfiguration _config;
-
-    public AuthService(IUserRepository userRepository, IConfiguration config)
+    public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {
-        _userRepository = userRepository;
-        _config = config;
+        var email = request.Email.Trim().ToLowerInvariant();
+        if (await userRepository.GetByEmailAsync(email) is not null)
+            throw AppException.Conflict("E-mail ja cadastrado", "Utilize outro e-mail ou faca login.");
+
+        var user = new User
+        {
+            FullName = request.FullName.Trim(),
+            Email = email,
+            Phone = WhatsAppNumbers.NormalizePhone(request.Phone),
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            MonthlyCeiling = request.MonthlyCeiling ?? 0m,
+            OnboardingCompletedAt = request.MonthlyCeiling > 0 ? DateTime.UtcNow : null
+        };
+        await userRepository.AddAsync(user);
+        await categoryRepository.AddRangeAsync(CategoryTemplates.CloneForUser(user.Id));
+
+        return new AuthResponse(tokenService.GenerateToken(user), MapUser(user));
     }
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
     {
-        var user = await _userRepository.GetByEmailAsync(request.Email);
+        var user = await userRepository.GetByEmailAsync(request.Email.Trim().ToLowerInvariant());
+        if (user is null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            throw AppException.Unauthorized("Credenciais invalidas", "E-mail ou senha incorretos.");
+        EnsureActive(user);
 
-        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-        {
-            throw new Exception("Email ou senha inválidos.");
-        }
-
-        var token = GenerateJwtToken(user);
-
-        return new AuthResponse
-        {
-            Token = token,
-            User = new UserResponse
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                AccountType = user.AccountType
-            }
-        };
+        return new AuthResponse(tokenService.GenerateToken(user), MapUser(user));
     }
 
-    public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
+    public async Task<AuthResponse> DemoLoginAsync()
     {
-        var existingUser = await _userRepository.GetByEmailAsync(request.Email);
-        if (existingUser != null)
-        {
-            throw new Exception("Já existe uma conta com este email.");
-        }
-
-        var user = new User
-        {
-            FullName = request.FullName,
-            Email = request.Email,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-            AccountType = "Standard",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-
-        await _userRepository.AddAsync(user);
-
-        var token = GenerateJwtToken(user);
-
-        return new AuthResponse
-        {
-            Token = token,
-            User = new UserResponse
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                AccountType = user.AccountType
-            }
-        };
+        var demoEmail = configuration["Demo:Email"] ?? "demo@conektafinance.com";
+        var user = await userRepository.GetByEmailAsync(demoEmail)
+            ?? throw AppException.NotFound("Demonstracao indisponivel",
+                "A conta de demonstracao nao esta configurada neste ambiente.");
+        EnsureActive(user);
+        return new AuthResponse(tokenService.GenerateToken(user), MapUser(user));
     }
 
-    private string GenerateJwtToken(User user)
+    internal static void EnsureActive(User user)
     {
-        var secret = _config["JwtSettings:Secret"] ?? throw new Exception("JWT Secret is not configured.");
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var claims = new[]
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(ClaimTypes.Name, user.FullName),
-            new Claim("accountType", user.AccountType),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
-
-        var expirationMinutes = int.Parse(_config["JwtSettings:ExpirationMinutes"] ?? "60");
-
-        var token = new JwtSecurityToken(
-            issuer: _config["JwtSettings:Issuer"],
-            audience: _config["JwtSettings:Audience"],
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(expirationMinutes),
-            signingCredentials: creds
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        if (!user.IsActive)
+            throw AppException.Forbidden("Conta desativada",
+                "Esta conta foi desativada pelo administrador. Entre em contato com o suporte.");
     }
+
+    internal static UserResponse MapUser(User user) => new(
+        user.Id,
+        user.FullName,
+        user.DisplayName,
+        user.Email,
+        user.Phone,
+        user.Cpf,
+        user.Occupation,
+        user.AvatarUrl,
+        user.AccountType,
+        user.MonthlyCeiling,
+        user.Currency,
+        user.CycleStartDay,
+        user.OnboardingCompletedAt.HasValue);
 }

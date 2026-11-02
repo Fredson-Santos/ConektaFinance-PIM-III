@@ -1,99 +1,110 @@
-using PIM_III_Backend.Application.Dtos.Alerts;
+using PIM_III_Backend.Application.Services;
+using PIM_III_Backend.Application.Dtos;
+using PIM_III_Backend.Application.Exceptions;
+using PIM_III_Backend.Application.Formatting;
 using PIM_III_Backend.Domain.Entities;
 using PIM_III_Backend.Domain.Enums;
 using PIM_III_Backend.Domain.Interfaces;
 
 namespace PIM_III_Backend.Application.Services;
 
-public class AlertService : IAlertService
+public class AlertService(
+    IAlertRepository alertRepository,
+    IBudgetRepository budgetRepository,
+    ICategoryRepository categoryRepository,
+    ITransactionRepository transactionRepository) : IAlertService
 {
-    private readonly IAlertRepository _alertRepository;
-    private readonly IBudgetRepository _budgetRepository;
-    private readonly IExpenseRepository _expenseRepository;
-
-    public AlertService(IAlertRepository alertRepository, IBudgetRepository budgetRepository, IExpenseRepository expenseRepository)
+    public async Task CheckBudgetAlertsAsync(int userId, int categoryId, int year, int month)
     {
-        _alertRepository = alertRepository;
-        _budgetRepository = budgetRepository;
-        _expenseRepository = expenseRepository;
+        var category = await categoryRepository.GetByIdAndUserAsync(categoryId, userId);
+        if (category is null || category.Kind != CategoryKind.Expense)
+            return;
+
+        var budget = await budgetRepository.GetAsync(userId, categoryId, month, year);
+        if (budget is null || budget.LimitValue <= 0)
+            return;
+
+        var start = new DateTime(year, month, 1);
+        var end = start.AddMonths(1);
+        var spent = await transactionRepository.SumAsync(userId, TransactionType.Expense, start, end, categoryId);
+        var percentage = BudgetStatus.PercentageUsed(spent, budget.LimitValue);
+
+        if (percentage > 100)
+            await UpsertAsync(userId, categoryId,
+                $"cat:{categoryId}:{year}-{month:D2}:exceeded",
+                AlertType.BudgetExceeded,
+                $"{category.Name} acima do teto",
+                string.Create(PtBr.Culture, $"Orcamento excedido em R$ {Math.Abs(budget.LimitValue - spent):F2}. Limite de R$ {budget.LimitValue:F2}."));
+        else if (percentage >= 80)
+            await UpsertAsync(userId, categoryId,
+                $"cat:{categoryId}:{year}-{month:D2}:limit",
+                AlertType.CategoryLimit,
+                string.Create(PtBr.Culture, $"{category.Name} — {Math.Round(percentage)}% do teto"),
+                string.Create(PtBr.Culture, $"Restam R$ {Math.Max(0, budget.LimitValue - spent):F2} ate o fechamento do mes."));
     }
 
-    public async Task<IEnumerable<AlertResponse>> GetUserAlertsAsync(int userId, bool onlyUnread = false)
+    private async Task UpsertAsync(int userId, int categoryId, string dedupKey, AlertType type, string title, string message)
     {
-        var alerts = await _alertRepository.GetByUserIdAsync(userId, onlyUnread);
-        return alerts.Select(a => new AlertResponse(
-            a.Id,
-            a.Type == AlertType.BudgetExceeded ? "orcamento_excedido" :
-            a.Type == AlertType.CategoryLimit ? "categoria_limite" : "gasto_alto",
-            a.Title,
-            a.Message,
-            a.CategoryId,
-            a.Category?.Name,
-            a.IsRead,
-            a.CreatedAt
-        ));
-    }
-
-    public async Task MarkAsReadAsync(int id, int userId)
-    {
-        var alert = await _alertRepository.GetByIdAsync(id);
-        if (alert == null || alert.UserId != userId) return;
-
-        alert.IsRead = true;
-        await _alertRepository.UpdateAsync(alert);
-    }
-
-    public async Task DeleteAsync(int id, int userId)
-    {
-        var alert = await _alertRepository.GetByIdAsync(id);
-        if (alert == null || alert.UserId != userId) return;
-        await _alertRepository.DeleteAsync(id);
-    }
-
-    public async Task CheckBudgetAlertsAsync(int userId, int categoryId, decimal currentValue)
-    {
-        var now = DateTime.UtcNow;
-        var budget = await _budgetRepository.GetByUserAndCategoryAsync(userId, categoryId, now.Month, now.Year);
-        
-        if (budget != null)
+        var existing = await alertRepository.GetByDedupKeyAsync(userId, dedupKey);
+        if (existing is null)
         {
-            var monthStart = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-            var monthEnd = monthStart.AddMonths(1).AddTicks(-1); // 23:59:59.9999999 do último dia
-            var expenses = await _expenseRepository.GetByUserIdAsync(userId,
-                monthStart,
-                monthEnd,
-                categoryId);
-            
-            var totalSpent = expenses.Sum(x => x.Value);
-
-            if (totalSpent > budget.LimitValue)
+            await alertRepository.AddAsync(new Alert
             {
-                await _alertRepository.AddAsync(new Alert
-                {
-                    UserId = userId,
-                    CategoryId = categoryId,
-                    Type = AlertType.BudgetExceeded,
-                    Title = "Orçamento Excedido",
-                    Message = $"Orçamento da categoria excedido! Limite: {budget.LimitValue:C2}, Gasto: {totalSpent:C2}",
-                    IsRead = false,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                });
-            }
-            else if (totalSpent > budget.LimitValue * 0.8m)
-            {
-                await _alertRepository.AddAsync(new Alert
-                {
-                    UserId = userId,
-                    CategoryId = categoryId,
-                    Type = AlertType.CategoryLimit,
-                    Title = "Quase no Limite",
-                    Message = $"Você atingiu 80% do orçamento da categoria. Gasto: {totalSpent:C2}",
-                    IsRead = false,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                });
-            }
+                UserId = userId,
+                CategoryId = categoryId,
+                Type = type,
+                Title = title,
+                Message = message,
+                DedupKey = dedupKey
+            });
+            return;
         }
+        existing.Type = type;
+        existing.Title = title;
+        existing.Message = message;
+        await alertRepository.UpdateAsync(existing);
     }
+
+    public async Task<List<AlertResponse>> ListAsync(int userId, bool unreadOnly)
+    {
+        var alerts = await alertRepository.ListAsync(userId, unreadOnly);
+        return alerts.Select(Map).ToList();
+    }
+
+    public Task<int> CountUnreadAsync(int userId) =>
+        alertRepository.CountUnreadAsync(userId);
+
+    public async Task MarkAsReadAsync(int userId, int alertId)
+    {
+        var alert = await GetOwnedAsync(userId, alertId);
+        alert.IsRead = true;
+        await alertRepository.UpdateAsync(alert);
+    }
+
+    public async Task DismissAsync(int userId, int alertId)
+    {
+        var alert = await GetOwnedAsync(userId, alertId);
+        await alertRepository.DeleteAsync(alert);
+    }
+
+    private async Task<Alert> GetOwnedAsync(int userId, int alertId)
+    {
+        var alert = await alertRepository.GetByIdAndUserAsync(alertId, userId)
+            ?? throw AppException.NotFound("Alerta nao encontrado", "Verifique o identificador informado.");
+        return alert;
+    }
+
+    private static AlertResponse Map(Alert alert) => new(
+        alert.Id,
+        alert.Type switch
+        {
+            AlertType.BudgetExceeded => "budgetExceeded",
+            AlertType.CategoryLimit => "categoryLimit",
+            _ => "highExpense"
+        },
+        alert.Title,
+        alert.Message,
+        alert.Category is null ? null : new AlertCategoryBrief(alert.Category.Id, alert.Category.Name),
+        alert.IsRead,
+        alert.CreatedAt);
 }

@@ -1,160 +1,187 @@
-using PIM_III_Backend.Application.Dtos.Reports;
+using PIM_III_Backend.Application.Dtos;
+using PIM_III_Backend.Application.Exceptions;
+using PIM_III_Backend.Domain.Enums;
 using PIM_III_Backend.Domain.Interfaces;
 
 namespace PIM_III_Backend.Application.Services;
 
-public class ReportService : IReportService
+public class ReportService(
+    ITransactionRepository transactionRepository,
+    ICategoryRepository categoryRepository,
+    IMonthlyClosingRepository monthlyClosingRepository) : IReportService
 {
-    private readonly IExpenseRepository _expenseRepository;
-    private readonly IBudgetRepository _budgetRepository;
-    private readonly IIncomeRepository _incomeRepository;
-
-    public ReportService(IExpenseRepository expenseRepository, IBudgetRepository budgetRepository, IIncomeRepository incomeRepository)
+    // O consolidado e calculado pela procedure sp_fechamento_mensal no PostgreSQL.
+    public async Task<MonthlyClosingResponse> CloseMonthAsync(int userId, int year, int month)
     {
-        _expenseRepository = expenseRepository;
-        _budgetRepository = budgetRepository;
-        _incomeRepository = incomeRepository;
+        if (month is < 1 or > 12 || year is < 2000 or > 2100)
+            throw AppException.BadRequest("Periodo invalido", "Informe um mes entre 1 e 12 e um ano valido.");
+
+        var closing = await monthlyClosingRepository.CloseAsync(userId, year, month);
+        MonthlyClosingCategoryDto? topCategory = null;
+        if (closing.TopCategoryId is int categoryId &&
+            await categoryRepository.GetByIdAndUserAsync(categoryId, userId) is { } category)
+            topCategory = new MonthlyClosingCategoryDto(category.Id, category.Name, closing.TopCategoryTotal);
+
+        return new MonthlyClosingResponse(
+            closing.PeriodYear,
+            closing.PeriodMonth,
+            closing.TotalIncome,
+            closing.TotalExpense,
+            closing.Balance,
+            closing.MonthlyCeiling,
+            closing.CeilingPercentage,
+            topCategory,
+            closing.TransactionCount,
+            closing.ClosedAt);
     }
 
-    public async Task<ReportSummaryResponse> GetSummaryAsync(int userId, DateTime? start = null, DateTime? end = null)
+    public async Task<ReportSummaryResponse> GetSummaryAsync(int userId, DateTime? start, DateTime? end)
     {
-        var now = DateTime.UtcNow;
+        var (periodStart, periodEnd) = NormalizePeriod(start, end);
+        var income = await transactionRepository.SumAsync(userId, TransactionType.Income, periodStart, periodEnd);
+        var expense = await transactionRepository.SumAsync(userId, TransactionType.Expense, periodStart, periodEnd);
+        var balance = income - expense;
+        var savingsRate = income > 0 ? Math.Round((double)(balance / income) * 100, 1) : (double?)null;
 
-        // Se não fornecer datas, usar o mês atual
-        if (!start.HasValue || !end.HasValue)
-        {
-            start = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-            end = start.Value.AddMonths(1).AddTicks(-1);
-        }
+        var months = MonthsInPeriod(periodStart, periodEnd);
+        var averageMonthlyExpense = Math.Round(expense / months, 2);
 
-        var expenses = await _expenseRepository.GetByUserIdAsync(userId, start, end);
-        var totalSpent = expenses.Sum(x => x.Value);
-        var highestExpense = expenses.OrderByDescending(x => x.Value).FirstOrDefault();
+        var largest = await transactionRepository.GetLargestExpenseAsync(userId, periodStart, periodEnd);
+        var recurrentSpent = await transactionRepository.SumRecurrentAsync(userId, TransactionType.Expense, periodStart, periodEnd);
+        var recurrentCount = await transactionRepository.CountRecurrentAsync(userId, TransactionType.Expense, periodStart, periodEnd);
 
-        var budgets = await _budgetRepository.GetByUserIdAsync(userId);
-        // BUG 2.2 CORRIGIDO: Só usar orçamentos do período atual.
-        // Se não há orçamento definido para o mês, totalBudget = 0 (comportamento correto).
-        var currentBudgets = budgets
-            .Where(x => x.PeriodYear == start.Value.Year && x.PeriodMonth == start.Value.Month)
-            .ToList();
-        var totalBudget = currentBudgets.Sum(x => x.LimitValue);
-
-        var incomes = await _incomeRepository.GetByUserIdAsync(userId, start, end);
-        var totalIncome = incomes.Sum(x => x.Amount);
-
-        totalBudget += totalIncome;
-
-        var remainingBudget = totalBudget - totalSpent;
-        var overallPercentage = totalBudget > 0 ? (double)(totalSpent / totalBudget * 100) : 0;
-
-        var recurrentExpenses = expenses.Where(x => x.IsRecurrent).ToList();
-        var recurrentSpent = recurrentExpenses.Sum(x => x.Value);
-        var recurrentCount = recurrentExpenses.Count;
+        var previousStart = periodStart.AddDays(-(periodEnd - periodStart).Days);
+        var previousIncome = await transactionRepository.SumAsync(userId, TransactionType.Income, previousStart, periodStart);
+        var previousExpense = await transactionRepository.SumAsync(userId, TransactionType.Expense, previousStart, periodStart);
+        var comparison = new PreviousPeriodComparisonDto(
+            ChangePct(income, previousIncome),
+            ChangePct(expense, previousExpense));
 
         return new ReportSummaryResponse(
-            totalBudget,
-            totalSpent,
-            remainingBudget,
-            overallPercentage,
-            highestExpense != null ? new LargestExpenseDto(highestExpense.Value, highestExpense.Description) : null,
+            income,
+            expense,
+            balance,
+            savingsRate,
+            averageMonthlyExpense,
+            largest is null ? null : new LargestExpenseDto(largest.Value, largest.Description, largest.TransactionDate),
             recurrentSpent,
-            recurrentCount
-        );
+            recurrentCount,
+            comparison);
     }
 
-    public async Task<IEnumerable<CategoryReportResponse>> GetByCategoryAsync(int userId, DateTime? start = null, DateTime? end = null)
+    public async Task<List<CategoryReportResponse>> GetByCategoryAsync(int userId, DateTime? start, DateTime? end, TransactionType kind)
+    {
+        var (periodStart, periodEnd) = NormalizePeriod(start, end);
+        var sums = await transactionRepository.SumByCategoryAsync(userId, kind, periodStart, periodEnd);
+        if (sums.Count == 0)
+            return [];
+
+        var categories = await categoryRepository.ListAsync(userId,
+            kind == TransactionType.Income ? Domain.Enums.CategoryKind.Income : Domain.Enums.CategoryKind.Expense);
+        var names = categories.ToDictionary(c => c.Id);
+        var total = sums.Sum(s => s.Total);
+
+        return sums
+            .Select(s =>
+            {
+                names.TryGetValue(s.CategoryId, out var category);
+                return new CategoryReportResponse(
+                    s.CategoryId,
+                    category?.Name ?? "Sem categoria",
+                    category?.ColorCode ?? "#888888",
+                    category?.Icon ?? "Tag",
+                    s.Total,
+                    total > 0 ? Math.Round((double)(s.Total / total) * 100, 1) : 0);
+            })
+            .OrderByDescending(c => c.Total)
+            .ToList();
+    }
+
+    public async Task<List<TrendReportResponse>> GetTrendAsync(int userId, int months)
+    {
+        var effectiveMonths = Math.Clamp(months, 1, 24);
+        var now = DateTime.UtcNow;
+        var currentMonthStart = new DateTime(now.Year, now.Month, 1);
+        var trend = new List<TrendReportResponse>();
+        for (var offset = effectiveMonths - 1; offset >= 0; offset--)
+        {
+            var periodStart = currentMonthStart.AddMonths(-offset);
+            var periodEnd = periodStart.AddMonths(1);
+            var income = await transactionRepository.SumAsync(userId, TransactionType.Income, periodStart, periodEnd);
+            var expense = await transactionRepository.SumAsync(userId, TransactionType.Expense, periodStart, periodEnd);
+            trend.Add(new TrendReportResponse(
+                $"{periodStart.Month:D2}/{periodStart.Year}",
+                income,
+                expense,
+                income - expense));
+        }
+        return trend;
+    }
+
+    public async Task<List<DailyExpenseReportResponse>> GetDailyAsync(int userId, DateTime? start, DateTime? end)
+    {
+        var (periodStart, periodEnd) = NormalizePeriod(start, end);
+        if ((periodEnd - periodStart).TotalDays > 366)
+            throw AppException.BadRequest("Periodo muito longo", "Informe um periodo de ate 12 meses.");
+        var sums = await transactionRepository.SumByDayAsync(userId, TransactionType.Expense, periodStart, periodEnd);
+        var byDate = sums.ToDictionary(s => s.Date, s => s.Total);
+
+        var daily = new List<DailyExpenseReportResponse>();
+        for (var day = periodStart; day < periodEnd; day = day.AddDays(1))
+            daily.Add(new DailyExpenseReportResponse(day.ToString("dd"), byDate.GetValueOrDefault(day, 0m)));
+        return daily;
+    }
+
+    public async Task<PeriodExportResponse> GetExportAsync(int userId, DateTime? start, DateTime? end)
+    {
+        var (periodStart, periodEnd) = NormalizePeriod(start, end);
+        var transactions = await transactionRepository.ListByPeriodAsync(userId, periodStart, periodEnd);
+        return new PeriodExportResponse(periodStart, periodEnd,
+            transactions.Select(TransactionService.MapResponse).ToList());
+    }
+
+    public static string BuildCsv(PeriodExportResponse export)
+    {
+        var builder = new System.Text.StringBuilder();
+        builder.AppendLine("Data;Descricao;Categoria;Tipo;Valor;Forma de pagamento;Observacao");
+        foreach (var transaction in export.Transactions)
+        {
+            builder.AppendJoin(';',
+                transaction.TransactionDate.ToString("dd/MM/yyyy"),
+                Escape(transaction.Description),
+                Escape(transaction.Category.Name),
+                transaction.Type == TransactionType.Expense ? "Despesa" : "Receita",
+                transaction.Value.ToString("F2", System.Globalization.CultureInfo.CreateSpecificCulture("pt-BR")),
+                transaction.PaymentMethod?.ToString() ?? string.Empty,
+                Escape(transaction.Observation ?? string.Empty));
+            builder.AppendLine();
+        }
+        return builder.ToString();
+    }
+
+    private static string Escape(string value)
+    {
+        var containsSeparator = value.Contains(';') || value.Contains('"') || value.Contains('\n');
+        var escaped = value.Replace("\"", "\"\"");
+        return containsSeparator ? $"\"{escaped}\"" : escaped;
+    }
+
+    private static (DateTime Start, DateTime End) NormalizePeriod(DateTime? start, DateTime? end)
     {
         var now = DateTime.UtcNow;
-
-        // Se não fornecer datas, usar o mês atual
-        if (!start.HasValue || !end.HasValue)
-        {
-            start = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-            end = start.Value.AddMonths(1).AddTicks(-1);
-        }
-
-        var expenses = await _expenseRepository.GetByUserIdAsync(userId, start, end);
-        var budgets = await _budgetRepository.GetByUserIdAsync(userId);
-
-        // BUG 2.2 CORRIGIDO: Só usar orçamentos do período selecionado, sem fallback histórico.
-        var currentBudgets = budgets
-            .Where(x => x.PeriodYear == start.Value.Year && x.PeriodMonth == start.Value.Month)
-            .ToList();
-
-        var expensesByCategory = expenses.GroupBy(x => new { x.CategoryId, x.Category.Name }).ToList();
-        var result = new List<CategoryReportResponse>();
-
-        foreach (var g in expensesByCategory)
-        {
-            var catId = g.Key.CategoryId;
-            var catName = g.Key.Name;
-            var totalSpent = g.Sum(x => x.Value);
-            var budget = currentBudgets.FirstOrDefault(b => b.CategoryId == catId);
-            decimal? budgetLimit = budget?.LimitValue;
-
-            double percentageUsed = 0;
-            if (budgetLimit.HasValue && budgetLimit.Value > 0)
-            {
-                percentageUsed = (double)(totalSpent / budgetLimit.Value * 100);
-            }
-            else
-            {
-                var totalExpenses = expenses.Sum(x => x.Value);
-                percentageUsed = totalExpenses > 0 ? (double)(totalSpent / totalExpenses * 100) : 0;
-            }
-
-            result.Add(new CategoryReportResponse(catId, catName, totalSpent, budgetLimit, percentageUsed));
-        }
-
-        return result.OrderByDescending(x => x.TotalSpent);
+        var periodStart = start?.Date ?? new DateTime(now.Year, now.Month, 1);
+        var periodEnd = end?.Date ?? new DateTime(now.Year, now.Month, 1).AddMonths(1);
+        if (periodEnd <= periodStart)
+            throw AppException.BadRequest("Periodo invalido", "A data final deve ser posterior a inicial.");
+        return (periodStart, periodEnd);
     }
 
-    public async Task<IEnumerable<TrendReportResponse>> GetTrendAsync(int userId, DateTime? start = null, DateTime? end = null)
+    private static int MonthsInPeriod(DateTime start, DateTime end)
     {
-        var expenses = await _expenseRepository.GetByUserIdAsync(userId);
-
-        // Se fornecer datas, filtrar pelo intervalo
-        if (start.HasValue && end.HasValue)
-        {
-            expenses = expenses.Where(x => x.TransactionDate >= start.Value && x.TransactionDate <= end.Value).ToList();
-        }
-
-        return expenses
-            .GroupBy(x => new { x.TransactionDate.Year, x.TransactionDate.Month })
-            .Select(g => new TrendReportResponse(
-                $"{g.Key.Month:D2}/{g.Key.Year}",
-                g.Sum(x => x.Value)
-            ))
-            .OrderBy(x => x.Period)
-            .TakeLast(6);
+        var months = (end.Year - start.Year) * 12 + end.Month - start.Month;
+        return Math.Max(1, months);
     }
 
-    public async Task<IEnumerable<DailyExpenseReportResponse>> GetDailyAsync(int userId, DateTime? start = null, DateTime? end = null)
-    {
-        var now = DateTime.UtcNow;
-
-        // Se não fornecer datas, usar o mês atual
-        if (!start.HasValue || !end.HasValue)
-        {
-            start = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-            end = start.Value.AddMonths(1).AddTicks(-1);
-        }
-
-        var expenses = await _expenseRepository.GetByUserIdAsync(userId, start, end);
-
-        // Gerar todos os dias do período para que dias sem gasto apareçam como 0
-        var totalDays = (int)(end.Value.Date - start.Value.Date).TotalDays + 1;
-        var allDays = Enumerable.Range(0, totalDays)
-            .Select(i => start.Value.Date.AddDays(i))
-            .ToList();
-
-        var expensesByDay = expenses
-            .GroupBy(x => x.TransactionDate.Date)
-            .ToDictionary(g => g.Key, g => g.Sum(x => x.Value));
-
-        return allDays.Select(day => new DailyExpenseReportResponse(
-            day.Day.ToString("D2"),
-            expensesByDay.TryGetValue(day, out var val) ? val : 0
-        ));
-    }
+    private static double? ChangePct(decimal current, decimal previous) =>
+        previous == 0 ? null : Math.Round((double)(current - previous) / (double)previous * 100, 1);
 }
