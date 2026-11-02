@@ -1,15 +1,17 @@
 # Tasks de Planejamento e Implementação — Migração do Front para React e Refação do Backend
 
-> **Escopo deste documento:** Rastreamento unificado do ciclo de vida da migração: **Planejamento (Etapas 1–7 — Concluído)** e **Execução/Implementação (Fases F0–F13 — F0 a F11 concluídas; F12 planejada; F13 planejada)**.
+> **Escopo deste documento:** Rastreamento unificado do ciclo de vida da migração: **Planejamento (Etapas 1–7 — Concluído)** e **Execução/Implementação (Fases F0–F13 — F0 a F11 e F13 concluídas; F12 em aberto)**.
 > **Fonte da verdade e especificação:** Protótipo em `docs/02-planejamento/prototipo/index.html` e especificações técnicas em `docs/03-criterios/04-solucao-web/`, `docs/03-criterios/07-banco-de-dados/` e `docs/02-planejamento/fases/06_PLANO_IMPLEMENTACAO.md`.
-> **Direção técnica:** React + Vite (SPA/PWA) no front · ASP.NET Core (.NET 10) no back · EF Core + SQLite · Nginx + Docker.
+> **Direção técnica:** React + Vite (SPA/PWA) no front · ASP.NET Core (.NET 10) no back · EF Core + PostgreSQL 16 · Nginx + Docker. *(O runtime começou em SQLite e migrou para PostgreSQL na F14.4b; as menções a SQLite abaixo são registro histórico.)*
 
 **Legenda:** `[ ]` pendente · `[x]` concluído
 
 > **Status Atual (28/10/2026):**
 > - **Planejamento (Etapas 1–7):** **100% Concluído e Aprovado**.
 > - **Implementação (Fases F0–F11):** **100% Concluída** — backend com 133 testes verdes (`dotnet test`), frontend com 61 testes verdes (`npm test` + `npm run build`), 30 commits atômicos no padrão do `git.md`.
-> - **Fase F12 (Documentação e Evidências):** **Necessária e planejada** — documentação acadêmica, manual de usuário atualizado e evidências visuais obrigatórias para os entregáveis do PIM IV.
+> - **Fase F12 (Documentação e Evidências):** **Em aberto** (F12.1–F12.3 pendentes) — documentação acadêmica, manual de usuário atualizado e evidências visuais obrigatórias para os entregáveis do PIM IV.
+> - **Fase F13 (UX, Autenticação e Onboarding):** **Concluída** — ver [`TASKS_FASE_13.md`](TASKS_FASE_13.md).
+> - **Fase F14 (Requisitos técnicos do manual):** F14.1–F14.14 concluídas; F14.15 (Kanban) em andamento — ver [`TASKS_FASE_14.md`](TASKS_FASE_14.md).
 
 ---
 
@@ -294,9 +296,9 @@ F0 Fundações → F1 Auth → F2 Categorias → F3 Transações → F4 Orçamen
 
 | Status | ID | Área | Tarefa | Critério de Aceite (DoD) | Commit Previsto |
 |:---:|---|---|---|---|---|
-| [ ] | F13.1 | `frontend` | Redesenhar tela de login com estética clean/moderna e autenticação exclusiva via WhatsApp (OTP) com sessão salva | Redesign minimalista; remoção total de e-mail/senha; fluxo único WhatsApp OTP; checkbox "Salvar sessão"; botão de demo discreto | `feat(frontend): redesenha tela de login com layout clean e auth exclusiva por whatsapp` |
-| [ ] | F13.2 | `frontend` / `backend` | Implementar fluxo guiado de Onboarding para novos usuários | Modal/tela de primeiro acesso coletando nome, teto de gastos mensal e preferências; persistência no backend e boas-vindas | `feat(frontend): implementa fluxo guiado de onboarding para novos usuarios` |
-| [ ] | F13.3 | `frontend` | Destacar o dia atual em azul no gráfico "Distribuição de gastos na semana" | Dia corrente identificado dinamicamente e destacado em azul (`var(--ds-blue-600)`); demais barras com preenchimento neutro | `style(frontend): destaca dia atual em azul no grafico de gastos semanais` |
-| [ ] | F13.4 | `frontend` | Integrar teto do Onboarding ao card "Consumo do Limite" no Dashboard | Card utiliza o teto mensal definido no onboarding; calcula porcentagem de consumo e exibe alerta de proximidade da meta | `feat(frontend): conecta teto orcamentario do onboarding ao card de consumo` |
-| [ ] | F13.5 | `frontend` | Corrigir totalizador da tela "Gastos" para somar exclusivamente despesas | Indicador "Transações por período" filtra estritamente `type === 'expense'`, excluindo receitas da somatória | `fix(frontend): ajusta totalizador de gastos para somar exclusivamente despesas` |
-| [ ] | F13.6 | `frontend` | Tornar o gráfico de "Entradas e Saídas" mais descritivo e intuitivo | Legenda visual com marcadores Verde/Vermelho; custom tooltip com entradas, saídas e saldo líquido do mês em R$ | `style(frontend): enriquece informacoes e tooltips do grafico de entradas e saidas` |
+| [x] | F13.1 | `frontend` | Redesenhar tela de login com estética clean/moderna e autenticação exclusiva via WhatsApp (OTP) com sessão salva | Redesign minimalista; remoção total de e-mail/senha; fluxo único WhatsApp OTP; checkbox "Salvar sessão"; botão de demo discreto | `feat(frontend): redesenha tela de login com layout clean e auth exclusiva por whatsapp` |
+| [x] | F13.2 | `frontend` / `backend` | Implementar fluxo guiado de Onboarding para novos usuários | Modal/tela de primeiro acesso coletando nome, teto de gastos mensal e preferências; persistência no backend e boas-vindas | `feat(frontend): implementa fluxo guiado de onboarding para novos usuarios` |
+| [x] | F13.3 | `frontend` | Destacar o dia atual em azul no gráfico "Distribuição de gastos na semana" | Dia corrente identificado dinamicamente e destacado em azul (`var(--ds-blue-600)`); demais barras com preenchimento neutro | `style(frontend): destaca dia atual em azul no grafico de gastos semanais` |
+| [x] | F13.4 | `frontend` | Integrar teto do Onboarding ao card "Consumo do Limite" no Dashboard | Card utiliza o teto mensal definido no onboarding; calcula porcentagem de consumo e exibe alerta de proximidade da meta | `feat(frontend): conecta teto orcamentario do onboarding ao card de consumo` |
+| [x] | F13.5 | `frontend` | Corrigir totalizador da tela "Gastos" para somar exclusivamente despesas | Indicador "Transações por período" filtra estritamente `type === 'expense'`, excluindo receitas da somatória | `fix(frontend): ajusta totalizador de gastos para somar exclusivamente despesas` |
+| [x] | F13.6 | `frontend` | Tornar o gráfico de "Entradas e Saídas" mais descritivo e intuitivo | Legenda visual com marcadores Verde/Vermelho; custom tooltip com entradas, saídas e saldo líquido do mês em R$ | `style(frontend): enriquece informacoes e tooltips do grafico de entradas e saidas` |
