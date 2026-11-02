@@ -63,13 +63,14 @@ BEGIN
            l.pagamento, l.recorrente, 0, 0
       FROM generate_series(v_mes - interval '5 months', v_mes, interval '1 month') AS m
      CROSS JOIN (VALUES
-            ('Salário',   1, 'Salário mensal',          7800.00,  5, 5, true),
-            ('Moradia',   0, 'Aluguel',                 1850.00, 10, 2, true),
-            ('Moradia',   0, 'Conta de energia',         210.00, 12, 2, true),
-            ('Saúde',     0, 'Plano de saúde',           320.00, 15, 0, true),
-            ('Alimentação', 0, 'Supermercado do mês',    890.00,  8, 0, false),
-            ('Transporte',  0, 'Combustível',            380.00,  9, 3, false),
-            ('Lazer',     0, 'Assinatura de streaming',   39.90, 20, 0, true)
+            ('Salário',   1, 'Salário mensal',          7800.00,  1, 5, true),
+            ('Moradia',   0, 'Aluguel',                 1850.00,  1, 2, true),
+            ('Lazer',     0, 'Assinatura de streaming',   39.90,  1, 0, true),
+            ('Alimentação', 0, 'Supermercado do mês',    890.00,  1, 0, false),
+            ('Transporte',  0, 'Combustível',            380.00,  2, 3, false),
+            ('Saúde',     0, 'Farmácia',                 120.00,  2, 1, false),
+            ('Moradia',   0, 'Conta de energia',         210.00,  5, 2, true),
+            ('Saúde',     0, 'Plano de saúde',           320.00, 10, 0, true)
          ) AS l(categoria, tipo, descricao, valor, dia, pagamento, recorrente)
       JOIN categories c ON c.user_id = v_user_id AND c.name = l.categoria
      WHERE m + (l.dia - 1) * interval '1 day' <= timezone('utc', now());
