@@ -1,7 +1,7 @@
 # 🚀 Tasks da Fase F14 — Requisitos Técnicos do Manual PIM IV
 
 > **Projeto:** ConektaFinance — PIM IV (UNIP)
-> **Status:** F14.1 a F14.14 concluídas `[x]` em 28/10/2026 · F14.15 em andamento (issues #1–#16 criadas; quadro aguardando permissão `project` no `gh`)
+> **Status:** F14.1 a F14.14 concluídas `[x]` em 28/10/2026 · F14.15 em andamento (quadro criado em https://github.com/users/Fredson-Santos/projects/1; faltam as capturas)
 > **Fonte dos requisitos:** `docs/00-manual-pim-iv/manual_pim_iv_ads.md` (§ 2.4 Atividades e § 2.5 Critérios de Avaliação) e `docs/02-planejamento/ROADMAP_PIM_IV.md`
 > **Área:** Banco de Dados (PostgreSQL) · Backend (ASP.NET Core 10) · Frontend (React 19 + Vite + PWA) · Infra (Docker, GitHub Actions, Dokploy)
 > **Padrão de Commits:** Rigorosamente alinhado a `.agents/rules/git.md` (`tipo(escopo): descrição`)
@@ -465,8 +465,8 @@ O manual pede quadro Kanban e definição das entregas. Um quadro real, com hist
 
 #### 3. Critérios de Aceite (DoD)
 
-- [ ] Todas as tasks F14 representadas no quadro com sprint e responsável. — *pendente (02/11/2026): o quadro não foi criado; o token do `gh` não tem o escopo `project`*
-- [ ] Capturas do quadro em pelo menos dois momentos (início e fim da fase) para o relatório. — *pendente (02/11/2026): depende do quadro*
+- [x] Todas as tasks F14 representadas no quadro com sprint e responsável. *(quadro: https://github.com/users/Fredson-Santos/projects/1, criado em 02/11/2026)*
+- [ ] Capturas do quadro em pelo menos dois momentos (início e fim da fase) para o relatório. — *pendente (02/11/2026): o quadro foi criado depois da implementação, então não existe um registro do início da fase; capturar o estado atual e o final (após fechar a #16)*
 
 ---
 
