@@ -18,10 +18,12 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
+      # O projeto de testes referencia a API: compilá-lo compila os dois.
+      # Sem isso, `dotnet test --no-build` não encontra a DLL de testes e termina verde sem rodar nada.
       - name: Restaurar dependências
-        run: dotnet restore
+        run: dotnet restore tests/PIM-III-Backend.Tests.csproj
       - name: Compilar
-        run: dotnet build --no-restore
+        run: dotnet build tests/PIM-III-Backend.Tests.csproj --no-restore
       - name: Testar
         run: dotnet test tests/PIM-III-Backend.Tests.csproj --no-build --logger "console;verbosity=normal"
 
