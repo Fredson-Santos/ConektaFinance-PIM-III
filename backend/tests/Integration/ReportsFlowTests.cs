@@ -42,12 +42,13 @@ public class ReportsFlowTests(CustomWebApplicationFactory factory) : IClassFixtu
         var salario = categories!.First(c => c.Kind == Domain.Enums.CategoryKind.Income).Id;
         var alimentacao = categories.First(c => c.Name == "Alimentação").Id;
         var moradia = categories.First(c => c.Name == "Moradia").Id;
-        var now = DateTime.UtcNow;
-        var periodStart = new DateTime(now.Year, now.Month, 1);
+        // Usa a data de hoje: sempre cai no mes corrente e nunca e futura (a API rejeita datas futuras).
+        var today = DateTime.UtcNow.Date;
+        var periodStart = new DateTime(today.Year, today.Month, 1);
         var periodEnd = periodStart.AddMonths(1);
-        await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("income", salario, "Salario", 5000m, periodStart.AddDays(4)));
-        await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("expense", alimentacao, "Mercado", 450m, now.AddDays(-3)));
-        await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("expense", moradia, "Aluguel", 1200m, periodStart.AddDays(7)));
+        await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("income", salario, "Salario", 5000m, today));
+        await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("expense", alimentacao, "Mercado", 450m, today));
+        await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("expense", moradia, "Aluguel", 1200m, today));
 
         var summary = await (await client.GetAsync($"/api/v1/reports/summary?start={periodStart:yyyy-MM-dd}&end={periodEnd:yyyy-MM-dd}"))
             .Content.ReadFromJsonAsync<ReportSummaryResponse>(Json);
@@ -107,8 +108,9 @@ public class ReportsFlowTests(CustomWebApplicationFactory factory) : IClassFixtu
             .ReadFromJsonAsync<List<CategoryResponse>>(Json);
         var alimentacao = categories!.First(c => c.Name == "Alimentação").Id;
         var transporte = categories!.First(c => c.Name == "Transporte").Id;
-        await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("expense", alimentacao, "Mercado", 300m, DateTime.UtcNow.AddDays(-1)));
-        await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("expense", transporte, "Uber", 100m, DateTime.UtcNow.AddDays(-2)));
+        // O relatorio considera o mes corrente; datas no passado saem do periodo nos primeiros dias do mes.
+        await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("expense", alimentacao, "Mercado", 300m, DateTime.UtcNow.Date));
+        await client.PostAsJsonAsync("/api/v1/transactions", NewTransaction("expense", transporte, "Uber", 100m, DateTime.UtcNow.Date));
 
         var byCategory = await (await client.GetAsync("/api/v1/reports/by-category")).Content
             .ReadFromJsonAsync<List<CategoryReportResponse>>(Json);

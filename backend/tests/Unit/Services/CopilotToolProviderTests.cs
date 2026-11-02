@@ -52,7 +52,7 @@ public class CopilotToolProviderTests
                 new CategoryBrief(3, "Alimentação", "#f00", "icon"), DateTime.UtcNow));
 
         var result = await _provider.ExecuteAsync(1, "create_transaction",
-            Args(new { type = "expense", description = "Ifood", value = 89.9, categoryName = "alimentação" }));
+            Args(new { type = "expense", description = "Ifood", value = 89.9, categoryName = "alimentação", date = "2026-10-21" }));
 
         using var document = JsonDocument.Parse(result);
         document.RootElement.GetProperty("success").GetBoolean().Should().BeTrue();
