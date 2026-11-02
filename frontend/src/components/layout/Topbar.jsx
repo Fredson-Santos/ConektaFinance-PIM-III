@@ -28,7 +28,9 @@ export function Topbar() {
       <div className="topbar-left">
         <div className="topbar-brand mobile-only">
           <div className="brand-mark" style={{ width: 26, height: 26 }}>
-            <svg className="icon" style={{ width: 13, height: 13 }}><use href="#i-sparkle" /></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 3L14 9L20 11L14 13L12 19L10 13L4 11L10 9L12 3Z" />
+            </svg>
           </div>
         </div>
         <div>
