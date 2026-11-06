@@ -1,10 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
-using PIM_III_Backend.Application.Dtos;
+using ConektaFinance.Api.Application.Dtos;
 using Xunit;
 
-namespace PIM_III_Backend.Tests.Integration;
+namespace ConektaFinance.Api.Tests.Integration;
 
 public class AuthFlowTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {

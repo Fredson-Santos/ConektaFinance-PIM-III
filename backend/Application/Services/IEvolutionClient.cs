@@ -1,4 +1,4 @@
-namespace PIM_III_Backend.Application.Services;
+namespace ConektaFinance.Api.Application.Services;
 
 /// <summary>
 /// Cliente da Evolution API (canal WhatsApp). A implementacao HTTP fica em

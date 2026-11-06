@@ -2,10 +2,10 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using ClosedXML.Excel;
-using PIM_III_Backend.Application.Exceptions;
-using PIM_III_Backend.Application.Services;
+using ConektaFinance.Api.Application.Exceptions;
+using ConektaFinance.Api.Application.Services;
 
-namespace PIM_III_Backend.Infrastructure.Importing;
+namespace ConektaFinance.Api.Infrastructure.Importing;
 
 public partial class StatementParser : IStatementParser
 {

@@ -3,11 +3,11 @@ using System.Net.Http.Json;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PIM_III_Backend.Application.Dtos;
-using PIM_III_Backend.Infrastructure.Persistence;
+using ConektaFinance.Api.Application.Dtos;
+using ConektaFinance.Api.Infrastructure.Persistence;
 using Xunit;
 
-namespace PIM_III_Backend.Tests.Integration;
+namespace ConektaFinance.Api.Tests.Integration;
 
 // Valida as triggers e procedures de database/ aplicadas pela API no PostgreSQL.
 public class DatabaseProgrammabilityFlowTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>

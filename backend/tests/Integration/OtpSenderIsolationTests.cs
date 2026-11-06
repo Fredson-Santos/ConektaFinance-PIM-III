@@ -1,10 +1,10 @@
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using PIM_III_Backend.Application.Services;
-using PIM_III_Backend.Infrastructure.Messaging;
+using ConektaFinance.Api.Application.Services;
+using ConektaFinance.Api.Infrastructure.Messaging;
 using Xunit;
 
-namespace PIM_III_Backend.Tests.Integration;
+namespace ConektaFinance.Api.Tests.Integration;
 
 /// <summary>
 /// Regressao do incidente de envios indevidos pelo WhatsApp: a suíte roda em

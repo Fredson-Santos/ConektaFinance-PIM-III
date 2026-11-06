@@ -1,4 +1,4 @@
-namespace PIM_III_Backend.Application.Services;
+namespace ConektaFinance.Api.Application.Services;
 
 /// <summary>
 /// Persiste imagens anexadas à conversa do assistente (ex.: foto de nota fiscal).

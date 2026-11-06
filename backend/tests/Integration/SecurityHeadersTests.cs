@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Xunit;
 
-namespace PIM_III_Backend.Tests.Integration;
+namespace ConektaFinance.Api.Tests.Integration;
 
 public class SecurityHeadersTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {

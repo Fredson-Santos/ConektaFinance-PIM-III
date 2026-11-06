@@ -3,9 +3,9 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using PIM_III_Backend.Domain.Entities;
+using ConektaFinance.Api.Domain.Entities;
 
-namespace PIM_III_Backend.Application.Services;
+namespace ConektaFinance.Api.Application.Services;
 
 public class TokenService(IConfiguration configuration) : ITokenService
 {

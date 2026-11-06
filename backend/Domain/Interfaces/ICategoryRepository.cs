@@ -1,7 +1,7 @@
-using PIM_III_Backend.Domain.Entities;
-using PIM_III_Backend.Domain.Enums;
+using ConektaFinance.Api.Domain.Entities;
+using ConektaFinance.Api.Domain.Enums;
 
-namespace PIM_III_Backend.Domain.Interfaces;
+namespace ConektaFinance.Api.Domain.Interfaces;
 
 public interface ICategoryRepository
 {

@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using PIM_III_Backend.Application.Dtos;
-using PIM_III_Backend.Application.Services;
+using ConektaFinance.Api.Application.Dtos;
+using ConektaFinance.Api.Application.Services;
 
-namespace PIM_III_Backend.Controllers;
+namespace ConektaFinance.Api.Controllers;
 
 /// <summary>
 /// Cadastro e login por e-mail, código OTP via WhatsApp e conta de demonstração.

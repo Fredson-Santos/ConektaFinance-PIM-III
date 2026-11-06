@@ -1,4 +1,4 @@
-namespace PIM_III_Backend.Application.Dtos;
+namespace ConektaFinance.Api.Application.Dtos;
 
 public record CopilotActionDto(string Tool, Dictionary<string, object?>? Args, string? Status = null);
 

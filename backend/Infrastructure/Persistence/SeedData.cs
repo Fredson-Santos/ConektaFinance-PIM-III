@@ -1,10 +1,10 @@
 using BCrypt.Net;
 using Microsoft.EntityFrameworkCore;
-using PIM_III_Backend.Domain.Constants;
-using PIM_III_Backend.Domain.Entities;
-using PIM_III_Backend.Domain.Enums;
+using ConektaFinance.Api.Domain.Constants;
+using ConektaFinance.Api.Domain.Entities;
+using ConektaFinance.Api.Domain.Enums;
 
-namespace PIM_III_Backend.Infrastructure.Persistence;
+namespace ConektaFinance.Api.Infrastructure.Persistence;
 
 public static class SeedData
 {

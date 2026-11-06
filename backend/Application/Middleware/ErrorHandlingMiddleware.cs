@@ -1,8 +1,8 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using PIM_III_Backend.Application.Exceptions;
+using ConektaFinance.Api.Application.Exceptions;
 
-namespace PIM_III_Backend.Application.Middleware;
+namespace ConektaFinance.Api.Application.Middleware;
 
 public class ErrorHandlingMiddleware(
     RequestDelegate next,

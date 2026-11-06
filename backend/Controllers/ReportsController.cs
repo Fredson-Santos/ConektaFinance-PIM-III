@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using PIM_III_Backend.Application.Dtos;
-using PIM_III_Backend.Application.Exceptions;
-using PIM_III_Backend.Application.Services;
-using PIM_III_Backend.Domain.Enums;
+using ConektaFinance.Api.Application.Dtos;
+using ConektaFinance.Api.Application.Exceptions;
+using ConektaFinance.Api.Application.Services;
+using ConektaFinance.Api.Domain.Enums;
 
-namespace PIM_III_Backend.Controllers;
+namespace ConektaFinance.Api.Controllers;
 
 /// <summary>
 /// Relatórios consolidados e exportações.
@@ -70,7 +70,7 @@ public class ReportsController(IReportService reportService) : BaseApiController
     public async Task<IActionResult> ExportCsv([FromQuery] DateTime? start, [FromQuery] DateTime? end)
     {
         var export = await reportService.GetExportAsync(CurrentUserId, start, end);
-        var csv = PIM_III_Backend.Application.Services.ReportService.BuildCsv(export);
+        var csv = ConektaFinance.Api.Application.Services.ReportService.BuildCsv(export);
         var bytes = System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(csv)).ToArray();
         return File(bytes, "text/csv; charset=utf-8",
             $"transacoes_{export.Start:MM-yyyy}_{export.End:MM-yyyy}.csv");

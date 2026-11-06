@@ -1,4 +1,4 @@
-namespace PIM_III_Backend.Domain.Models;
+namespace ConektaFinance.Api.Domain.Models;
 
 public class PagedResult<T>(List<T> items, int totalItems, int page, int pageSize)
 {

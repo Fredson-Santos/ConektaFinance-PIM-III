@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Configuration;
-using PIM_III_Backend.Application.Services;
+using ConektaFinance.Api.Application.Services;
 
-namespace PIM_III_Backend.Controllers;
+namespace ConektaFinance.Api.Controllers;
 
 /// <summary>
 /// Endpoints publicos de webhook para integracoes externas. O canal WhatsApp

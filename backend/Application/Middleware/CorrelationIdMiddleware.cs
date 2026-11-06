@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Serilog.Context;
 
-namespace PIM_III_Backend.Application.Middleware;
+namespace ConektaFinance.Api.Application.Middleware;
 
 // Identificador de correlacao por requisicao: reaproveita o X-Correlation-Id
 // enviado pelo cliente (se valido) ou gera um novo; volta no cabecalho da

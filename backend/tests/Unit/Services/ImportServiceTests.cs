@@ -1,13 +1,13 @@
 using FluentAssertions;
 using Moq;
-using PIM_III_Backend.Application.Dtos;
-using PIM_III_Backend.Application.Exceptions;
-using PIM_III_Backend.Application.Services;
-using PIM_III_Backend.Domain.Entities;
-using PIM_III_Backend.Domain.Enums;
-using PIM_III_Backend.Domain.Interfaces;
+using ConektaFinance.Api.Application.Dtos;
+using ConektaFinance.Api.Application.Exceptions;
+using ConektaFinance.Api.Application.Services;
+using ConektaFinance.Api.Domain.Entities;
+using ConektaFinance.Api.Domain.Enums;
+using ConektaFinance.Api.Domain.Interfaces;
 
-namespace PIM_III_Backend.Tests.Unit.Services;
+namespace ConektaFinance.Api.Tests.Unit.Services;
 
 public class ImportServiceTests
 {
@@ -18,7 +18,7 @@ public class ImportServiceTests
 
     public ImportServiceTests() =>
         _service = new ImportService(_importBatchRepository.Object, _transactionRepository.Object, _categoryRepository.Object,
-            new PIM_III_Backend.Infrastructure.Importing.StatementParser());
+            new ConektaFinance.Api.Infrastructure.Importing.StatementParser());
 
     private void SetupCategories()
     {

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace PIM_III_Backend.Infrastructure.Health;
+namespace ConektaFinance.Api.Infrastructure.Health;
 
 // Canal WhatsApp opcional: fora do ar deixa a API "Degraded", nunca "Unhealthy",
 // porque web e PWA continuam funcionando sem ele.

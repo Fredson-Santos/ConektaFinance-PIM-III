@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using PIM_III_Backend.Infrastructure.Persistence;
+using ConektaFinance.Api.Infrastructure.Persistence;
 
-namespace PIM_III_Backend.Infrastructure.Persistence;
+namespace ConektaFinance.Api.Infrastructure.Persistence;
 
 public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
 {

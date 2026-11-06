@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace PIM_III_Backend.Controllers;
+namespace ConektaFinance.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]

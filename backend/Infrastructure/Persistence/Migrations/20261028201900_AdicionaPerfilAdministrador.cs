@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
+namespace ConektaFinance.Api.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class AdicionaPerfilAdministrador : Migration

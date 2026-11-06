@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using PIM_III_Backend.Infrastructure.Persistence;
+using ConektaFinance.Api.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
+namespace ConektaFinance.Api.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20261028195126_InitialCreate")]
@@ -25,7 +25,7 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Alert", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.Alert", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -89,7 +89,7 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.ToTable("alerts", (string)null);
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Budget", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.Budget", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -140,7 +140,7 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.ToTable("budgets", (string)null);
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Category", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -208,7 +208,7 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.ToTable("categories", (string)null);
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.ChatMessage", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.ChatMessage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -263,7 +263,7 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.ToTable("chat_messages", (string)null);
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.ImportBatch", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.ImportBatch", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -324,7 +324,7 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.ToTable("import_batches", (string)null);
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.OtpCode", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.OtpCode", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -380,7 +380,7 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.ToTable("otp_codes", (string)null);
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Transaction", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.Transaction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -473,7 +473,7 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.ToTable("transactions", (string)null);
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.User", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -573,15 +573,15 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Alert", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.Alert", b =>
                 {
-                    b.HasOne("PIM_III_Backend.Domain.Entities.Category", "Category")
+                    b.HasOne("ConektaFinance.Api.Domain.Entities.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_alerts_categories_category_id");
 
-                    b.HasOne("PIM_III_Backend.Domain.Entities.User", "User")
+                    b.HasOne("ConektaFinance.Api.Domain.Entities.User", "User")
                         .WithMany("Alerts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -593,16 +593,16 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Budget", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.Budget", b =>
                 {
-                    b.HasOne("PIM_III_Backend.Domain.Entities.Category", "Category")
+                    b.HasOne("ConektaFinance.Api.Domain.Entities.Category", "Category")
                         .WithMany("Budgets")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_budgets_categories_category_id");
 
-                    b.HasOne("PIM_III_Backend.Domain.Entities.User", "User")
+                    b.HasOne("ConektaFinance.Api.Domain.Entities.User", "User")
                         .WithMany("Budgets")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -614,9 +614,9 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Category", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.Category", b =>
                 {
-                    b.HasOne("PIM_III_Backend.Domain.Entities.User", "User")
+                    b.HasOne("ConektaFinance.Api.Domain.Entities.User", "User")
                         .WithMany("Categories")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -626,9 +626,9 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.ChatMessage", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.ChatMessage", b =>
                 {
-                    b.HasOne("PIM_III_Backend.Domain.Entities.User", "User")
+                    b.HasOne("ConektaFinance.Api.Domain.Entities.User", "User")
                         .WithMany("ChatMessages")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -638,9 +638,9 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.ImportBatch", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.ImportBatch", b =>
                 {
-                    b.HasOne("PIM_III_Backend.Domain.Entities.User", "User")
+                    b.HasOne("ConektaFinance.Api.Domain.Entities.User", "User")
                         .WithMany("ImportBatches")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -650,30 +650,30 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.OtpCode", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.OtpCode", b =>
                 {
-                    b.HasOne("PIM_III_Backend.Domain.Entities.User", null)
+                    b.HasOne("ConektaFinance.Api.Domain.Entities.User", null)
                         .WithMany("OtpCodes")
                         .HasForeignKey("UserId")
                         .HasConstraintName("fk_otp_codes_users_user_id");
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Transaction", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.Transaction", b =>
                 {
-                    b.HasOne("PIM_III_Backend.Domain.Entities.Category", "Category")
+                    b.HasOne("ConektaFinance.Api.Domain.Entities.Category", "Category")
                         .WithMany("Transactions")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_transactions_categories_category_id");
 
-                    b.HasOne("PIM_III_Backend.Domain.Entities.ImportBatch", "ImportBatch")
+                    b.HasOne("ConektaFinance.Api.Domain.Entities.ImportBatch", "ImportBatch")
                         .WithMany()
                         .HasForeignKey("ImportBatchId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_transactions_import_batches_import_batch_id");
 
-                    b.HasOne("PIM_III_Backend.Domain.Entities.User", "User")
+                    b.HasOne("ConektaFinance.Api.Domain.Entities.User", "User")
                         .WithMany("Transactions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -687,14 +687,14 @@ namespace PIM_III_Backend.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.Category", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.Category", b =>
                 {
                     b.Navigation("Budgets");
 
                     b.Navigation("Transactions");
                 });
 
-            modelBuilder.Entity("PIM_III_Backend.Domain.Entities.User", b =>
+            modelBuilder.Entity("ConektaFinance.Api.Domain.Entities.User", b =>
                 {
                     b.Navigation("Alerts");
 

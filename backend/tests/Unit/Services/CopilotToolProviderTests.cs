@@ -1,14 +1,14 @@
 using FluentAssertions;
 using Moq;
 using System.Text.Json;
-using PIM_III_Backend.Application.Dtos;
-using PIM_III_Backend.Application.Services;
-using PIM_III_Backend.Domain.Entities;
-using PIM_III_Backend.Domain.Enums;
-using PIM_III_Backend.Domain.Interfaces;
-using PIM_III_Backend.Domain.Models;
+using ConektaFinance.Api.Application.Dtos;
+using ConektaFinance.Api.Application.Services;
+using ConektaFinance.Api.Domain.Entities;
+using ConektaFinance.Api.Domain.Enums;
+using ConektaFinance.Api.Domain.Interfaces;
+using ConektaFinance.Api.Domain.Models;
 
-namespace PIM_III_Backend.Tests.Unit.Services;
+namespace ConektaFinance.Api.Tests.Unit.Services;
 
 public class CopilotToolProviderTests
 {

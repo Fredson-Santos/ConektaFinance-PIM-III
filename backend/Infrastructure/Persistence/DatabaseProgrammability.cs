@@ -1,7 +1,7 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 
-namespace PIM_III_Backend.Infrastructure.Persistence;
+namespace ConektaFinance.Api.Infrastructure.Persistence;
 
 // Aplica as procedures, functions e triggers de database/ (embutidas no assembly).
 // Os scripts sao idempotentes, entao rodam a cada startup apos as migrations.

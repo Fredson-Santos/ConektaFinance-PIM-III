@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace PIM_III_Backend.Application.Services;
+namespace ConektaFinance.Api.Application.Services;
 
 /// <summary>
 /// Diretrizes eticas do assistente de IA. Alem das regras no prompt do LLM, este

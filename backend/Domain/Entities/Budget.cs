@@ -1,4 +1,4 @@
-namespace PIM_III_Backend.Domain.Entities;
+namespace ConektaFinance.Api.Domain.Entities;
 
 public class Budget
 {

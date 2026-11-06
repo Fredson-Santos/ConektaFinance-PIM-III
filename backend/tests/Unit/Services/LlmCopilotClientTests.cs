@@ -5,10 +5,10 @@ using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
-using PIM_III_Backend.Application.Services;
-using PIM_III_Backend.Infrastructure.Copilot;
+using ConektaFinance.Api.Application.Services;
+using ConektaFinance.Api.Infrastructure.Copilot;
 
-namespace PIM_III_Backend.Tests.Unit.Services;
+namespace ConektaFinance.Api.Tests.Unit.Services;
 
 internal sealed class FakeHttpMessageHandler(Func<int, string> responseBodyFactory) : HttpMessageHandler
 {

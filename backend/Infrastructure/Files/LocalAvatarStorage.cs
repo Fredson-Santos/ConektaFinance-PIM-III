@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using PIM_III_Backend.Application.Services;
+using ConektaFinance.Api.Application.Services;
 
-namespace PIM_III_Backend.Infrastructure.Files;
+namespace ConektaFinance.Api.Infrastructure.Files;
 
 public class LocalAvatarStorage(IWebHostEnvironment environment, IConfiguration configuration) : IAvatarStorage
 {

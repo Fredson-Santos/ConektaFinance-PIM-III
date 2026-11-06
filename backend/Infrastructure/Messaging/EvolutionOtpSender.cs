@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using PIM_III_Backend.Application.Services;
+using ConektaFinance.Api.Application.Services;
 
-namespace PIM_III_Backend.Infrastructure.Messaging;
+namespace ConektaFinance.Api.Infrastructure.Messaging;
 
 /// <summary>
 /// Entrega real do codigo OTP pelo WhatsApp (Evolution API). Registrado apenas

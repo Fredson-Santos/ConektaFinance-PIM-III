@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using PIM_III_Backend.Application.Dtos;
-using PIM_III_Backend.Application.Services;
+using ConektaFinance.Api.Application.Dtos;
+using ConektaFinance.Api.Application.Services;
 
-namespace PIM_III_Backend.Controllers;
+namespace ConektaFinance.Api.Controllers;
 
 /// <summary>
 /// Indicadores agregados da tela inicial.

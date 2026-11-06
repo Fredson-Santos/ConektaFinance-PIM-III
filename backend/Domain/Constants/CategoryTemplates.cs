@@ -1,7 +1,7 @@
-using PIM_III_Backend.Domain.Entities;
-using PIM_III_Backend.Domain.Enums;
+using ConektaFinance.Api.Domain.Entities;
+using ConektaFinance.Api.Domain.Enums;
 
-namespace PIM_III_Backend.Domain.Constants;
+namespace ConektaFinance.Api.Domain.Constants;
 
 public static class CategoryTemplates
 {

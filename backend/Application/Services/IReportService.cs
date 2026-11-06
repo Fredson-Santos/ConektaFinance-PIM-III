@@ -1,7 +1,7 @@
-using PIM_III_Backend.Application.Dtos;
-using PIM_III_Backend.Domain.Enums;
+using ConektaFinance.Api.Application.Dtos;
+using ConektaFinance.Api.Domain.Enums;
 
-namespace PIM_III_Backend.Application.Services;
+namespace ConektaFinance.Api.Application.Services;
 
 public interface IReportService
 {

@@ -1,13 +1,13 @@
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Moq;
-using PIM_III_Backend.Application.Dtos;
-using PIM_III_Backend.Application.Exceptions;
-using PIM_III_Backend.Application.Services;
-using PIM_III_Backend.Domain.Entities;
-using PIM_III_Backend.Domain.Interfaces;
+using ConektaFinance.Api.Application.Dtos;
+using ConektaFinance.Api.Application.Exceptions;
+using ConektaFinance.Api.Application.Services;
+using ConektaFinance.Api.Domain.Entities;
+using ConektaFinance.Api.Domain.Interfaces;
 
-namespace PIM_III_Backend.Tests.Unit.Services;
+namespace ConektaFinance.Api.Tests.Unit.Services;
 
 public class AuthServiceTests
 {

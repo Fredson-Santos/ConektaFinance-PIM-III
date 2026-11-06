@@ -1,8 +1,8 @@
 using Npgsql;
-using PIM_III_Backend.Infrastructure.Persistence;
+using ConektaFinance.Api.Infrastructure.Persistence;
 using Testcontainers.PostgreSql;
 
-namespace PIM_III_Backend.Tests.Integration;
+namespace ConektaFinance.Api.Tests.Integration;
 
 // Um unico container PostgreSQL para toda a suite; cada fabrica de testes
 // cria o proprio banco para manter as classes isoladas entre si.

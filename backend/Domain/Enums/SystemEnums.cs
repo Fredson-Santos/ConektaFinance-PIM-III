@@ -1,4 +1,4 @@
-namespace PIM_III_Backend.Domain.Enums;
+namespace ConektaFinance.Api.Domain.Enums;
 
 public enum AlertType
 {

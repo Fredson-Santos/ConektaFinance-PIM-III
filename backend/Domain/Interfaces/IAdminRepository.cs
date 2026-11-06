@@ -1,6 +1,6 @@
-using PIM_III_Backend.Domain.Models;
+using ConektaFinance.Api.Domain.Models;
 
-namespace PIM_III_Backend.Domain.Interfaces;
+namespace ConektaFinance.Api.Domain.Interfaces;
 
 public interface IAdminRepository
 {

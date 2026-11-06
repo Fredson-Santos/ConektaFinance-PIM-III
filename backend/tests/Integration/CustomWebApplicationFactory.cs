@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using PIM_III_Backend.Application.Services;
-using PIM_III_Backend.Infrastructure.Copilot;
-using PIM_III_Backend.Infrastructure.Messaging;
-using PIM_III_Backend.Infrastructure.Persistence;
+using ConektaFinance.Api.Application.Services;
+using ConektaFinance.Api.Infrastructure.Copilot;
+using ConektaFinance.Api.Infrastructure.Messaging;
+using ConektaFinance.Api.Infrastructure.Persistence;
 
-namespace PIM_III_Backend.Tests.Integration;
+namespace ConektaFinance.Api.Tests.Integration;
 
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {

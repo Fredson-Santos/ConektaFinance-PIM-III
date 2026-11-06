@@ -1,9 +1,9 @@
-using PIM_III_Backend.Application.Dtos;
-using PIM_III_Backend.Application.Exceptions;
-using PIM_III_Backend.Domain.Interfaces;
-using PIM_III_Backend.Domain.Models;
+using ConektaFinance.Api.Application.Dtos;
+using ConektaFinance.Api.Application.Exceptions;
+using ConektaFinance.Api.Domain.Interfaces;
+using ConektaFinance.Api.Domain.Models;
 
-namespace PIM_III_Backend.Application.Services;
+namespace ConektaFinance.Api.Application.Services;
 
 public class AdminService(IAdminRepository adminRepository, IUserRepository userRepository) : IAdminService
 {

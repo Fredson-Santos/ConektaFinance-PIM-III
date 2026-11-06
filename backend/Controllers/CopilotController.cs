@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using PIM_III_Backend.Application.Dtos;
-using PIM_III_Backend.Application.Services;
+using ConektaFinance.Api.Application.Dtos;
+using ConektaFinance.Api.Application.Services;
 
-namespace PIM_III_Backend.Controllers;
+namespace ConektaFinance.Api.Controllers;
 
 /// <summary>
 /// Assistente financeiro com function calling (consultas e rascunhos de lançamento).

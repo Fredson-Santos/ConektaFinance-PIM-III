@@ -1,4 +1,4 @@
-namespace PIM_III_Backend.Domain.Constants;
+namespace ConektaFinance.Api.Domain.Constants;
 
 public static class AccountTypes
 {

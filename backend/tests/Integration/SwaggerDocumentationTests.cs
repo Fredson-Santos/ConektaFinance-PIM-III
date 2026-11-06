@@ -2,7 +2,7 @@ using System.Text.Json;
 using FluentAssertions;
 using Xunit;
 
-namespace PIM_III_Backend.Tests.Integration;
+namespace ConektaFinance.Api.Tests.Integration;
 
 // Garante que todo endpoint publicado no Swagger tem descricao, tag e codigos de erro.
 public class SwaggerDocumentationTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>

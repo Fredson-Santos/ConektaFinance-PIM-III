@@ -2,11 +2,11 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using FluentAssertions;
-using PIM_III_Backend.Application.Dtos;
-using PIM_III_Backend.Domain.Enums;
+using ConektaFinance.Api.Application.Dtos;
+using ConektaFinance.Api.Domain.Enums;
 using Xunit;
 
-namespace PIM_III_Backend.Tests.Integration;
+namespace ConektaFinance.Api.Tests.Integration;
 
 public class CategoriesFlowTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {

@@ -1,4 +1,4 @@
-namespace PIM_III_Backend.Application.Dtos;
+namespace ConektaFinance.Api.Application.Dtos;
 
 public record BudgetUpsertRequest(int CategoryId, decimal LimitValue, int Month, int Year);
 

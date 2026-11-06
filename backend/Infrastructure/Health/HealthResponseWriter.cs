@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace PIM_III_Backend.Infrastructure.Health;
+namespace ConektaFinance.Api.Infrastructure.Health;
 
 public static class HealthResponseWriter
 {

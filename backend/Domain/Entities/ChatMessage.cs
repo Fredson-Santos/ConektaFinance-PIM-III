@@ -1,6 +1,6 @@
-using PIM_III_Backend.Domain.Enums;
+using ConektaFinance.Api.Domain.Enums;
 
-namespace PIM_III_Backend.Domain.Entities;
+namespace ConektaFinance.Api.Domain.Entities;
 
 public class ChatMessage
 {

@@ -2,9 +2,9 @@ using System.Security.Claims;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PIM_III_Backend.Controllers;
+using ConektaFinance.Api.Controllers;
 
-namespace PIM_III_Backend.Tests.Unit;
+namespace ConektaFinance.Api.Tests.Unit;
 
 public class BaseApiControllerTests
 {

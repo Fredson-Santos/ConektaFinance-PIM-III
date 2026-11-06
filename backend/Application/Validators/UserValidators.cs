@@ -1,7 +1,7 @@
 using FluentValidation;
-using PIM_III_Backend.Application.Dtos;
+using ConektaFinance.Api.Application.Dtos;
 
-namespace PIM_III_Backend.Application.Validators;
+namespace ConektaFinance.Api.Application.Validators;
 
 public class UpdateProfileValidator : AbstractValidator<UpdateProfileRequest>
 {

@@ -1,6 +1,6 @@
-using PIM_III_Backend.Application.Dtos;
+using ConektaFinance.Api.Application.Dtos;
 
-namespace PIM_III_Backend.Application.Services;
+namespace ConektaFinance.Api.Application.Services;
 
 public interface IAdminService
 {

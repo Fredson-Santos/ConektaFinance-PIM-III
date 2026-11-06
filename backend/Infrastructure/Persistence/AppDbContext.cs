@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using PIM_III_Backend.Domain.Entities;
+using ConektaFinance.Api.Domain.Entities;
 
-namespace PIM_III_Backend.Infrastructure.Persistence;
+namespace ConektaFinance.Api.Infrastructure.Persistence;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {

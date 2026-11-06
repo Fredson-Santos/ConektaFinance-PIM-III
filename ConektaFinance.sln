@@ -4,11 +4,11 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend", "backend", "{1AE8ACA6-933B-BF2A-3671-3E2EAC007D16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PIM-III-Backend", "backend\PIM-III-Backend.csproj", "{91599BBF-4905-37E2-40F9-529C7A601951}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConektaFinance.Api", "backend\ConektaFinance.Api.csproj", "{91599BBF-4905-37E2-40F9-529C7A601951}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F57642F3-C37C-D174-720E-6A6AAD5BEE22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PIM-III-Backend.Tests", "backend\tests\PIM-III-Backend.Tests.csproj", "{B6C0A3DE-E48C-B06C-7C0D-C1F91FDA4179}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConektaFinance.Api.Tests", "backend\tests\ConektaFinance.Api.Tests.csproj", "{B6C0A3DE-E48C-B06C-7C0D-C1F91FDA4179}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

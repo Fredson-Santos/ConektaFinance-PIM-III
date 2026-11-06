@@ -1,6 +1,6 @@
-using PIM_III_Backend.Domain.Enums;
+using ConektaFinance.Api.Domain.Enums;
 
-namespace PIM_III_Backend.Domain.Models;
+namespace ConektaFinance.Api.Domain.Models;
 
 public class TransactionFilter
 {

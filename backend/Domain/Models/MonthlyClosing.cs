@@ -1,4 +1,4 @@
-namespace PIM_III_Backend.Domain.Models;
+namespace ConektaFinance.Api.Domain.Models;
 
 // Linha de monthly_closings, gravada pela procedure sp_fechamento_mensal.
 public class MonthlyClosing

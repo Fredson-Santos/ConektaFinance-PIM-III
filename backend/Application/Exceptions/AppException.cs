@@ -1,4 +1,4 @@
-namespace PIM_III_Backend.Application.Exceptions;
+namespace ConektaFinance.Api.Application.Exceptions;
 
 public class AppException(int statusCode, string title, string detail, IDictionary<string, string[]>? errors = null)
     : Exception(title)

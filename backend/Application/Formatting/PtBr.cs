@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace PIM_III_Backend.Application.Formatting;
+namespace ConektaFinance.Api.Application.Formatting;
 
 // Cultura usada nos textos exibidos ao usuário (valores em R$ e percentuais).
 // O container roda com a cultura invariante, que formataria "R$ 45.00" em vez de "R$ 45,00";

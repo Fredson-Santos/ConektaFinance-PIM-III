@@ -4,10 +4,10 @@ using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
-using PIM_III_Backend.Application.Services;
-using PIM_III_Backend.Infrastructure.Messaging;
+using ConektaFinance.Api.Application.Services;
+using ConektaFinance.Api.Infrastructure.Messaging;
 
-namespace PIM_III_Backend.Tests.Unit.Messaging;
+namespace ConektaFinance.Api.Tests.Unit.Messaging;
 
 public class EvolutionClientTests
 {

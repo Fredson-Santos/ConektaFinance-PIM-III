@@ -1,4 +1,4 @@
-namespace PIM_III_Backend.Application.Dtos;
+namespace ConektaFinance.Api.Application.Dtos;
 
 public record UpdateProfileRequest(string? FullName, string? DisplayName, string? Phone, string? Cpf, string? Occupation);
 

@@ -4,11 +4,11 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using PIM_III_Backend.Application.Services;
-using PIM_III_Backend.Application.Formatting;
-using PIM_III_Backend.Domain.Constants;
+using ConektaFinance.Api.Application.Services;
+using ConektaFinance.Api.Application.Formatting;
+using ConektaFinance.Api.Domain.Constants;
 
-namespace PIM_III_Backend.Infrastructure.Copilot;
+namespace ConektaFinance.Api.Infrastructure.Copilot;
 
 public partial class RuleBasedCopilotClient : ICopilotAiClient
 {

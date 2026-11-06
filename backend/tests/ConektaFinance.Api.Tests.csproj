@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <RootNamespace>PIM_III_Backend.Tests</RootNamespace>
+    <RootNamespace>ConektaFinance.Api.Tests</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PIM-III-Backend.csproj" />
+    <ProjectReference Include="..\ConektaFinance.Api.csproj" />
   </ItemGroup>
 
 </Project>

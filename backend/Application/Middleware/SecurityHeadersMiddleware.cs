@@ -1,4 +1,4 @@
-namespace PIM_III_Backend.Application.Middleware;
+namespace ConektaFinance.Api.Application.Middleware;
 
 // Cabecalhos de seguranca em todas as respostas da API. A CSP restritiva vale
 // para os endpoints JSON; a interface do Swagger precisa carregar seus scripts.

@@ -2,13 +2,13 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using PIM_III_Backend.Application.Dtos;
-using PIM_III_Backend.Application.Exceptions;
-using PIM_III_Backend.Domain.Entities;
-using PIM_III_Backend.Domain.Enums;
-using PIM_III_Backend.Domain.Interfaces;
+using ConektaFinance.Api.Application.Dtos;
+using ConektaFinance.Api.Application.Exceptions;
+using ConektaFinance.Api.Domain.Entities;
+using ConektaFinance.Api.Domain.Enums;
+using ConektaFinance.Api.Domain.Interfaces;
 
-namespace PIM_III_Backend.Application.Services;
+namespace ConektaFinance.Api.Application.Services;
 
 /// <summary>
 /// Ponte entre o webhook da Evolution API e o mesmo CopilotService usado pelo

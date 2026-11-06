@@ -1,12 +1,12 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
-using PIM_III_Backend.Application.Dtos;
-using PIM_III_Backend.Application.Exceptions;
-using PIM_III_Backend.Application.Services;
-using PIM_III_Backend.Domain.Enums;
-using PIM_III_Backend.Domain.Models;
+using ConektaFinance.Api.Application.Dtos;
+using ConektaFinance.Api.Application.Exceptions;
+using ConektaFinance.Api.Application.Services;
+using ConektaFinance.Api.Domain.Enums;
+using ConektaFinance.Api.Domain.Models;
 
-namespace PIM_III_Backend.Controllers;
+namespace ConektaFinance.Api.Controllers;
 
 /// <summary>
 /// Receitas e despesas do usuário.

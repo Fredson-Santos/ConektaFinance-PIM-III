@@ -1,6 +1,6 @@
-using PIM_III_Backend.Domain.Entities;
+using ConektaFinance.Api.Domain.Entities;
 
-namespace PIM_III_Backend.Domain.Interfaces;
+namespace ConektaFinance.Api.Domain.Interfaces;
 
 public interface IUserRepository
 {

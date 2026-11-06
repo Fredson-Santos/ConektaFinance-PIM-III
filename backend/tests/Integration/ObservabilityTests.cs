@@ -6,10 +6,10 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using PIM_III_Backend.Application.Dtos;
+using ConektaFinance.Api.Application.Dtos;
 using Xunit;
 
-namespace PIM_III_Backend.Tests.Integration;
+namespace ConektaFinance.Api.Tests.Integration;
 
 public class ObservabilityTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {

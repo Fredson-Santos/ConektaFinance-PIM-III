@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PIM_III_Backend.Domain.Entities;
-using PIM_III_Backend.Domain.Enums;
+using ConektaFinance.Api.Domain.Entities;
+using ConektaFinance.Api.Domain.Enums;
 
-namespace PIM_III_Backend.Infrastructure.Persistence.Configurations;
+namespace ConektaFinance.Api.Infrastructure.Persistence.Configurations;
 
 public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 {

@@ -3,10 +3,10 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using FluentAssertions;
-using PIM_III_Backend.Application.Dtos;
+using ConektaFinance.Api.Application.Dtos;
 using Xunit;
 
-namespace PIM_III_Backend.Tests.Integration;
+namespace ConektaFinance.Api.Tests.Integration;
 
 public class DangerZoneFlowTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {

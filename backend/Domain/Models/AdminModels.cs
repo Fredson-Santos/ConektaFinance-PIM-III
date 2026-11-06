@@ -1,4 +1,4 @@
-namespace PIM_III_Backend.Domain.Models;
+namespace ConektaFinance.Api.Domain.Models;
 
 public record AdminMetrics(
     int TotalUsers,

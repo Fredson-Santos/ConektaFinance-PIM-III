@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PIM_III_Backend.Domain.Entities;
+using ConektaFinance.Api.Domain.Entities;
 
-namespace PIM_III_Backend.Infrastructure.Persistence.Configurations;
+namespace ConektaFinance.Api.Infrastructure.Persistence.Configurations;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {

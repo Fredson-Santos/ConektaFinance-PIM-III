@@ -1,4 +1,4 @@
-namespace PIM_III_Backend.Application.Services;
+namespace ConektaFinance.Api.Application.Services;
 
 /// <summary>
 /// Normalizacao de telefones entre o formato do dominio (10-11 digitos, sem

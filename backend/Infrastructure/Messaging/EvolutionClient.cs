@@ -2,9 +2,9 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using PIM_III_Backend.Application.Services;
+using ConektaFinance.Api.Application.Services;
 
-namespace PIM_III_Backend.Infrastructure.Messaging;
+namespace ConektaFinance.Api.Infrastructure.Messaging;
 
 /// <summary>
 /// Cliente HTTP da Evolution API v2 (https://docs.evolutionfoundation.com.br),

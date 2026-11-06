@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace PIM_III_Backend.Infrastructure.Persistence;
+namespace ConektaFinance.Api.Infrastructure.Persistence;
 
 public static class PostgresOptions
 {

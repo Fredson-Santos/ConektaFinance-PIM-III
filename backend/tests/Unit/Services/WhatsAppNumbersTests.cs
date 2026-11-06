@@ -1,7 +1,7 @@
 using FluentAssertions;
-using PIM_III_Backend.Application.Services;
+using ConektaFinance.Api.Application.Services;
 
-namespace PIM_III_Backend.Tests.Unit.Services;
+namespace ConektaFinance.Api.Tests.Unit.Services;
 
 public class WhatsAppNumbersTests
 {

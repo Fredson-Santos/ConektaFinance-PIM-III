@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using PIM_III_Backend.Application.Exceptions;
-using PIM_III_Backend.Application.Middleware;
+using ConektaFinance.Api.Application.Exceptions;
+using ConektaFinance.Api.Application.Middleware;
 
-namespace PIM_III_Backend.Tests.Unit;
+namespace ConektaFinance.Api.Tests.Unit;
 
 public class ErrorHandlingMiddlewareTests
 {

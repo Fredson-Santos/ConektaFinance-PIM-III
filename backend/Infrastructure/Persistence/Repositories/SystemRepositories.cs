@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using PIM_III_Backend.Domain.Entities;
-using PIM_III_Backend.Domain.Enums;
-using PIM_III_Backend.Domain.Interfaces;
-using PIM_III_Backend.Domain.Models;
-using PIM_III_Backend.Infrastructure.Persistence;
+using ConektaFinance.Api.Domain.Entities;
+using ConektaFinance.Api.Domain.Enums;
+using ConektaFinance.Api.Domain.Interfaces;
+using ConektaFinance.Api.Domain.Models;
+using ConektaFinance.Api.Infrastructure.Persistence;
 
-namespace PIM_III_Backend.Infrastructure.Persistence.Repositories;
+namespace ConektaFinance.Api.Infrastructure.Persistence.Repositories;
 
 public class AlertRepository(AppDbContext context) : IAlertRepository
 {

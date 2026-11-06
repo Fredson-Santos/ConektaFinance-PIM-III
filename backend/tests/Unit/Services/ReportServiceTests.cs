@@ -1,11 +1,11 @@
 using FluentAssertions;
 using Moq;
-using PIM_III_Backend.Application.Services;
-using PIM_III_Backend.Domain.Entities;
-using PIM_III_Backend.Domain.Enums;
-using PIM_III_Backend.Domain.Interfaces;
+using ConektaFinance.Api.Application.Services;
+using ConektaFinance.Api.Domain.Entities;
+using ConektaFinance.Api.Domain.Enums;
+using ConektaFinance.Api.Domain.Interfaces;
 
-namespace PIM_III_Backend.Tests.Unit.Services;
+namespace ConektaFinance.Api.Tests.Unit.Services;
 
 public class ReportServiceTests
 {
@@ -103,7 +103,7 @@ public class ReportServiceTests
     public async Task Periodo_com_fim_antes_do_inicio_lanca_400()
     {
         var act = () => _service.GetSummaryAsync(1, new DateTime(2026, 10, 10), new DateTime(2026, 10, 1));
-        var exception = await act.Should().ThrowAsync<PIM_III_Backend.Application.Exceptions.AppException>();
+        var exception = await act.Should().ThrowAsync<ConektaFinance.Api.Application.Exceptions.AppException>();
         exception.Which.StatusCode.Should().Be(400);
     }
 }

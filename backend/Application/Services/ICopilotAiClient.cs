@@ -1,4 +1,4 @@
-namespace PIM_III_Backend.Application.Services;
+namespace ConektaFinance.Api.Application.Services;
 
 public record CategoryBudgetSnapshot(string Name, decimal Spent, decimal Limit, double Percentage, string Status);
 

@@ -8,8 +8,8 @@ cd "$(dirname "$0")/.."
 
 tmp="$(mktemp)"
 trap 'rm -f "$tmp"' EXIT
-dotnet build backend/PIM-III-Backend.csproj -v q -nologo >/dev/null
-dotnet ef migrations script --project backend/PIM-III-Backend.csproj --no-build -o "$tmp" >/dev/null
+dotnet build backend/ConektaFinance.Api.csproj -v q -nologo >/dev/null
+dotnet ef migrations script --project backend/ConektaFinance.Api.csproj --no-build -o "$tmp" >/dev/null
 
 {
   echo "-- ============================================================================"
