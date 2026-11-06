@@ -81,3 +81,8 @@ backend/wwwroot/uploads/
 
 
 dev-dist/
+
+# Pastas locais de agentes / motion
+.agents/
+.claude/
+motion/
