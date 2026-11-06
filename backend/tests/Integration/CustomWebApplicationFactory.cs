@@ -24,6 +24,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             Path.Combine(Path.GetTempPath(), "conekta-test-uploads"));
         builder.UseSetting("RateLimit:AuthPermitLimit", "10000");
         builder.UseSetting("RateLimit:AuthWindowSeconds", "60");
+        builder.UseSetting("RateLimit:OtpPermitLimit", "10000");
         builder.UseSetting("ConnectionStrings:DefaultConnection", _connectionString);
         builder.UseSetting("Admin:Email", AdminEmail);
         builder.UseSetting("Admin:Password", AdminPassword);

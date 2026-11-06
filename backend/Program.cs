@@ -172,7 +172,11 @@ builder.Services.AddRateLimiter(options =>
     options.AddPolicy("otp", context =>
         RateLimitPartition.GetFixedWindowLimiter(
             $"otp:{context.Connection.RemoteIpAddress?.ToString() ?? "anonimo"}",
-            _ => new FixedWindowRateLimiterOptions { PermitLimit = 3, Window = TimeSpan.FromSeconds(45) }));
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = builder.Configuration.GetValue("RateLimit:OtpPermitLimit", 3),
+                Window = TimeSpan.FromSeconds(builder.Configuration.GetValue("RateLimit:OtpWindowSeconds", 45))
+            }));
     options.AddPolicy("webhook", context =>
         RateLimitPartition.GetFixedWindowLimiter(
             context.Connection.RemoteIpAddress?.ToString() ?? "anonimo",
