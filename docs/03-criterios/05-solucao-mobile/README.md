@@ -32,9 +32,16 @@ No manual, sincronização significa manter o app móvel consistente com o servi
 - Não há fila offline: sem conexão, o app abre (shell em cache), mas não grava lançamentos. A escolha é intencional, porque mantém um único ponto de escrita e evita conflitos de edição entre dispositivos.
 - A atualização entre dispositivos acontece na próxima consulta (ao abrir ou trocar de tela). Não há push em tempo real (WebSocket).
 
+## Material para o relatório
+
+- [`COMPARATIVO_PLATAFORMAS.md`](COMPARATIVO_PLATAFORMAS.md): nativo × híbrido × PWA, justificativa da escolha e trecho do manifest.
+- Prints no celular real: `01-relatorio-abnt/figuras/06-PWA-*.png`.
+- Diagrama do service worker: `01-relatorio-abnt/figuras/diagramas/06-ciclo-service-worker.png`.
+
 ## Pendências
 
-- [ ] Comparativo Nativo × Híbrido × PWA
-- [ ] Prints em celular: instalação, modo standalone e fluxo de navegação
-- [ ] Diagrama do ciclo de vida do service worker
+- [x] Comparativo Nativo × Híbrido × PWA
+- [x] Prints em celular: modo standalone e fluxo de navegação
+- [ ] Prints do banner de instalação e do ícone na tela inicial (opcional)
+- [x] Diagrama do ciclo de vida do service worker
 - [ ] Redação do capítulo

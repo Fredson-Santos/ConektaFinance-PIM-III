@@ -2,6 +2,8 @@
 
 Índice da pasta `docs/`, organizada pelos critérios de avaliação do [Manual do PIM IV](00-manual-pim-iv/manual_pim_iv_ads.md) (§ 2.4 e § 2.5).
 
+> **Vai escrever o relatório?** Comece pelo [`01-relatorio-abnt/GUIA_DE_ENTREGA.md`](01-relatorio-abnt/GUIA_DE_ENTREGA.md).
+
 | Pasta | Conteúdo |
 | --- | --- |
 | [`00-manual-pim-iv/`](00-manual-pim-iv/) | Manual oficial do PIM IV (PDF original e transcrição em Markdown) |

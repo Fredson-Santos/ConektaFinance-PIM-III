@@ -12,10 +12,14 @@ Product Backlog, Sprint Backlog, cronograma das sprints, quadro Kanban e defini�
 - Issues #1–#16 da fase F14 no GitHub.
 - Histórico de commits padronizado (`tipo(escopo): descrição`).
 
+## Material para o relatório
+
+- [`GESTAO_AGIL.md`](GESTAO_AGIL.md): metodologia, papéis, Product Backlog com 22 histórias, cronograma das 4 sprints (datas do GitHub Project), Sprint Backlog, cerimônias, definição de pronto, entregas e passo a passo das capturas do Kanban.
+
 ## Pendências
 
-- [ ] Quadro Kanban no GitHub Projects (F14.15)
-- [ ] Product Backlog com user stories e critérios de aceite
-- [ ] Sprint Backlog e cronograma das sprints
-- [ ] Cerimônias adotadas (planning, daily, review e retrospectiva)
+- [ ] Criar a visão *Board* no GitHub Project e capturar o Kanban, antes e depois de fechar a issue #16 (F14.15)
+- [x] Product Backlog com user stories e critérios de aceite
+- [x] Sprint Backlog e cronograma das sprints
+- [ ] Grupo confirmar papéis e como as cerimônias aconteceram
 - [ ] Redação do capítulo

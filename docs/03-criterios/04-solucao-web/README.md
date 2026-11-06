@@ -23,7 +23,11 @@ Arquitetura da aplicação, APIs REST, autenticação, segurança, estrutura adm
 - Estrutura administrativa: `AdminController` com `[Authorize(Roles)]` e tela `/admin` em [`frontend/src/views/admin/`](../../../frontend/src/views/admin/).
 - Testes de integração: [`backend/tests/Integration/`](../../../backend/tests/Integration/).
 
+## Figuras
+
+Prints do Swagger, das telas web e do painel administrativo: [`01-relatorio-abnt/figuras/`](../../01-relatorio-abnt/figuras/) (`05-*.png`). Diagramas de camadas e de classes em `figuras/diagramas/`. POO e SOLID com trechos do código: [`06-arquitetura-software/POO_SOLID.md`](../06-arquitetura-software/POO_SOLID.md).
+
 ## Pendências
 
-- [ ] Prints do Swagger, das telas web e do painel administrativo
+- [x] Prints do Swagger, das telas web e do painel administrativo
 - [ ] Redação do capítulo

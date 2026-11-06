@@ -12,6 +12,7 @@ Modelo lógico, modelo físico, MER, procedures, triggers e script completo do b
 | --- | --- |
 | [`03_MODELO_DADOS.md`](03_MODELO_DADOS.md) | Dicionário e modelo de dados |
 | [`DIAGRAMA_ER.md`](DIAGRAMA_ER.md) | Diagrama ER em Mermaid (planejamento) |
+| [`PROCEDURES_TRIGGERS.md`](PROCEDURES_TRIGGERS.md) | Trechos selecionados das procedures, functions e triggers, com a explicação de cada um |
 
 ## Evidências no código
 
@@ -22,4 +23,5 @@ Modelo lógico, modelo físico, MER, procedures, triggers e script completo do b
 
 ## Pendências
 
-- [ ] Redação do capítulo com os diagramas e trechos das procedures e triggers
+- [x] Seleção dos trechos de procedures e triggers ([`PROCEDURES_TRIGGERS.md`](PROCEDURES_TRIGGERS.md))
+- [ ] Redação do capítulo com os diagramas e os trechos

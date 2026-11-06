@@ -1,6 +1,13 @@
 # 📝 Relatório ABNT (parte escrita)
 
-> **Status:** não iniciado.
+> **Status:** material de apoio pronto; redação não iniciada. **Comece pelo [`GUIA_DE_ENTREGA.md`](GUIA_DE_ENTREGA.md).**
+
+| Arquivo | Conteúdo |
+| --- | --- |
+| [`GUIA_DE_ENTREGA.md`](GUIA_DE_ENTREGA.md) | Roteiro por capítulo: material, figuras, páginas sugeridas, pendências do grupo e checklist |
+| [`DADOS_PRE_TEXTUAIS.md`](DADOS_PRE_TEXTUAIS.md) | Capa, folha de rosto, palavras-chave |
+| [`REFERENCIAS.md`](REFERENCIAS.md) | Banco de referências ABNT por capítulo |
+| [`figuras/`](figuras/) | Capturas e diagramas, com índice no README |
 > Critério 01 — Formatação ABNT rigorosa / Referência a livros (1,0 pt). Trabalhos fora do padrão ABNT podem ser reprovados sumariamente.
 
 ## Estrutura obrigatória (manual § 2.5)

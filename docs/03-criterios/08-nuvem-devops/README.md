@@ -14,5 +14,5 @@ Arquitetura em nuvem, serviços utilizados, containers, pipeline CI/CD, monitora
 
 ## Pendências
 
-- [ ] Diagrama da arquitetura em nuvem (VPS, proxy reverso, SSL, containers e volumes)
+- [x] Diagrama da arquitetura em nuvem: `01-relatorio-abnt/figuras/diagramas/08-arquitetura-nuvem.png`
 - [ ] Redação do capítulo
