@@ -109,7 +109,7 @@ const browser = await chromium.launch()
   await context.close()
 }
 
-// As telas do PWA (capítulo 6) foram capturadas em um celular real: figuras/01-PWA-*.png.
+// As telas do PWA (capítulo 6) foram capturadas em um celular real: figuras/06-PWA-*.png.
 
 await browser.close()
 
